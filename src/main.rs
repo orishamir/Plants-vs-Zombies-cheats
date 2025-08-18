@@ -6,6 +6,7 @@ use gui::MyApp;
 
 mod game;
 mod gui;
+mod models;
 mod toggleables;
 
 fn main() -> eframe::Result {

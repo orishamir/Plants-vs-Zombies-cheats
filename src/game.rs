@@ -43,6 +43,7 @@ pub struct GameProcess {
 }
 
 impl GameProcess {
+    #[allow(dead_code)]
     pub fn read<T: Copy>(&self, offsets: &[usize]) -> Result<T, std::io::Error> {
         let mut offsets = Vec::<usize>::from(offsets);
         if !offsets.is_empty() {

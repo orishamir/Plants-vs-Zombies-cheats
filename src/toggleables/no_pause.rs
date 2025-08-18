@@ -3,8 +3,6 @@ use crate::game::GameProcess;
 
 const INSTRUCTION_OFFSETS: [usize; 1] = [0x1924B];
 
-#[derive(Default)]
-
 /// The cheat modifies the instructions like this:
 /// ```diff
 /// popcapgame1.exe+19244 - 80 BD 7C010000 00     - cmp byte ptr [ebp+0000017C],00
@@ -19,6 +17,7 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x1924B];
 /// I change it to run regardless.
 ///
 /// TODO: Hide "pause" menu
+#[derive(Default)]
 pub struct NoPauseCheat {}
 
 impl Toggleable for NoPauseCheat {
