@@ -1,7 +1,8 @@
-mod lawnmower;
-mod plant;
-mod plant_type;
-mod projectile;
-mod projectile_type;
-mod zombie;
-mod zombie_type;
+pub mod entities;
+pub mod lawnmower;
+pub mod plant;
+pub mod plant_type;
+pub mod projectile;
+pub mod projectile_type;
+pub mod zombie;
+pub mod zombie_type;

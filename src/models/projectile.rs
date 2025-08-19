@@ -1,6 +1,7 @@
 use crate::models::projectile_type::ProjectileType;
 
 #[allow(dead_code)]
+#[derive(Debug, Clone, Copy)]
 pub struct Projectile {
     display_pos_x: u32,
     display_pos_y: u32,

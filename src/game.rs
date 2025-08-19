@@ -39,18 +39,31 @@ pub fn get_base_module_address(module_name: &str, pid: u32) -> Option<usize> {
 #[derive(Debug)]
 pub struct GameProcess {
     handle: ProcessHandle,
-    base_address: usize,
+    pub base_address: usize,
 }
 
+#[allow(dead_code)]
 impl GameProcess {
-    #[allow(dead_code)]
     pub fn read<T: Copy>(&self, offsets: &[usize]) -> Result<T, std::io::Error> {
-        let mut offsets = Vec::<usize>::from(offsets);
-        if !offsets.is_empty() {
-            offsets[0] += self.base_address;
-        }
+        let offsets = Vec::<usize>::from(offsets);
 
         let member = DataMember::<T>::new_offset(self.handle, offsets);
+        unsafe { member.read() }
+    }
+
+    pub fn read_with_base_addr<T: Copy>(&self, offsets: &[usize]) -> Result<T, std::io::Error> {
+        let mut out = offsets.to_vec();
+        if let Some(first) = out.first_mut() {
+            *first += self.base_address
+        }
+
+        return self.read(&out);
+    }
+
+    /// Read memory at `addr`
+    pub fn read_at<T: Copy>(&self, addr: usize) -> Result<T, std::io::Error> {
+        let member = DataMember::<T>::new_offset(self.handle, vec![addr]);
+        println!("{:x}", member.get_offset().unwrap());
         unsafe { member.read() }
     }
 

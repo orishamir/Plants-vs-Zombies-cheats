@@ -4,12 +4,30 @@ use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
 
+use crate::{
+    game::GameProcess,
+    models::{entities::Entities, zombie::Zombie},
+};
+
 mod game;
 mod gui;
 mod models;
 mod toggleables;
 
-fn main() -> eframe::Result {
+fn main() {
+    let proc = GameProcess::default();
+    // [[[[[[[<popcapgame1.exe>+]+]+]+0]+3dc]+4]+0]+a4
+    let ents = proc
+        .read_with_base_addr::<Entities>(&[0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4])
+        .expect("oh no");
+    println!("{}", size_of::<Zombie>());
+    let x = proc
+        .read::<Zombie>(&[ents.zombies_ptr as usize])
+        .expect("oh no");
+    println!("{:#?}", x)
+}
+
+fn _main2() -> eframe::Result {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
     let options = NativeOptions {
         viewport: ViewportBuilder::default()

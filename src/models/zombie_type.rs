@@ -1,5 +1,6 @@
 #[allow(dead_code)]
 #[repr(u32)]
+#[derive(Debug, Copy, Clone)]
 pub enum ZombieType {
     Zombie,
     FlagZombie,

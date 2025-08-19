@@ -1,5 +1,6 @@
 #[allow(dead_code)]
 #[repr(u32)]
+#[derive(Debug, Clone, Copy)]
 pub enum LawnmowerType {
     Normal = 0,
     PoolCleaner = 1,
