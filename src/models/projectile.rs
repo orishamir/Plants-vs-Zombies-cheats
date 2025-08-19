@@ -1,11 +1,35 @@
+use std::fmt::Debug;
+
 use crate::models::projectile_type::ProjectileType;
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
+#[repr(C, packed)]
 pub struct Projectile {
-    display_pos_x: u32,
-    display_pos_y: u32,
-    pos_x: f32,
-    pos_y: f32,
-    projectile_type: ProjectileType,
+    _pad1: [u8; 8],
+    pub display_pos_x: u32,
+    pub display_pos_y: u32,
+    _pad2: [u8; 32],
+    pub pos_x: f32,
+    pub pos_y_1: f32,
+    _pad3: [u8; 20],
+    pub pos_y_2: f32,
+    pub is_deleted: u32,
+    _pad4: [u8; 8],
+    pub projectile_type: u32,
+    _pad5: [u8; 52],
+}
+
+impl Debug for Projectile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Projectile")
+            .field("display_pos_x", &{ self.display_pos_x })
+            .field("display_pos_y", &{ self.display_pos_y })
+            .field("pos_x", &{ self.pos_x })
+            .field("pos_y_1", &{ self.pos_y_1 })
+            .field("pos_y_2", &{ self.pos_y_2 })
+            .field("is_deleted", &{ self.is_deleted })
+            .field("projectile_type", &{ self.projectile_type })
+            .finish()
+    }
 }
