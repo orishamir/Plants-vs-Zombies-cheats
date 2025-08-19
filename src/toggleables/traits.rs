@@ -14,6 +14,7 @@ pub trait Toggleable {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub enum ToggleCheatError {
     IoError(std::io::Error),
 }

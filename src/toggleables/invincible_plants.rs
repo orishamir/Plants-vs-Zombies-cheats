@@ -9,7 +9,7 @@ pub struct InvinciblePlantsCheat {}
 impl Toggleable for InvinciblePlantsCheat {
     fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
         Ok(process.write::<[u8; 4]>(
-            &INSTRUCTION_OFFSETS.to_vec(),
+            &INSTRUCTION_OFFSETS,
             [
                 0x90, 0x90, 0x90, 0x90, // NOPs
             ],
@@ -18,7 +18,7 @@ impl Toggleable for InvinciblePlantsCheat {
 
     fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
         Ok(process.write::<[u8; 4]>(
-            &INSTRUCTION_OFFSETS.to_vec(),
+            &INSTRUCTION_OFFSETS,
             [
                 0x83, 0x46, 0x40, 0xFC, // add dword ptr [esi + 0x40], -04
             ],

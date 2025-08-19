@@ -54,9 +54,9 @@ pub enum PlantType {
     ReverseRepeater,
 }
 
-impl Into<u32> for PlantType {
-    fn into(self) -> u32 {
-        match self {
+impl From<PlantType> for u32 {
+    fn from(val: PlantType) -> Self {
+        match val {
             PlantType::Peashooter => 0,
             PlantType::Sunflower => 1,
             PlantType::CherryBomb => 2,

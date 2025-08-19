@@ -2,6 +2,7 @@ use super::plant_type::PlantType;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
+#[repr(C, packed)]
 pub struct Plant {
     display_pos_x: u32,
     display_pos_y: u32,

@@ -11,8 +11,10 @@ pub fn get_base_module_address(module_name: &str, pid: u32) -> Option<usize> {
             return None;
         }
 
-        let mut module_entry = MODULEENTRY32::default();
-        module_entry.dwSize = std::mem::size_of::<MODULEENTRY32>() as u32;
+        let mut module_entry = MODULEENTRY32 {
+            dwSize: size_of::<MODULEENTRY32>() as u32,
+            ..Default::default()
+        };
         if Module32First(snapshot, &mut module_entry).as_bool() {
             loop {
                 let name_bytes = module_entry.szModule;
@@ -39,7 +41,7 @@ pub fn get_base_module_address(module_name: &str, pid: u32) -> Option<usize> {
 #[derive(Debug)]
 pub struct GameProcess {
     handle: ProcessHandle,
-    pub base_address: usize,
+    base_address: usize,
 }
 
 #[allow(dead_code)]
@@ -57,14 +59,12 @@ impl GameProcess {
             *first += self.base_address
         }
 
-        return self.read(&out);
+        self.read(&out)
     }
 
     /// Read memory at `addr`
     pub fn read_at<T: Copy>(&self, addr: usize) -> Result<T, std::io::Error> {
-        let member = DataMember::<T>::new_offset(self.handle, vec![addr]);
-        println!("{:x}", member.get_offset().unwrap());
-        unsafe { member.read() }
+        self.read(&[addr])
     }
 
     pub fn write<T: Copy>(&self, offsets: &[usize], value: T) -> Result<(), std::io::Error> {
@@ -97,7 +97,7 @@ impl Default for GameProcess {
                 .expect("popcapgame1.exe module not found");
 
         Self {
-            handle: handle,
+            handle,
             base_address: module_base_address,
         }
     }

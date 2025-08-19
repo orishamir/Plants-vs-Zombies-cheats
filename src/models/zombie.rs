@@ -1,17 +1,16 @@
 #![allow(dead_code)]
 
-use std::fmt::{Debug, write};
+use std::fmt::Debug;
 
-use crate::models::zombie_type::ZombieType;
 enum ArmorType {
     None,
     Cone,
     Bucket,
 }
 
-impl Into<u32> for ArmorType {
-    fn into(self) -> u32 {
-        match self {
+impl From<ArmorType> for u32 {
+    fn from(val: ArmorType) -> Self {
+        match val {
             ArmorType::None => 0,
             ArmorType::Cone => 1,
             ArmorType::Bucket => 2,
@@ -19,7 +18,7 @@ impl Into<u32> for ArmorType {
     }
 }
 
-#[repr(packed)]
+#[repr(C, packed)]
 #[derive(Clone, Copy)]
 pub struct Zombie {
     _pad1: [u8; 8],

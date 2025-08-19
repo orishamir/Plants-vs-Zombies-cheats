@@ -17,22 +17,22 @@ pub enum ProjectileType {
     Butterstick,
 }
 
-impl Into<u32> for ProjectileType {
-    fn into(self) -> u32 {
-        match self {
-            Self::Pea => 0,
-            Self::FrozenPea => 1,
-            Self::Cabbage => 2,
-            Self::Watermelon => 3,
-            Self::Puff => 4,
-            Self::WinterMelon => 5,
-            Self::FlamingPea => 6,
-            Self::Star => 7,
-            Self::Cacti => 8,
-            Self::Basketball => 9,
-            Self::Corn => 10,
-            Self::GiantCorn => 11,
-            Self::Butterstick => 12,
+impl From<ProjectileType> for u32 {
+    fn from(val: ProjectileType) -> Self {
+        match val {
+            ProjectileType::Pea => 0,
+            ProjectileType::FrozenPea => 1,
+            ProjectileType::Cabbage => 2,
+            ProjectileType::Watermelon => 3,
+            ProjectileType::Puff => 4,
+            ProjectileType::WinterMelon => 5,
+            ProjectileType::FlamingPea => 6,
+            ProjectileType::Star => 7,
+            ProjectileType::Cacti => 8,
+            ProjectileType::Basketball => 9,
+            ProjectileType::Corn => 10,
+            ProjectileType::GiantCorn => 11,
+            ProjectileType::Butterstick => 12,
         }
     }
 }

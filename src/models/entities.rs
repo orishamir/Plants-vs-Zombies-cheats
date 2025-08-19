@@ -1,5 +1,5 @@
 #[allow(dead_code)]
-#[repr(packed)]
+#[repr(C, packed)]
 #[derive(Copy, Clone, Debug)]
 pub struct Entities {
     // Zombies

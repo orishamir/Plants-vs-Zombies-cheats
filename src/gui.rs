@@ -1,9 +1,9 @@
 use crate::game::GameProcess;
 use crate::toggleables::{
-    FastChomperCheat, FreePlantsCheat, InfiniteLawnmowersCheat, InstantRechargeCheat,
-    InvinciblePlantsCheat, NoPauseCheat, PlantAnywhereCheat, Toggleable,
+    FastChomperCheat, FreePlantsCheat, InstantRechargeCheat, InvinciblePlantsCheat, NoPauseCheat,
+    PlantAnywhereCheat, Toggleable,
 };
-use egui::{self, Atom, AtomExt, Rgba, Ui, Vec2};
+use egui::{self, AtomExt, Rgba, Ui};
 
 struct Cheats {
     toggleables: Vec<Box<dyn Toggleable>>,
@@ -17,7 +17,6 @@ impl Default for Cheats {
             Box::new(PlantAnywhereCheat {}),
             Box::new(FreePlantsCheat {}),
             Box::new(InstantRechargeCheat {}),
-            Box::new(InfiniteLawnmowersCheat {}),
             Box::new(FastChomperCheat {}),
             Box::new(NoPauseCheat {}),
         ];
@@ -36,14 +35,14 @@ pub struct MyApp {
 
 impl MyApp {
     fn render_toggleables(&mut self, ui: &mut Ui) {
-        for (toggleable, mut toggled) in self
+        for (toggleable, toggled) in self
             .cheats
             .toggleables
             .iter_mut()
             .zip(&mut self.cheats.toggled)
         {
             if ui
-                .checkbox(&mut toggled, toggleable.get_name().atom_grow(true))
+                .checkbox(toggled, toggleable.get_name().atom_grow(true))
                 .changed()
             {
                 toggleable
@@ -71,9 +70,7 @@ impl Default for MyApp {
         let popcapgame = GameProcess::default();
 
         let cheats: Cheats = Default::default();
-        Self {
-            cheats: cheats,
-            popcapgame: popcapgame,
-        }
+
+        Self { cheats, popcapgame }
     }
 }

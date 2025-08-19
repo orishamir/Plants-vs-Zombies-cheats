@@ -24,7 +24,7 @@ fn main() {
     let x = proc
         .read::<Zombie>(&[ents.zombies_ptr as usize])
         .expect("oh no");
-    println!("{:#?}", x)
+    println!("{x:#?}")
 }
 
 fn _main2() -> eframe::Result {

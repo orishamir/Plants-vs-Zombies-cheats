@@ -8,13 +8,13 @@ pub enum LawnmowerType {
     Unidentifiable = 3,
 }
 
-impl Into<u32> for LawnmowerType {
-    fn into(self) -> u32 {
-        match self {
-            Self::Normal => 0,
-            Self::PoolCleaner => 1,
-            Self::RoofCleaner => 2,
-            Self::Unidentifiable => 3,
+impl From<LawnmowerType> for u32 {
+    fn from(val: LawnmowerType) -> Self {
+        match val {
+            LawnmowerType::Normal => 0,
+            LawnmowerType::PoolCleaner => 1,
+            LawnmowerType::RoofCleaner => 2,
+            LawnmowerType::Unidentifiable => 3,
         }
     }
 }
@@ -27,17 +27,18 @@ pub enum LawnmowerMode {
     Running = 2,
 }
 
-impl Into<u32> for LawnmowerMode {
-    fn into(self) -> u32 {
-        match self {
-            Self::Resetting => 0,
-            Self::Normal => 1,
-            Self::Running => 2,
+impl From<LawnmowerMode> for u32 {
+    fn from(val: LawnmowerMode) -> Self {
+        match val {
+            LawnmowerMode::Resetting => 0,
+            LawnmowerMode::Normal => 1,
+            LawnmowerMode::Running => 2,
         }
     }
 }
 
 #[allow(dead_code)]
+#[repr(C, packed)]
 pub struct Lawnmower {
     display_pos_x: f32,
     display_pos_y: f32,

@@ -19,6 +19,7 @@ const COOLDOWN_INSTRUCTION_OFFSET: [usize; 1] = [0x69648]; // "popcapgame1.exe" 
 #[derive(Default)]
 pub struct FastChomperCheat {}
 
+#[allow(dead_code)]
 enum ChomperState {
     WaitingForPrey, // Pretty much "idle"
     Targeting,
@@ -27,14 +28,14 @@ enum ChomperState {
     FinishedEating, // I'm not sure the difference between this and 1.
 }
 
-impl Into<u8> for ChomperState {
-    fn into(self) -> u8 {
-        match self {
-            Self::WaitingForPrey => 1,
-            Self::Targeting => 10,
-            Self::KilledZombie => 11,
-            Self::Digesting => 13,
-            Self::FinishedEating => 14,
+impl From<ChomperState> for u8 {
+    fn from(val: ChomperState) -> Self {
+        match val {
+            ChomperState::WaitingForPrey => 1,
+            ChomperState::Targeting => 10,
+            ChomperState::KilledZombie => 11,
+            ChomperState::Digesting => 13,
+            ChomperState::FinishedEating => 14,
         }
     }
 }
@@ -43,7 +44,7 @@ impl Toggleable for FastChomperCheat {
     fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xE
         process.write::<[u8; 7]>(
-            &INSTRUCTION_OFFSET1.to_vec(),
+            &INSTRUCTION_OFFSET1,
             [
                 0xC7,
                 0x47,
@@ -57,7 +58,7 @@ impl Toggleable for FastChomperCheat {
 
         // mov [edi + 3C], 0xE
         process.write::<[u8; 7]>(
-            &INSTRUCTION_OFFSET2.to_vec(),
+            &INSTRUCTION_OFFSET2,
             [
                 0xC7,
                 0x47,
@@ -72,14 +73,14 @@ impl Toggleable for FastChomperCheat {
         // Momenterally restore all currently-digesting Choppers
         // to their normal state by setting the timer to 0.
         process.write::<[u8; 4]>(
-            &COOLDOWN_INSTRUCTION_OFFSET.to_vec(),
+            &COOLDOWN_INSTRUCTION_OFFSET,
             [
                 0x83, 0x67, 0x54, 0x00, // and dword ptr [edi + 54], 0x0
             ],
         )?;
         std::thread::sleep(Duration::from_millis(500));
         process.write::<[u8; 4]>(
-            &COOLDOWN_INSTRUCTION_OFFSET.to_vec(),
+            &COOLDOWN_INSTRUCTION_OFFSET,
             [
                 0x48, // dec eax
                 0x89, 0x47, 0x54, // mov [edi + 54], eax
@@ -92,7 +93,7 @@ impl Toggleable for FastChomperCheat {
     fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xD
         process.write::<[u8; 7]>(
-            &INSTRUCTION_OFFSET1.to_vec(),
+            &INSTRUCTION_OFFSET1,
             [
                 0xC7,
                 0x47,
@@ -106,7 +107,7 @@ impl Toggleable for FastChomperCheat {
 
         // mov [edi + 3C], 0xB
         process.write::<[u8; 7]>(
-            &INSTRUCTION_OFFSET2.to_vec(),
+            &INSTRUCTION_OFFSET2,
             [
                 0xC7,
                 0x47,
