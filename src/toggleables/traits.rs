@@ -3,7 +3,7 @@ use crate::game::GameProcess;
 pub trait Toggleable {
     fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError>;
     fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError>;
-    fn get_name(&self) -> &'static str;
+    fn name(&self) -> &'static str;
     fn toggle(&mut self, process: &GameProcess, toggled: bool) -> Result<(), ToggleCheatError> {
         if toggled {
             self.activate(process)

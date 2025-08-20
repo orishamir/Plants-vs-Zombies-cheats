@@ -37,8 +37,8 @@ pub enum ZombieType {
 impl Debug for ZombieType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let raw_value = unsafe { transmute::<&Self, &u32>(self) };
-        if !matches!(raw_value, 0..25 | 32) {
-            return write!(f, "Unknown");
+        if !matches!(raw_value, 0..=25 | 32) {
+            return write!(f, "{raw_value}");
         }
 
         match self {

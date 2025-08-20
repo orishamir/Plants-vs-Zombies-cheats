@@ -8,7 +8,7 @@ pub struct InstantRechargeCheat {}
 
 impl Toggleable for InstantRechargeCheat {
     fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
-        Ok(process.write::<[u8; 9]>(
+        Ok(process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0x81, 0x47, 0x24, 0x0, 0x2, 0x0, 0x0,  // add [edi+24], 000200
@@ -19,7 +19,7 @@ impl Toggleable for InstantRechargeCheat {
     }
 
     fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
-        Ok(process.write::<[u8; 9]>(
+        Ok(process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0xff, 0x47, 0x24, // inc [edi + 24]
@@ -29,7 +29,7 @@ impl Toggleable for InstantRechargeCheat {
         )?)
     }
 
-    fn get_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Instant Plant Recharge"
     }
 }

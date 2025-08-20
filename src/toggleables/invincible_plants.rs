@@ -8,12 +8,7 @@ pub struct InvinciblePlantsCheat {}
 
 impl Toggleable for InvinciblePlantsCheat {
     fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
-        Ok(process.write::<[u8; 4]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0x90, 0x90, 0x90, 0x90, // NOPs
-            ],
-        )?)
+        Ok(process.write::<[u8; 4]>(&INSTRUCTION_OFFSETS, [0x90; _])?)
     }
 
     fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
@@ -25,7 +20,7 @@ impl Toggleable for InvinciblePlantsCheat {
         )?)
     }
 
-    fn get_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Invincible Plants"
     }
 }

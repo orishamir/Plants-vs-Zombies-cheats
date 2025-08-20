@@ -43,7 +43,7 @@ impl From<ChomperState> for u8 {
 impl Toggleable for FastChomperCheat {
     fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xE
-        process.write::<[u8; 7]>(
+        process.write::<[u8; _]>(
             &INSTRUCTION_OFFSET1,
             [
                 0xC7,
@@ -57,7 +57,7 @@ impl Toggleable for FastChomperCheat {
         )?;
 
         // mov [edi + 3C], 0xE
-        process.write::<[u8; 7]>(
+        process.write::<[u8; _]>(
             &INSTRUCTION_OFFSET2,
             [
                 0xC7,
@@ -121,7 +121,7 @@ impl Toggleable for FastChomperCheat {
         Ok(())
     }
 
-    fn get_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Hungry Chompers"
     }
 }

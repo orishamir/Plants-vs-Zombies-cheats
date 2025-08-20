@@ -17,7 +17,7 @@ impl Toggleable for FreePlantsCheat {
     }
 
     fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
-        Ok(process.write::<[u8; 2]>(
+        Ok(process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0x29, 0xde, // sub esi, ebx
@@ -25,7 +25,7 @@ impl Toggleable for FreePlantsCheat {
         )?)
     }
 
-    fn get_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Free Plants"
     }
 }

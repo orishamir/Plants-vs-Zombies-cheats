@@ -25,7 +25,7 @@ impl Toggleable for PlantAnywhereCheat {
         )?)
     }
 
-    fn get_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Plant Anywhere"
     }
 }

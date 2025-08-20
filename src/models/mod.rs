@@ -12,7 +12,7 @@ mod zombie_type;
 
 pub use coin::{Coin, CoinType};
 pub use entities::Entities;
-pub use griditem::{Griditem, GriditemType};
+pub use griditem::{Griditem, GriditemType, VaseType};
 pub use plant::Plant;
 pub use plant_type::PlantType;
 pub use projectile::Projectile;

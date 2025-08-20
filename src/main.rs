@@ -1,10 +1,15 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use std::{thread, time::Duration};
+
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
 
-use crate::game::GameProcess;
+use crate::{
+    game::GameProcess,
+    models::{Griditem, PlantType, VaseType},
+};
 
 mod entities_loader;
 mod game;
@@ -14,14 +19,22 @@ mod toggleables;
 
 fn main() {
     let proc = GameProcess::default();
-    let loader = entities_loader::EntitiesLoader::load(&proc).unwrap();
-    println!("{:#?}", loader.griditems);
-    // loop {
-    //     println!("{:#?}", loader.coins);
-    //     let loader = entities_loader::EntitiesLoader::load(&proc).unwrap();
-    //     thread::sleep(Duration::from_millis(500));
-    //     print!("\x1B[2J\x1B[1;1H");
-    // }
+    // let loader = entities_loader::EntitiesLoader::load(&proc).unwrap();
+    // println!("{:#?}", loader.griditems);
+    loop {
+        let loader = entities_loader::EntitiesLoader::load(&proc).unwrap();
+        println!(
+            "{:#?}",
+            loader
+                .griditems
+                .iter()
+                // .filter(|item| { matches!(item.plant_type, PlantType::Plantern) })
+                .filter(|item| { matches!(item.vase_type, VaseType::ConfirmedPlant) })
+                .collect::<Vec<_>>()
+        );
+        thread::sleep(Duration::from_millis(500));
+        print!("\x1B[2J\x1B[1;1H");
+    }
 }
 
 fn _main() -> eframe::Result {

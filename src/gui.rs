@@ -1,7 +1,7 @@
 use crate::game::GameProcess;
 use crate::toggleables::{
     FastChomperCheat, FreePlantsCheat, InstantRechargeCheat, InvinciblePlantsCheat, NoPauseCheat,
-    PlantAnywhereCheat, Toggleable,
+    PlantAnywhereCheat, SeethroughVasesCheat, Toggleable,
 };
 use egui::{self, AtomExt, Rgba, Ui};
 
@@ -19,6 +19,7 @@ impl Default for Cheats {
             Box::new(InstantRechargeCheat {}),
             Box::new(FastChomperCheat {}),
             Box::new(NoPauseCheat {}),
+            Box::new(SeethroughVasesCheat {}),
         ];
 
         Self {
@@ -42,13 +43,13 @@ impl MyApp {
             .zip(&mut self.cheats.toggled)
         {
             if ui
-                .checkbox(toggled, toggleable.get_name().atom_grow(true))
+                .checkbox(toggled, toggleable.name().atom_grow(true))
                 .changed()
             {
                 toggleable
                     .toggle(&self.popcapgame, *toggled)
                     .expect("What the actual sigma");
-                println!("Detected change in {} to {toggled}", toggleable.get_name(),);
+                println!("Detected change in {} to {toggled}", toggleable.name(),);
             }
         }
     }

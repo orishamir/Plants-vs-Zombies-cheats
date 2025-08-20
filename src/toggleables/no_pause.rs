@@ -39,7 +39,7 @@ impl Toggleable for NoPauseCheat {
         )?)
     }
 
-    fn get_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "No Pause"
     }
 }
