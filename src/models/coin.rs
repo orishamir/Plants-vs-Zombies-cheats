@@ -42,3 +42,13 @@ pub enum CoinType {
     Sun = 4,
     GiantBagOfCash = 18,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_struct_size() {
+        assert_eq!(size_of::<Coin>(), 216);
+    }
+}

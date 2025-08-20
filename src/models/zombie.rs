@@ -51,3 +51,13 @@ impl Debug for Zombie {
             .finish()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_struct_size() {
+        assert_eq!(size_of::<Zombie>(), 360);
+    }
+}

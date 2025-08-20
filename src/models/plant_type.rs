@@ -2,7 +2,7 @@ use std::{fmt::Debug, mem::transmute};
 
 #[allow(dead_code)]
 #[repr(u32)]
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy)]
 pub enum PlantType {
     Peashooter = 0,
     Sunflower = 1,
@@ -59,7 +59,7 @@ impl Debug for PlantType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let raw_value = unsafe { transmute::<&Self, &u32>(self) };
         if !matches!(raw_value, 0..=47 | 52) {
-            return write!(f, "Unknown");
+            return write!(f, "{raw_value}");
         }
 
         match self {

@@ -29,7 +29,7 @@ fn main() {
                 .griditems
                 .iter()
                 // .filter(|item| { matches!(item.plant_type, PlantType::Plantern) })
-                .filter(|item| { matches!(item.vase_type, VaseType::ConfirmedPlant) })
+                .filter(|item| { matches!(item.vase_type, VaseType::Plant) })
                 .collect::<Vec<_>>()
         );
         thread::sleep(Duration::from_millis(500));

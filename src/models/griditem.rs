@@ -72,13 +72,14 @@ impl Debug for GriditemType {
 #[allow(dead_code)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
+/// See [Kinds of vases](https://plantsvszombies.fandom.com/wiki/Vasebreaker?file=Scary_Pot.png)
 pub enum VaseType {
     /// Normal vase
-    Hidden = 3,
+    Mistery = 3,
     /// The green vase
-    ConfirmedPlant = 4,
+    Plant = 4,
     /// The zombie vase
-    ConfirmedZombie = 5,
+    Zombie = 5,
 }
 
 impl Debug for VaseType {
@@ -89,9 +90,19 @@ impl Debug for VaseType {
         }
 
         match self {
-            Self::Hidden => write!(f, "Hidden"),
-            Self::ConfirmedPlant => write!(f, "ConfirmedPlant"),
-            Self::ConfirmedZombie => write!(f, "ConfirmedZombie"),
+            Self::Mistery => write!(f, "Mistery"),
+            Self::Plant => write!(f, "Plant"),
+            Self::Zombie => write!(f, "Zombie"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_struct_size() {
+        assert_eq!(size_of::<Griditem>(), 236);
     }
 }

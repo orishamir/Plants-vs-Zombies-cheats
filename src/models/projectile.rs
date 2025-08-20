@@ -33,3 +33,13 @@ impl Debug for Projectile {
             .finish()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_struct_size() {
+        assert_eq!(size_of::<Projectile>(), 148);
+    }
+}
