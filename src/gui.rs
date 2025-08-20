@@ -62,7 +62,13 @@ impl eframe::App for MyApp {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.set_pixels_per_point(1.3);
-        egui::Window::new("Toggleables").show(ctx, |ui| self.render_toggleables(ui));
+        egui::Window::new("Toggleables").show(ctx, |ui| {
+            self.render_toggleables(ui);
+            // if ui.button("hey").clicked() {
+            // let gui = OverlayGui::default();
+            // gui.start();
+            // }
+        });
     }
 }
 
@@ -70,8 +76,9 @@ impl Default for MyApp {
     fn default() -> Self {
         let popcapgame = GameProcess::default();
 
-        let cheats: Cheats = Default::default();
-
-        Self { cheats, popcapgame }
+        Self {
+            cheats: Default::default(),
+            popcapgame,
+        }
     }
 }

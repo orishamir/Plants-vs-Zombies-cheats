@@ -14,8 +14,8 @@ pub struct Projectile {
     pub pos_y_1: f32,
     _pad3: [u8; 20],
     pub pos_y_2: f32,
-    pub is_deleted: u32,
-    _pad4: [u8; 8],
+    pub is_deleted: bool,
+    _pad4: [u8; 11],
     pub projectile_type: u32,
     _pad5: [u8; 52],
 }

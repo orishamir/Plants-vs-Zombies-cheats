@@ -1,7 +1,12 @@
 use process_memory::{DataMember, Memory, ProcessHandle, TryIntoProcessHandle};
 use std::ffi::OsStr;
-use windows::Win32::System::Diagnostics::ToolHelp::{
-    CreateToolhelp32Snapshot, MODULEENTRY32, Module32First, Module32Next, TH32CS_SNAPMODULE,
+use sysinfo::Pid;
+use windows::Win32::{
+    Foundation::{HWND, RECT},
+    System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, MODULEENTRY32, Module32First, Module32Next, TH32CS_SNAPMODULE,
+    },
+    UI::WindowsAndMessaging,
 };
 
 pub fn get_base_module_address(module_name: &str, pid: u32) -> Option<usize> {
@@ -41,11 +46,23 @@ pub fn get_base_module_address(module_name: &str, pid: u32) -> Option<usize> {
 #[derive(Debug)]
 pub struct GameProcess {
     handle: ProcessHandle,
+    pid: Pid,
     base_address: usize,
 }
 
 #[allow(dead_code)]
 impl GameProcess {
+    pub fn get_rect_size(&self) -> RECT {
+        let mut rect = RECT::default();
+        unsafe {
+            let _ = WindowsAndMessaging::GetWindowRect(
+                main_window_by_pid(self.pid.as_u32()).expect("asd"),
+                &mut rect,
+            );
+        }
+        rect
+    }
+
     pub fn read<T: Copy>(&self, offsets: &[usize]) -> Result<T, std::io::Error> {
         let offsets = Vec::<usize>::from(offsets);
 
@@ -98,7 +115,67 @@ impl Default for GameProcess {
 
         Self {
             handle,
+            pid: popcapgame.pid(),
             base_address: module_base_address,
         }
     }
+}
+
+use std::mem::size_of;
+use windows::Win32::Foundation::{BOOL, LPARAM};
+use windows::Win32::Graphics::Dwm::{DWMWA_CLOAKED, DwmGetWindowAttribute};
+use windows::Win32::UI::WindowsAndMessaging::{
+    EnumWindows, GW_OWNER, GWL_EXSTYLE, GetWindow, GetWindowLongPtrW, GetWindowTextLengthW,
+    GetWindowThreadProcessId, IsWindowVisible, WS_EX_TOOLWINDOW,
+};
+
+/// Heuristic: visible, not owned, not toolwindow, not DWM-cloaked, has title.
+fn main_window_by_pid(pid: u32) -> Option<HWND> {
+    #[derive(Debug)]
+    struct Data {
+        pid: u32,
+        found: Option<HWND>,
+    }
+
+    unsafe extern "system" fn enum_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
+        let data = unsafe { &mut *(lparam.0 as *mut Data) };
+        let mut wpid = 0u32;
+        unsafe { GetWindowThreadProcessId(hwnd, Some(&mut wpid)) };
+        if wpid != data.pid {
+            return true.into();
+        }
+        if !unsafe { IsWindowVisible(hwnd).as_bool() }
+            || unsafe { GetWindow(hwnd, GW_OWNER).0 } != 0
+        {
+            return true.into();
+        }
+        let ex = unsafe { GetWindowLongPtrW(hwnd, GWL_EXSTYLE) } as u32;
+        if (ex & WS_EX_TOOLWINDOW.0) != 0 {
+            return true.into();
+        }
+        let mut cloaked: u32 = 0;
+        let _ = unsafe {
+            DwmGetWindowAttribute(
+                hwnd,
+                DWMWA_CLOAKED,
+                &mut cloaked as *mut _ as *mut _,
+                size_of::<u32>() as u32,
+            )
+        };
+        if cloaked != 0 {
+            return true.into();
+        }
+        if unsafe { GetWindowTextLengthW(hwnd) } == 0 {
+            return true.into();
+        }
+
+        data.found = Some(hwnd);
+        false.into()
+    }
+
+    let mut data = Data { pid, found: None };
+    unsafe {
+        EnumWindows(Some(enum_proc), LPARAM(&mut data as *mut _ as isize));
+    }
+    data.found
 }

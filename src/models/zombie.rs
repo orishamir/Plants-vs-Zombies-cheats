@@ -31,8 +31,8 @@ pub struct Zombie {
     _pad6: [u8; 4],
     pub armor_hp: u32,
     _pad7: [u8; 24],
-    pub is_dead: u32,
-    _pad8: [u8; 120],
+    pub is_dead: bool,
+    _pad8: [u8; 123],
 }
 
 impl Debug for Zombie {

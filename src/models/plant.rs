@@ -24,9 +24,9 @@ pub struct Plant {
     /// - Cob cannon: The time left until cob is ready to shoot.
     pub plant_timer: u32,
     _pad6: [u8; 233],
-    pub is_deleted: u8,
+    pub is_deleted: bool,
     _pad7: [u8; 3],
-    pub is_considered_shoveling: u8,
+    pub is_considered_shoveling: bool,
     _pad8: [u8; 6],
 }
 

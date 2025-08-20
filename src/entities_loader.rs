@@ -21,33 +21,33 @@ impl EntitiesLoader {
             proc,
             ents.zombies_ptr,
             ents.zombies_count as usize,
-            |zombie| zombie.is_dead == 0,
+            |zombie| !zombie.is_dead,
         );
 
         let plants = Self::load_entity::<Plant>(
             proc,
             ents.plants_ptr,
             ents.plants_count as usize,
-            |plant| plant.is_deleted == 0,
+            |plant| !plant.is_deleted,
         );
 
         let projectiles = Self::load_entity::<Projectile>(
             proc,
             ents.projectiles_ptr,
             ents.projectiles_count as usize,
-            |projectile| projectile.is_deleted == 0,
+            |projectile| !projectile.is_deleted,
         );
 
         let coins =
             Self::load_entity::<Coin>(proc, ents.coins_ptr, ents.coins_count as usize, |coin| {
-                coin.is_deleted == 0
+                !coin.is_deleted
             });
 
         let griditems = Self::load_entity::<Griditem>(
             proc,
             ents.griditems_ptr,
             ents.griditems_count as usize,
-            |griditem| griditem.is_deleted == 0,
+            |griditem| !griditem.is_deleted,
         );
 
         Ok(Self {
