@@ -1,5 +1,5 @@
 use crate::game::GameProcess;
-use crate::models::{Coin, Entities, Griditem, Plant, Projectile, Zombie};
+use crate::models::{Card, Coin, Entities, Griditem, Plant, Projectile, Zombie};
 
 #[allow(dead_code)]
 pub struct EntitiesLoader {
@@ -9,13 +9,14 @@ pub struct EntitiesLoader {
     pub coins: Vec<Coin>,
     // lawnmowers
     pub griditems: Vec<Griditem>,
+    pub cards: Vec<Card>,
 }
 
 impl EntitiesLoader {
     pub fn load(proc: &GameProcess) -> Result<Self, std::io::Error> {
-        let ents = proc.read_with_base_addr::<Entities>(&[
-            0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4,
-        ])?;
+        let ents = proc
+            .read_with_base_addr::<Entities>(&[0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4])
+            .expect("what");
 
         let zombies = Self::load_entity::<Zombie>(
             proc,
@@ -50,11 +51,31 @@ impl EntitiesLoader {
             |griditem| !griditem.is_deleted,
         );
 
+        let cards_count: usize = proc
+            .read_with_base_addr(&[0x331C50, 0x320, 0x30, 0x0, 0x8, 0x15c, 0x24])
+            .expect("msg");
+
+        let cards = (0..cards_count)
+            .map(|i| {
+                proc.read_with_base_addr::<Card>(&[
+                    0x331C50,
+                    0x320,
+                    0x30,
+                    0x0,
+                    0x8,
+                    0x15c,
+                    0x28 + i * size_of::<Card>(),
+                ])
+                .expect("Couldn't read card")
+            })
+            .collect();
+
         Ok(Self {
             zombies,
             plants,
             projectiles,
             coins,
+            cards,
             griditems,
         })
     }

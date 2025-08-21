@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::models::projectile_type::ProjectileType;
+use super::ProjectileType;
 
 #[allow(dead_code)]
 #[derive(Clone, Copy)]

@@ -2,7 +2,7 @@
 
 use std::fmt::Debug;
 
-use super::zombie_type::ZombieType;
+use super::ZombieType;
 
 #[repr(u32)]
 #[derive(Debug, Copy, Clone)]

@@ -56,18 +56,13 @@ impl MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-        Rgba::from_rgba_premultiplied(0., 0., 0., 0.5).to_array()
-    }
+    // fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
+    // Rgba::TRANSPARENT.to_array()
+    // }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        ctx.set_pixels_per_point(1.3);
         egui::Window::new("Toggleables").show(ctx, |ui| {
             self.render_toggleables(ui);
-            // if ui.button("hey").clicked() {
-            // let gui = OverlayGui::default();
-            // gui.start();
-            // }
         });
     }
 }

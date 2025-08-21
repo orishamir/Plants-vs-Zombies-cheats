@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use super::plant_type::PlantType;
+use super::PlantType;
 
 #[allow(dead_code)]
 #[derive(Clone, Copy)]

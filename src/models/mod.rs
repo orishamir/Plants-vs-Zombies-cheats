@@ -1,4 +1,6 @@
 #![allow(unused_imports)]
+mod card;
+mod card_type;
 mod coin;
 mod entities;
 mod griditem;
@@ -10,6 +12,8 @@ mod projectile_type;
 mod zombie;
 mod zombie_type;
 
+pub use card::Card;
+pub use card_type::CardType;
 pub use coin::{Coin, CoinType};
 pub use entities::Entities;
 pub use griditem::{Griditem, GriditemType, VaseType};

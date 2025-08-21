@@ -2,7 +2,7 @@ use std::{fmt::Debug, mem::transmute};
 
 use egui::Grid;
 
-use crate::models::{PlantType, ZombieType};
+use super::{PlantType, ZombieType};
 
 #[derive(Clone, Copy)]
 #[repr(C, packed)]
