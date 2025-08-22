@@ -1,5 +1,8 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, mem::transmute};
 
+use crate::models::PlantType;
+
+/// Game memory calls this a Coin, but it is any pickable item
 #[derive(Clone, Copy)]
 #[repr(C, packed)]
 pub struct Coin {
@@ -14,7 +17,11 @@ pub struct Coin {
     _pad5: [u8; 4],
     pub age_since_reached_destination: u32,
     pub coin_type: CoinType,
-    _pad6: [u8; 124],
+    _pad6: [u8; 12],
+    /// If CoinType is DroppedCard, this is the plant.
+    /// For example winning a new card or a broken vase's drop.
+    pub plant_type: PlantType,
+    _pad7: [u8; 108],
 }
 
 impl Debug for Coin {
@@ -29,18 +36,37 @@ impl Debug for Coin {
                 self.age_since_reached_destination
             })
             .field("coin_type", &{ self.coin_type })
+            .field("plant_type", &{ self.plant_type })
             .finish()
     }
 }
 
 #[allow(dead_code)]
 #[repr(u32)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub enum CoinType {
     Silver = 1,
     Gold = 2,
     Sun = 4,
+    DroppedCard = 16,
     GiantBagOfCash = 18,
+}
+
+impl Debug for CoinType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let raw_value = unsafe { transmute::<&Self, &u32>(self) };
+        if !matches!(raw_value, 1 | 2 | 4 | 16 | 18) {
+            return write!(f, "{raw_value}");
+        }
+
+        match self {
+            Self::Silver => write!(f, "Silver"),
+            Self::Gold => write!(f, "Gold"),
+            Self::Sun => write!(f, "Sun"),
+            Self::DroppedCard => write!(f, "DroppedCard"),
+            Self::GiantBagOfCash => write!(f, "GiantBagOfCash"),
+        }
+    }
 }
 
 #[cfg(test)]

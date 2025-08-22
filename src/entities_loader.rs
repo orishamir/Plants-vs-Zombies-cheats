@@ -1,5 +1,5 @@
 use crate::game::GameProcess;
-use crate::models::{Card, Coin, Entities, Griditem, Plant, Projectile, Zombie};
+use crate::models::{Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie};
 
 #[allow(dead_code)]
 pub struct EntitiesLoader {
@@ -7,7 +7,7 @@ pub struct EntitiesLoader {
     pub plants: Vec<Plant>,
     pub projectiles: Vec<Projectile>,
     pub coins: Vec<Coin>,
-    // lawnmowers
+    pub lawnmowers: Vec<Lawnmower>,
     pub griditems: Vec<Griditem>,
     pub cards: Vec<Card>,
 }
@@ -18,36 +18,38 @@ impl EntitiesLoader {
             .read_with_base_addr::<Entities>(&[0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4])
             .expect("what");
 
-        let zombies = Self::load_entity::<Zombie>(
-            proc,
-            ents.zombies_ptr,
-            ents.zombies_count as usize,
-            |zombie| !zombie.is_dead,
-        );
+        let zombies =
+            Self::load_entity::<Zombie>(proc, ents.zombies_ptr, ents.zombies_count, |zombie| {
+                !zombie.is_dead
+            });
 
-        let plants = Self::load_entity::<Plant>(
-            proc,
-            ents.plants_ptr,
-            ents.plants_count as usize,
-            |plant| !plant.is_deleted,
-        );
+        let plants =
+            Self::load_entity::<Plant>(proc, ents.plants_ptr, ents.plants_count, |plant| {
+                !plant.is_deleted
+            });
 
         let projectiles = Self::load_entity::<Projectile>(
             proc,
             ents.projectiles_ptr,
-            ents.projectiles_count as usize,
+            ents.projectiles_count,
             |projectile| !projectile.is_deleted,
         );
 
-        let coins =
-            Self::load_entity::<Coin>(proc, ents.coins_ptr, ents.coins_count as usize, |coin| {
-                !coin.is_deleted
-            });
+        let coins = Self::load_entity::<Coin>(proc, ents.coins_ptr, ents.coins_count, |coin| {
+            !coin.is_deleted
+        });
+
+        let lawnmowers = Self::load_entity::<Lawnmower>(
+            proc,
+            ents.lawnmower_ptr,
+            ents.lawnmower_count,
+            |lawnmower| !lawnmower.is_deleted,
+        );
 
         let griditems = Self::load_entity::<Griditem>(
             proc,
             ents.griditems_ptr,
-            ents.griditems_count as usize,
+            ents.griditems_count,
             |griditem| !griditem.is_deleted,
         );
 
@@ -75,15 +77,16 @@ impl EntitiesLoader {
             plants,
             projectiles,
             coins,
-            cards,
+            lawnmowers,
             griditems,
+            cards,
         })
     }
 
     fn load_entity<T: Copy>(
         proc: &GameProcess,
         base_ptr: usize,
-        ent_count: usize,
+        ent_count: u32,
         filter: impl Fn(&T) -> bool,
     ) -> Vec<T> {
         let mut tmp_ptr = base_ptr;
@@ -95,7 +98,7 @@ impl EntitiesLoader {
             zombie_or_err.ok()
         })
         .filter(filter)
-        .take(ent_count)
+        .take(ent_count as usize)
         .collect()
     }
 }

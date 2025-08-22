@@ -4,7 +4,11 @@ use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
 
-use crate::{entities_loader::EntitiesLoader, game::GameProcess, models::Card};
+use crate::{
+    entities_loader::EntitiesLoader,
+    game::GameProcess,
+    models::{Card, Griditem},
+};
 
 mod entities_loader;
 mod game;
@@ -15,8 +19,8 @@ mod toggleables;
 
 fn main() {
     let proc = GameProcess::default();
-    let x = EntitiesLoader::load(&proc).unwrap();
-    println!("{:#?}", x.cards);
+    let ents = EntitiesLoader::load(&proc).unwrap();
+    println!("{:#?}", ents.lawnmowers);
 }
 
 fn _main() -> eframe::Result {
