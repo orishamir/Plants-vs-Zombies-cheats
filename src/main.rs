@@ -17,13 +17,13 @@ mod models;
 mod overlay_gui;
 mod toggleables;
 
-fn main() {
+fn _main() {
     let proc = GameProcess::default();
     let ents = EntitiesLoader::load(&proc).unwrap();
     println!("{:#?}", ents.lawnmowers);
 }
 
-fn _main() -> eframe::Result {
+fn main() -> eframe::Result {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
     let options = NativeOptions {
         viewport: ViewportBuilder::default()

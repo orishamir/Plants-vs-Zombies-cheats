@@ -1,5 +1,5 @@
 name: CI Pipeline
-on: [push]
+on: [workflow_dispatch]
 jobs:
   test:
     runs-on: windows-2022
@@ -19,7 +19,6 @@ jobs:
 
   build:
     runs-on: windows-2022
-    needs: [test]
     steps:
       - uses: actions/checkout@v4.2.2
 
