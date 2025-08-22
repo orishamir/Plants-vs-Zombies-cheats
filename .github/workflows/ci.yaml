@@ -16,3 +16,26 @@ jobs:
       
       - name: Test
         run: cargo test
+
+  build:
+    runs-on: windows-2022
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1.0.7
+        with:
+          profile: minimal
+          toolchain: stable
+          target: i686-pc-windows-msvc
+          override: true
+      
+      - name: Build Release
+        run: cargo build --target i686-pc-windows-msvc --release
+
+      - name: Upload Built Artifacts (.exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: plants_vs_zombies_cheats.exe
+          path: target/i686-pc-windows-msvc/release/plants_vs_zombies_cheats.exe
