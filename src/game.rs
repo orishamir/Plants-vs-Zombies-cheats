@@ -1,6 +1,7 @@
 use process_memory::{DataMember, Memory, ProcessHandle, TryIntoProcessHandle};
 use std::ffi::OsStr;
 use sysinfo::Pid;
+use thiserror::Error;
 use windows::Win32::{
     Foundation::{HWND, RECT},
     System::Diagnostics::ToolHelp::{
@@ -93,44 +94,57 @@ impl GameProcess {
         let member = DataMember::<T>::new_offset(self.handle, offsets);
         member.write(&value)
     }
-}
 
-impl Default for GameProcess {
-    fn default() -> Self {
+    pub fn init() -> Result<Self, GameProcessInitError> {
         let system = sysinfo::System::new_all();
         // system.refresh_all();
 
         let popcapgame = system
             .processes_by_exact_name(OsStr::new("popcapgame1.exe"))
             .next()
-            .expect("Popcapgame1.exe is not running");
+            .ok_or(GameProcessInitError::GameNotRunning)?;
 
-        let handle = (popcapgame.pid().as_u32() as process_memory::Pid)
-            .try_into_process_handle()
-            .expect("Couldn't get handle to popcapgame1.exe");
+        let handle =
+            (popcapgame.pid().as_u32() as process_memory::Pid).try_into_process_handle()?;
 
         let module_base_address =
             get_base_module_address("popcapgame1.exe", popcapgame.pid().as_u32())
-                .expect("popcapgame1.exe module not found");
+                .ok_or(GameProcessInitError::BaseModuleNotFound)?;
 
-        Self {
+        Ok(Self {
             handle,
             pid: popcapgame.pid(),
             base_address: module_base_address,
-        }
+        })
     }
 }
 
-use std::mem::size_of;
-use windows::Win32::Foundation::{BOOL, LPARAM};
-use windows::Win32::Graphics::Dwm::{DWMWA_CLOAKED, DwmGetWindowAttribute};
-use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GW_OWNER, GWL_EXSTYLE, GetWindow, GetWindowLongPtrW, GetWindowTextLengthW,
-    GetWindowThreadProcessId, IsWindowVisible, WS_EX_TOOLWINDOW,
-};
+impl Default for GameProcess {
+    fn default() -> Self {
+        GameProcess::init().unwrap()
+    }
+}
+
+#[derive(Error, Debug)]
+pub enum GameProcessInitError {
+    #[error("popcapgame1.exe is not running")]
+    GameNotRunning,
+    #[error("Couldn't get handle to popcapgame1.exe")]
+    CoudlntGetProcessHandle(#[from] std::io::Error),
+    #[error("popcapgame1.exe module not found")]
+    BaseModuleNotFound,
+}
 
 /// Heuristic: visible, not owned, not toolwindow, not DWM-cloaked, has title.
+/// Completely vibe coded
 fn main_window_by_pid(pid: u32) -> Option<HWND> {
+    use std::mem::size_of;
+    use windows::Win32::Foundation::{BOOL, LPARAM};
+    use windows::Win32::Graphics::Dwm::{DWMWA_CLOAKED, DwmGetWindowAttribute};
+    use windows::Win32::UI::WindowsAndMessaging::{
+        EnumWindows, GW_OWNER, GWL_EXSTYLE, GetWindow, GetWindowLongPtrW, GetWindowTextLengthW,
+        GetWindowThreadProcessId, IsWindowVisible, WS_EX_TOOLWINDOW,
+    };
     #[derive(Debug)]
     struct Data {
         pid: u32,

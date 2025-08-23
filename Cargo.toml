@@ -5,7 +5,12 @@ edition = "2024"
 
 [dependencies]
 process-memory = "0.5.0"
-windows = { version = "0.48", features = ["Win32_Foundation", "Win32_Graphics_Dwm", "Win32_System_Diagnostics_ToolHelp", "Win32_UI_WindowsAndMessaging"] }
+windows = { version = "0.48", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Dwm",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_UI_WindowsAndMessaging",
+] }
 sysinfo = "0.34.2"
 eframe = { version = "0.32.1" }
 egui = "0.32.1"

@@ -4,11 +4,7 @@ use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
 
-use crate::{
-    entities_loader::EntitiesLoader,
-    game::GameProcess,
-    models::{Card, Griditem},
-};
+use crate::{entities_loader::EntitiesLoader, game::GameProcess};
 
 mod entities_loader;
 mod game;
@@ -17,20 +13,23 @@ mod models;
 mod overlay_gui;
 mod toggleables;
 
-fn main() -> Result<(), entities_loader::LoadEntityError> {
-    let proc = GameProcess::default();
+fn _main() {
+    let proc = GameProcess::init().expect("problem with game process");
     loop {
-        let ents = EntitiesLoader::load(&proc)?;
+        let ents = EntitiesLoader::load(&proc).unwrap();
         println!("{:#?}", ents.cards);
     }
 }
 
-fn _main() -> eframe::Result {
+fn main() -> eframe::Result {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
     let options = NativeOptions {
         viewport: ViewportBuilder::default()
             .with_always_on_top()
-            .with_transparent(true),
+            .with_transparent(true)
+            .with_maximize_button(false)
+            .with_minimize_button(false)
+            .with_title("Plants vs. Zombies cheats"),
         renderer: eframe::Renderer::Glow,
         ..Default::default()
     };
