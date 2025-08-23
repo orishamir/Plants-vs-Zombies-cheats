@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 use crate::game::GameProcess;
 use crate::models::{Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie};
 
@@ -12,11 +14,19 @@ pub struct EntitiesLoader {
     pub cards: Vec<Card>,
 }
 
+#[derive(Error, Debug)]
+pub enum LoadEntityError {
+    #[error("not inside an active game")]
+    NotInGame,
+    #[error("io error: {0}")]
+    Unknown(#[from] std::io::Error),
+}
+
 impl EntitiesLoader {
-    pub fn load(proc: &GameProcess) -> Result<Self, std::io::Error> {
+    pub fn load(proc: &GameProcess) -> Result<Self, LoadEntityError> {
         let ents = proc
             .read_with_base_addr::<Entities>(&[0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4])
-            .expect("what");
+            .map_err(|_| LoadEntityError::NotInGame)?;
 
         let zombies =
             Self::load_entity::<Zombie>(proc, ents.zombies_ptr, ents.zombies_count, |zombie| {
@@ -53,24 +63,7 @@ impl EntitiesLoader {
             |griditem| !griditem.is_deleted,
         );
 
-        let cards_count: usize = proc
-            .read_with_base_addr(&[0x331C50, 0x320, 0x30, 0x0, 0x8, 0x15c, 0x24])
-            .expect("msg");
-
-        let cards = (0..cards_count)
-            .map(|i| {
-                proc.read_with_base_addr::<Card>(&[
-                    0x331C50,
-                    0x320,
-                    0x30,
-                    0x0,
-                    0x8,
-                    0x15c,
-                    0x28 + i * size_of::<Card>(),
-                ])
-                .expect("Couldn't read card")
-            })
-            .collect();
+        let cards = Self::load_cards(proc)?;
 
         Ok(Self {
             zombies,
@@ -91,14 +84,45 @@ impl EntitiesLoader {
     ) -> Vec<T> {
         let mut tmp_ptr = base_ptr;
         std::iter::from_fn(move || {
-            let zombie_or_err = proc.read_at::<T>(tmp_ptr);
+            let entity_or_err = proc.read_at::<T>(tmp_ptr);
             tmp_ptr += size_of::<T>();
-
             // TODO: Error handling?
-            zombie_or_err.ok()
+            if let Ok(entity) = entity_or_err {
+                Some(entity)
+            } else {
+                eprintln!(
+                    "WARNING: Couldn't load entity at {:x}",
+                    tmp_ptr - size_of::<T>()
+                );
+                None
+            }
         })
         .filter(filter)
         .take(ent_count as usize)
         .collect()
+    }
+
+    fn load_cards(proc: &GameProcess) -> Result<Vec<Card>, std::io::Error> {
+        let cards_count: usize =
+            proc.read_with_base_addr(&[0x331C50, 0x320, 0x18, 0x0, 0x8, 0x15c, 0x24])?;
+
+        let cards: Vec<Card> = (0..cards_count)
+            .filter_map(|i| {
+                proc.read_with_base_addr::<Card>(&[
+                    0x331C50,
+                    0x320,
+                    0x18,
+                    0x0,
+                    0x8,
+                    0x15c,
+                    0x28 + i * size_of::<Card>(),
+                ])
+                .ok()
+            })
+            .collect();
+
+        assert_eq!(cards_count, cards.len(), "Couldn't get all cards");
+
+        Ok(cards)
     }
 }

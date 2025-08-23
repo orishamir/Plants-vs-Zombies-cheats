@@ -1,4 +1,4 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
@@ -17,13 +17,15 @@ mod models;
 mod overlay_gui;
 mod toggleables;
 
-fn _main() {
+fn main() -> Result<(), entities_loader::LoadEntityError> {
     let proc = GameProcess::default();
-    let ents = EntitiesLoader::load(&proc).unwrap();
-    println!("{:#?}", ents.lawnmowers);
+    loop {
+        let ents = EntitiesLoader::load(&proc)?;
+        println!("{:#?}", ents.cards);
+    }
 }
 
-fn main() -> eframe::Result {
+fn _main() -> eframe::Result {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
     let options = NativeOptions {
         viewport: ViewportBuilder::default()
