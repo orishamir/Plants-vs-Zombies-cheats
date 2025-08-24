@@ -1,15 +1,32 @@
 #![allow(dead_code)]
 
-use std::fmt::Debug;
+use std::{fmt::Debug, mem::transmute};
 
 use super::ZombieType;
 
 #[repr(u32)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub enum ArmorType {
     None = 0,
     Cone = 1,
     Bucket = 2,
+    Door = 3,
+}
+
+impl Debug for ArmorType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let raw_value = unsafe { transmute::<&Self, &u32>(self) };
+        if !matches!(raw_value, 0..=2) {
+            return write!(f, "{raw_value}");
+        }
+
+        match self {
+            Self::None => write!(f, "None"),
+            Self::Cone => write!(f, "Cone"),
+            Self::Bucket => write!(f, "Bucket"),
+            Self::Door => write!(f, "Door"),
+        }
+    }
 }
 
 #[repr(C, packed)]

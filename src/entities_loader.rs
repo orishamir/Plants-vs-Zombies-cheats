@@ -91,8 +91,10 @@ impl EntitiesLoader {
                 Some(entity)
             } else {
                 eprintln!(
-                    "WARNING: Couldn't load entity at {:x}",
-                    tmp_ptr - size_of::<T>()
+                    "WARNING: Couldn't load entity at {:x}\nsize_of:{}\n because: {}",
+                    tmp_ptr - size_of::<T>(),
+                    size_of::<T>(),
+                    entity_or_err.err().unwrap()
                 );
                 None
             }
