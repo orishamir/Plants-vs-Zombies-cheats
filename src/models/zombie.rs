@@ -10,7 +10,7 @@ pub enum ArmorType {
     None = 0,
     Cone = 1,
     Bucket = 2,
-    Door = 3,
+    Football = 3,
 }
 
 impl Debug for ArmorType {
@@ -24,7 +24,7 @@ impl Debug for ArmorType {
             Self::None => write!(f, "None"),
             Self::Cone => write!(f, "Cone"),
             Self::Bucket => write!(f, "Bucket"),
-            Self::Door => write!(f, "Door"),
+            Self::Football => write!(f, "Football"),
         }
     }
 }
@@ -50,6 +50,31 @@ pub struct Zombie {
     _pad7: [u8; 24],
     pub is_dead: bool,
     _pad8: [u8; 123],
+}
+
+impl Default for Zombie {
+    fn default() -> Self {
+        Self {
+            _pad1: Default::default(),
+            display_pos_x: Default::default(),
+            display_pos_y: Default::default(),
+            _pad2: Default::default(),
+            row: Default::default(),
+            _pad3: Default::default(),
+            zombie_type: ZombieType::Zombie,
+            _pad4: Default::default(),
+            zombie_pos_x: Default::default(),
+            zombie_pos_y: Default::default(),
+            _pad5: [0; _],
+            armor_type: ArmorType::None,
+            health: Default::default(),
+            _pad6: Default::default(),
+            armor_hp: Default::default(),
+            _pad7: Default::default(),
+            is_dead: Default::default(),
+            _pad8: [0; _],
+        }
+    }
 }
 
 impl Debug for Zombie {

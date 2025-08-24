@@ -2,8 +2,9 @@ use std::{fmt::Debug, mem::transmute};
 
 #[allow(dead_code)]
 #[repr(u32)]
-#[derive(Clone, Copy)]
+#[derive(Default, Clone, Copy)]
 pub enum PlantType {
+    #[default]
     Peashooter = 0,
     Sunflower = 1,
     CherryBomb = 2,

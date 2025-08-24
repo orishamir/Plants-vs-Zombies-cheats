@@ -24,6 +24,27 @@ pub struct Coin {
     _pad7: [u8; 108],
 }
 
+impl Default for Coin {
+    fn default() -> Self {
+        Self {
+            _pad1: [0; _],
+            display_pos_x: Default::default(),
+            display_pos_y: Default::default(),
+            _pad2: Default::default(),
+            is_deleted: Default::default(),
+            _pad3: Default::default(),
+            destination_y: Default::default(),
+            age_since_spawned: Default::default(),
+            _pad5: Default::default(),
+            age_since_reached_destination: Default::default(),
+            coin_type: Default::default(),
+            _pad6: Default::default(),
+            plant_type: Default::default(),
+            _pad7: [0; _],
+        }
+    }
+}
+
 impl Debug for Coin {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Coin")
@@ -43,10 +64,11 @@ impl Debug for Coin {
 
 #[allow(dead_code)]
 #[repr(u32)]
-#[derive(Copy, Clone)]
+#[derive(Default, Copy, Clone)]
 pub enum CoinType {
     Silver = 1,
     Gold = 2,
+    #[default]
     Sun = 4,
     DroppedCard = 16,
     GiantBagOfCash = 18,

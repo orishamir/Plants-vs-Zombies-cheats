@@ -22,21 +22,24 @@ pub struct NoPauseCheat {}
 
 impl Toggleable for NoPauseCheat {
     fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
-        Ok(process.write::<[u8; 2]>(
+        process.write::<[u8; 2]>(
             &INSTRUCTION_OFFSETS,
             [
                 0xEB, 0x37, // jmp popcapgame1.exe+19284
             ],
-        )?)
+        );
+        Ok(())
     }
 
     fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
-        Ok(process.write::<[u8; 2]>(
+        process.write::<[u8; 2]>(
             &INSTRUCTION_OFFSETS,
             [
                 0x74, 0x37, // je popcapgame1.exe+19284
             ],
-        )?)
+        );
+
+        Ok(())
     }
 
     fn name(&self) -> &'static str {

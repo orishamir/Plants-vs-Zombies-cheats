@@ -2,7 +2,7 @@ use std::{fmt::Debug, mem::transmute};
 
 #[allow(dead_code)]
 #[repr(C, packed)]
-#[derive(Clone, Copy)]
+#[derive(Default, Clone, Copy)]
 pub struct Lawnmower {
     _pad1: [u8; 8],
     pub display_pos_x: f32,
@@ -32,8 +32,9 @@ impl Debug for Lawnmower {
 
 #[allow(dead_code)]
 #[repr(u32)]
-#[derive(Clone, Copy)]
+#[derive(Default, Clone, Copy)]
 pub enum LawnmowerType {
+    #[default]
     Normal = 0,
     PoolCleaner = 1,
     RoofCleaner = 2,
@@ -58,9 +59,10 @@ impl Debug for LawnmowerType {
 
 #[allow(dead_code)]
 #[repr(u32)]
-#[derive(Clone, Copy)]
+#[derive(Default, Clone, Copy)]
 pub enum LawnmowerMode {
     Resetting = 0,
+    #[default]
     Normal = 1,
     Running = 2,
 }

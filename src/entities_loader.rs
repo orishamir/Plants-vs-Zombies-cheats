@@ -1,4 +1,4 @@
-use thiserror::Error;
+use proc_mem::ProcMemError;
 
 use crate::game::GameProcess;
 use crate::models::{Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie};
@@ -14,19 +14,11 @@ pub struct EntitiesLoader {
     pub cards: Vec<Card>,
 }
 
-#[derive(Error, Debug)]
-pub enum LoadEntityError {
-    #[error("not inside an active game")]
-    NotInGame,
-    #[error("io error: {0}")]
-    Unknown(#[from] std::io::Error),
-}
-
 impl EntitiesLoader {
-    pub fn load(proc: &GameProcess) -> Result<Self, LoadEntityError> {
-        let ents = proc
-            .read_with_base_addr::<Entities>(&[0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4])
-            .map_err(|_| LoadEntityError::NotInGame)?;
+    pub fn load(proc: &GameProcess) -> Result<Self, ProcMemError> {
+        let ents = proc.read_with_base_addr::<Entities>(&[
+            0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4,
+        ])?;
 
         let zombies =
             Self::load_entity::<Zombie>(proc, ents.zombies_ptr, ents.zombies_count, |zombie| {
@@ -76,7 +68,7 @@ impl EntitiesLoader {
         })
     }
 
-    fn load_entity<T: Copy>(
+    fn load_entity<T: Default>(
         proc: &GameProcess,
         base_ptr: usize,
         ent_count: u32,
@@ -91,7 +83,7 @@ impl EntitiesLoader {
                 Some(entity)
             } else {
                 eprintln!(
-                    "WARNING: Couldn't load entity at {:x}\nsize_of:{}\n because: {}",
+                    "WARNING: Couldn't load entity at {:x}\nsize_of:{}\n because: {:#?}",
                     tmp_ptr - size_of::<T>(),
                     size_of::<T>(),
                     entity_or_err.err().unwrap()
@@ -104,7 +96,7 @@ impl EntitiesLoader {
         .collect()
     }
 
-    fn load_cards(proc: &GameProcess) -> Result<Vec<Card>, std::io::Error> {
+    fn load_cards(proc: &GameProcess) -> Result<Vec<Card>, ProcMemError> {
         let cards_count: usize =
             proc.read_with_base_addr(&[0x331C50, 0x320, 0x18, 0x0, 0x8, 0x15c, 0x24])?;
 

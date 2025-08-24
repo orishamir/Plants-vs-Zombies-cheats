@@ -25,6 +25,29 @@ pub struct Griditem {
     _pad7: [u8; 156],
 }
 
+impl Default for Griditem {
+    fn default() -> Self {
+        Self {
+            _pad1: Default::default(),
+            griditem_type: GriditemType::Rake,
+            vase_type: VaseType::Mistery,
+            column: Default::default(),
+            row: Default::default(),
+            timer_until_dead: Default::default(),
+            _pad3: Default::default(),
+            is_deleted: Default::default(),
+            _pad4: Default::default(),
+            zombie_type: ZombieType::BackupDancer,
+            plant_type: Default::default(),
+            _pad5: Default::default(),
+            is_highlighted: Default::default(),
+            _pad6: Default::default(),
+            opacity: Default::default(),
+            _pad7: [0; _],
+        }
+    }
+}
+
 impl Debug for Griditem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Griditem")

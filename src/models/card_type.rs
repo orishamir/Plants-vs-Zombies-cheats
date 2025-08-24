@@ -2,8 +2,9 @@ use std::{fmt::Debug, mem::transmute};
 
 #[allow(dead_code)]
 #[repr(u32)]
-#[derive(Copy, Clone)]
+#[derive(Default, Copy, Clone)]
 pub enum CardType {
+    #[default]
     Peashooter = 0,
     Sunflower = 1,
     CherryBomb = 2,
