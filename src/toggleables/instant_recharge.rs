@@ -1,5 +1,5 @@
 use super::{ToggleCheatError, Toggleable};
-use crate::game::GameProcess;
+use crate::game::Popcapgame;
 
 const INSTRUCTION_OFFSETS: [usize; 1] = [0x958BC];
 
@@ -7,7 +7,7 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x958BC];
 pub struct InstantRechargeCheat {}
 
 impl Toggleable for InstantRechargeCheat {
-    fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
+    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
@@ -20,7 +20,7 @@ impl Toggleable for InstantRechargeCheat {
         Ok(())
     }
 
-    fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
+    fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [

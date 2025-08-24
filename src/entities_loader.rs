@@ -1,6 +1,6 @@
 use proc_mem::ProcMemError;
 
-use crate::game::GameProcess;
+use crate::game::Popcapgame;
 use crate::models::{Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie};
 
 #[allow(dead_code)]
@@ -15,7 +15,7 @@ pub struct EntitiesLoader {
 }
 
 impl EntitiesLoader {
-    pub fn load(proc: &GameProcess) -> Result<Self, ProcMemError> {
+    pub fn load(proc: &Popcapgame) -> Result<Self, ProcMemError> {
         let ents = proc.read_with_base_addr::<Entities>(&[
             0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4,
         ])?;
@@ -69,7 +69,7 @@ impl EntitiesLoader {
     }
 
     fn load_entity<T: Default>(
-        proc: &GameProcess,
+        proc: &Popcapgame,
         base_ptr: usize,
         ent_count: u32,
         filter: impl Fn(&T) -> bool,
@@ -96,7 +96,7 @@ impl EntitiesLoader {
         .collect()
     }
 
-    fn load_cards(proc: &GameProcess) -> Result<Vec<Card>, ProcMemError> {
+    fn load_cards(proc: &Popcapgame) -> Result<Vec<Card>, ProcMemError> {
         let cards_count: usize =
             proc.read_with_base_addr(&[0x331C50, 0x320, 0x18, 0x0, 0x8, 0x15c, 0x24])?;
 

@@ -1,5 +1,5 @@
 use super::{ToggleCheatError, Toggleable};
-use crate::game::GameProcess;
+use crate::game::Popcapgame;
 
 const INSTRUCTION_OFFSETS: [usize; 1] = [0x1334D];
 
@@ -7,7 +7,7 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x1334D];
 pub struct PlantAnywhereCheat {}
 
 impl Toggleable for PlantAnywhereCheat {
-    fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
+    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         process.write::<[u8; 2]>(
             &INSTRUCTION_OFFSETS,
             [
@@ -18,7 +18,7 @@ impl Toggleable for PlantAnywhereCheat {
         Ok(())
     }
 
-    fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
+    fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         process.write::<[u8; 2]>(
             &INSTRUCTION_OFFSETS,
             [

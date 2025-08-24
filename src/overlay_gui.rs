@@ -1,9 +1,10 @@
-use crate::game::GameProcess;
+#![allow(dead_code, unused)]
+use crate::game::Popcapgame;
 use egui::{self, Frame, Id, ViewportBuilder, ViewportCommand};
 
 #[derive(Default)]
 pub struct OverlayGui {
-    pub popcapgame: GameProcess,
+    pub popcapgame: Popcapgame,
 }
 
 impl OverlayGui {

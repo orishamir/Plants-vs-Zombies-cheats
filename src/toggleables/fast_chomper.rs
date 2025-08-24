@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use super::{ToggleCheatError, Toggleable};
-use crate::game::GameProcess;
+use crate::game::Popcapgame;
 
 const INSTRUCTION_OFFSET1: [usize; 1] = [0x678E7]; // "popcapgame1.exe" + 0x678E7
 const INSTRUCTION_OFFSET2: [usize; 1] = [0x6789E]; // "popcapgame1.exe" + 0x6789E
@@ -41,7 +41,7 @@ impl From<ChomperState> for u8 {
 }
 
 impl Toggleable for FastChomperCheat {
-    fn activate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
+    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xE
         process.write::<[u8; _]>(
             &INSTRUCTION_OFFSET1,
@@ -90,7 +90,7 @@ impl Toggleable for FastChomperCheat {
         Ok(())
     }
 
-    fn deactivate(&self, process: &GameProcess) -> Result<(), ToggleCheatError> {
+    fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xD
         process.write::<[u8; 7]>(
             &INSTRUCTION_OFFSET1,

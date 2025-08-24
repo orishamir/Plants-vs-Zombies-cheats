@@ -5,13 +5,13 @@ use windows::Win32::{
 };
 
 #[derive(Debug)]
-pub struct GameProcess {
+pub struct Popcapgame {
     pub proc: Process,
     pub base_module: Module,
 }
 
 #[allow(dead_code)]
-impl GameProcess {
+impl Popcapgame {
     pub fn get_rect_size(&self) -> RECT {
         let mut rect = RECT::default();
         unsafe {
@@ -58,23 +58,24 @@ impl GameProcess {
     }
 }
 
-impl Default for GameProcess {
+impl Default for Popcapgame {
     fn default() -> Self {
-        GameProcess::init().unwrap()
+        Popcapgame::init().unwrap()
     }
 }
 
 /// Heuristic: visible, not owned, not toolwindow, not DWM-cloaked, has title.
 /// Completely vibe coded
-fn main_window_by_pid(pid: u32) -> Option<HWND> {
+pub fn main_window_by_pid(pid: u32) -> Option<HWND> {
     use std::mem::size_of;
-    use windows::Win32::Foundation::{BOOL, LPARAM};
+    use windows::Win32::Foundation::{HWND, LPARAM};
     use windows::Win32::Graphics::Dwm::{DWMWA_CLOAKED, DwmGetWindowAttribute};
     use windows::Win32::UI::WindowsAndMessaging::{
         EnumWindows, GW_OWNER, GWL_EXSTYLE, GetWindow, GetWindowLongPtrW, GetWindowTextLengthW,
-        GetWindowThreadProcessId, IsWindowVisible, WS_EX_TOOLWINDOW,
+        GetWindowThreadProcessId, IsWindowVisible, WINDOW_EX_STYLE, WS_EX_TOOLWINDOW,
     };
-    #[derive(Debug)]
+    use windows::core::BOOL;
+
     struct Data {
         pid: u32,
         found: Option<HWND>,
@@ -82,20 +83,32 @@ fn main_window_by_pid(pid: u32) -> Option<HWND> {
 
     unsafe extern "system" fn enum_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
         let data = unsafe { &mut *(lparam.0 as *mut Data) };
+
+        // PID match
         let mut wpid = 0u32;
         unsafe { GetWindowThreadProcessId(hwnd, Some(&mut wpid)) };
         if wpid != data.pid {
             return true.into();
         }
-        if !unsafe { IsWindowVisible(hwnd).as_bool() }
-            || unsafe { GetWindow(hwnd, GW_OWNER).0 } != 0
-        {
+
+        // Visible
+        if !unsafe { IsWindowVisible(hwnd).as_bool() } {
             return true.into();
         }
-        let ex = unsafe { GetWindowLongPtrW(hwnd, GWL_EXSTYLE) } as u32;
-        if (ex & WS_EX_TOOLWINDOW.0) != 0 {
+
+        // Not owned (owner == NULL)
+        let owner = unsafe { GetWindow(hwnd, GW_OWNER).unwrap_or_default() }; // HWND(null_mut()) on none/error
+        if !owner.0.is_null() {
             return true.into();
         }
+
+        // Not a tool window
+        let ex = WINDOW_EX_STYLE(unsafe { GetWindowLongPtrW(hwnd, GWL_EXSTYLE) } as u32);
+        if ex.contains(WS_EX_TOOLWINDOW) {
+            return true.into();
+        }
+
+        // Not DWM-cloaked
         let mut cloaked: u32 = 0;
         let _ = unsafe {
             DwmGetWindowAttribute(
@@ -108,6 +121,8 @@ fn main_window_by_pid(pid: u32) -> Option<HWND> {
         if cloaked != 0 {
             return true.into();
         }
+
+        // Has any title text (heuristic)
         if unsafe { GetWindowTextLengthW(hwnd) } == 0 {
             return true.into();
         }
@@ -118,7 +133,7 @@ fn main_window_by_pid(pid: u32) -> Option<HWND> {
 
     let mut data = Data { pid, found: None };
     unsafe {
-        EnumWindows(Some(enum_proc), LPARAM(&mut data as *mut _ as isize));
+        let _ = EnumWindows(Some(enum_proc), LPARAM(&mut data as *mut _ as isize));
     }
     data.found
 }
