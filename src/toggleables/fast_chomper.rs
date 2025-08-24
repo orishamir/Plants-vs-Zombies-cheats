@@ -54,7 +54,7 @@ impl Toggleable for FastChomperCheat {
                 0x00,
                 0x00,
             ],
-        )?;
+        );
 
         // mov [edi + 3C], 0xE
         process.write::<[u8; _]>(
@@ -68,7 +68,7 @@ impl Toggleable for FastChomperCheat {
                 0x00,
                 0x00,
             ],
-        )?;
+        );
 
         // Momenterally restore all currently-digesting Choppers
         // to their normal state by setting the timer to 0.
@@ -77,7 +77,7 @@ impl Toggleable for FastChomperCheat {
             [
                 0x83, 0x67, 0x54, 0x00, // and dword ptr [edi + 54], 0x0
             ],
-        )?;
+        );
         std::thread::sleep(Duration::from_millis(500));
         process.write::<[u8; 4]>(
             &COOLDOWN_INSTRUCTION_OFFSET,
@@ -85,7 +85,7 @@ impl Toggleable for FastChomperCheat {
                 0x48, // dec eax
                 0x89, 0x47, 0x54, // mov [edi + 54], eax
             ],
-        )?;
+        );
 
         Ok(())
     }
@@ -103,7 +103,7 @@ impl Toggleable for FastChomperCheat {
                 0x00,
                 0x00,
             ],
-        )?;
+        );
 
         // mov [edi + 3C], 0xB
         process.write::<[u8; 7]>(
@@ -117,7 +117,7 @@ impl Toggleable for FastChomperCheat {
                 0x00,
                 0x00,
             ],
-        )?;
+        );
         Ok(())
     }
 

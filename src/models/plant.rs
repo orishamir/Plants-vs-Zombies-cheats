@@ -30,6 +30,32 @@ pub struct Plant {
     _pad8: [u8; 6],
 }
 
+impl Default for Plant {
+    fn default() -> Self {
+        Self {
+            _pad1: Default::default(),
+            display_pos_x: Default::default(),
+            display_pos_y: Default::default(),
+            _pad2: Default::default(),
+            row: Default::default(),
+            _pad3: Default::default(),
+            plant_type: PlantType::Peashooter,
+            column: Default::default(),
+            _pad4: Default::default(),
+            plant_state: Default::default(),
+            health: Default::default(),
+            max_health: Default::default(),
+            _pad5: Default::default(),
+            plant_timer: Default::default(),
+            _pad6: [0; _],
+            is_deleted: Default::default(),
+            _pad7: Default::default(),
+            is_considered_shoveling: Default::default(),
+            _pad8: Default::default(),
+        }
+    }
+}
+
 impl Debug for Plant {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Plant")

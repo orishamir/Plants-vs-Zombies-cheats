@@ -1,54 +1,13 @@
-use process_memory::{DataMember, Memory, ProcessHandle, TryIntoProcessHandle};
-use std::ffi::OsStr;
-use sysinfo::Pid;
-use thiserror::Error;
+use proc_mem::{Module, ProcMemError, Process};
 use windows::Win32::{
     Foundation::{HWND, RECT},
-    System::Diagnostics::ToolHelp::{
-        CreateToolhelp32Snapshot, MODULEENTRY32, Module32First, Module32Next, TH32CS_SNAPMODULE,
-    },
     UI::WindowsAndMessaging,
 };
 
-pub fn get_base_module_address(module_name: &str, pid: u32) -> Option<usize> {
-    unsafe {
-        let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid).ok()?;
-        if snapshot.is_invalid() {
-            return None;
-        }
-
-        let mut module_entry = MODULEENTRY32 {
-            dwSize: size_of::<MODULEENTRY32>() as u32,
-            ..Default::default()
-        };
-        if Module32First(snapshot, &mut module_entry).as_bool() {
-            loop {
-                let name_bytes = module_entry.szModule;
-                let first_null = name_bytes
-                    .iter()
-                    .position(|&c| c == 0)
-                    .unwrap_or(name_bytes.len());
-                let name = String::from_utf8_lossy(&name_bytes[..first_null]);
-
-                if name.eq_ignore_ascii_case(module_name) {
-                    return Some(module_entry.modBaseAddr as usize);
-                }
-
-                if !Module32Next(snapshot, &mut module_entry).as_bool() {
-                    break;
-                }
-            }
-        }
-    }
-
-    None
-}
-
 #[derive(Debug)]
 pub struct GameProcess {
-    handle: ProcessHandle,
-    pid: Pid,
-    base_address: usize,
+    pub proc: Process,
+    pub base_module: Module,
 }
 
 #[allow(dead_code)]
@@ -57,65 +16,45 @@ impl GameProcess {
         let mut rect = RECT::default();
         unsafe {
             let _ = WindowsAndMessaging::GetWindowRect(
-                main_window_by_pid(self.pid.as_u32()).expect("asd"),
+                main_window_by_pid(self.proc.process_id).expect("asd"),
                 &mut rect,
             );
         }
         rect
     }
 
-    pub fn read<T: Copy>(&self, offsets: &[usize]) -> Result<T, std::io::Error> {
-        let offsets = Vec::<usize>::from(offsets);
-
-        let member = DataMember::<T>::new_offset(self.handle, offsets);
-        unsafe { member.read() }
+    pub fn read<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
+        self.proc.read_mem_chain::<T>(offsets.to_vec())
     }
 
-    pub fn read_with_base_addr<T: Copy>(&self, offsets: &[usize]) -> Result<T, std::io::Error> {
+    pub fn read_with_base_addr<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
         let mut out = offsets.to_vec();
-        if let Some(first) = out.first_mut() {
-            *first += self.base_address
-        }
-
+        out.insert(0, self.base_module.base_address());
         self.read(&out)
     }
 
-    /// Read memory at `addr`
-    pub fn read_at<T: Copy>(&self, addr: usize) -> Result<T, std::io::Error> {
-        self.read(&[addr])
+    pub fn read_at<T: Default>(&self, addr: usize) -> Result<T, ProcMemError> {
+        self.proc.read_mem::<T>(addr)
     }
 
-    pub fn write<T: Copy>(&self, offsets: &[usize], value: T) -> Result<(), std::io::Error> {
-        let mut offsets = Vec::<usize>::from(offsets);
-        if !offsets.is_empty() {
-            offsets[0] += self.base_address;
-        }
-
-        let member = DataMember::<T>::new_offset(self.handle, offsets);
-        member.write(&value)
+    pub fn write_at<T: Default>(&self, addr: usize, value: T) -> bool {
+        self.proc.write_mem::<T>(addr, value)
     }
 
-    pub fn init() -> Result<Self, GameProcessInitError> {
-        let system = sysinfo::System::new_all();
-        // system.refresh_all();
+    pub fn write<T: Default>(&self, offsets: &[usize], value: T) -> Result<(), ProcMemError> {
+        let mut offsets = offsets.to_vec();
+        offsets.insert(0, self.base_module.base_address());
 
-        let popcapgame = system
-            .processes_by_exact_name(OsStr::new("popcapgame1.exe"))
-            .next()
-            .ok_or(GameProcessInitError::GameNotRunning)?;
+        self.proc
+            .write_mem::<T>(self.proc.read_ptr_chain(offsets)?, value);
 
-        let handle =
-            (popcapgame.pid().as_u32() as process_memory::Pid).try_into_process_handle()?;
+        Ok(())
+    }
 
-        let module_base_address =
-            get_base_module_address("popcapgame1.exe", popcapgame.pid().as_u32())
-                .ok_or(GameProcessInitError::BaseModuleNotFound)?;
-
-        Ok(Self {
-            handle,
-            pid: popcapgame.pid(),
-            base_address: module_base_address,
-        })
+    pub fn init() -> Result<Self, ProcMemError> {
+        let proc = Process::with_name("popcapgame1.exe")?;
+        let base_module = proc.module("popcapgame1.exe")?;
+        Ok(Self { proc, base_module })
     }
 }
 
@@ -123,16 +62,6 @@ impl Default for GameProcess {
     fn default() -> Self {
         GameProcess::init().unwrap()
     }
-}
-
-#[derive(Error, Debug)]
-pub enum GameProcessInitError {
-    #[error("popcapgame1.exe is not running")]
-    GameNotRunning,
-    #[error("Couldn't get handle to popcapgame1.exe")]
-    CoudlntGetProcessHandle(#[from] std::io::Error),
-    #[error("popcapgame1.exe module not found")]
-    BaseModuleNotFound,
 }
 
 /// Heuristic: visible, not owned, not toolwindow, not DWM-cloaked, has title.

@@ -20,6 +20,25 @@ pub struct Projectile {
     _pad5: [u8; 52],
 }
 
+impl Default for Projectile {
+    fn default() -> Self {
+        Self {
+            _pad1: Default::default(),
+            display_pos_x: Default::default(),
+            display_pos_y: Default::default(),
+            _pad2: Default::default(),
+            pos_x: Default::default(),
+            pos_y_1: Default::default(),
+            _pad3: Default::default(),
+            pos_y_2: Default::default(),
+            is_deleted: Default::default(),
+            _pad4: Default::default(),
+            projectile_type: Default::default(),
+            _pad5: [0; _],
+        }
+    }
+}
+
 impl Debug for Projectile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Projectile")

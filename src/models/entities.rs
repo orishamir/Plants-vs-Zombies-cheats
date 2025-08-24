@@ -1,5 +1,5 @@
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct Entities {
     // Zombies
     pub zombies_ptr: usize,

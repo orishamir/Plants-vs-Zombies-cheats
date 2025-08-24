@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use super::{CardType, PlantType};
 
 #[repr(C, packed)]
-#[derive(Clone, Copy)]
+#[derive(Default, Clone, Copy)]
 pub struct Card {
     _pad1: [u8; 8],
     pub display_pos_x: u32,
