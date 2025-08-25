@@ -1,93 +1,48 @@
-use std::{fmt::Debug, mem::transmute};
+use super::{ArmorType, LawnmowerMode, LawnmowerType, MemoryParseable};
+use byteorder::{LittleEndian, ReadBytesExt};
+use std::{
+    fmt::Debug,
+    io::{Cursor, Read, Seek},
+};
 
 #[allow(dead_code)]
-#[repr(C, packed)]
-#[derive(Default, Clone, Copy)]
+#[derive(Debug, Default)]
 pub struct Lawnmower {
-    _pad1: [u8; 8],
     pub display_pos_x: f32,
     pub display_pos_y: f32,
-    _pad2: [u8; 4],
     pub row: u32,
-    _pad3: [u8; 20],
     pub lawnmower_mode: LawnmowerMode,
     pub is_deleted: bool,
-    _pad4: [u8; 3],
     pub lawnmower_type: LawnmowerType,
-    _pad5: [u8; 16],
 }
 
-impl Debug for Lawnmower {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Lawnmower")
-            .field("display_pos_x", &{ self.display_pos_x })
-            .field("display_pos_y", &{ self.display_pos_y })
-            .field("row", &{ self.row })
-            .field("lawnmower_mode", &{ self.lawnmower_mode })
-            .field("is_deleted", &self.is_deleted)
-            .field("lawnmower_type", &{ self.lawnmower_type })
-            .finish()
-    }
-}
+impl MemoryParseable for Lawnmower {
+    fn from_bytes(buf: Vec<u8>) -> Self {
+        assert_eq!(buf.len(), Self::size_of());
+        let mut rdr = Cursor::new(buf);
 
-#[allow(dead_code)]
-#[repr(u32)]
-#[derive(Default, Clone, Copy)]
-pub enum LawnmowerType {
-    #[default]
-    Normal = 0,
-    PoolCleaner = 1,
-    RoofCleaner = 2,
-    Unidentifiable = 3,
-}
+        rdr.set_position(0x8);
+        let display_pos_x = rdr.read_f32::<LittleEndian>().unwrap();
+        let display_pos_y = rdr.read_f32::<LittleEndian>().unwrap();
+        rdr.set_position(0x14);
+        let row = rdr.read_u32::<LittleEndian>().unwrap();
+        rdr.set_position(0x2c);
+        let lawnmower_mode: LawnmowerMode = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let is_deleted = rdr.read_u8().unwrap() != 0;
+        rdr.set_position(0x34);
+        let lawnmower_type = rdr.read_u32::<LittleEndian>().unwrap().into();
 
-impl Debug for LawnmowerType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let raw_value = unsafe { transmute::<&Self, &u32>(self) };
-        if !matches!(raw_value, 0..=3) {
-            return write!(f, "{raw_value}");
-        }
-
-        match self {
-            Self::Normal => write!(f, "Normal"),
-            Self::PoolCleaner => write!(f, "PoolCleaner"),
-            Self::RoofCleaner => write!(f, "RoofCleaner"),
-            Self::Unidentifiable => write!(f, "Unidentifiable"),
+        Self {
+            display_pos_x,
+            display_pos_y,
+            row,
+            lawnmower_mode,
+            is_deleted,
+            lawnmower_type,
         }
     }
-}
 
-#[allow(dead_code)]
-#[repr(u32)]
-#[derive(Default, Clone, Copy)]
-pub enum LawnmowerMode {
-    Resetting = 0,
-    #[default]
-    Normal = 1,
-    Running = 2,
-}
-
-impl Debug for LawnmowerMode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let raw_value = unsafe { transmute::<&Self, &u32>(self) };
-        if !matches!(raw_value, 0..=2) {
-            return write!(f, "{raw_value}");
-        }
-
-        match self {
-            Self::Resetting => write!(f, "Resetting"),
-            Self::Normal => write!(f, "Normal"),
-            Self::Running => write!(f, "Running"),
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn validate_struct_size() {
-        assert_eq!(size_of::<Lawnmower>(), 72);
+    fn size_of() -> usize {
+        72
     }
 }

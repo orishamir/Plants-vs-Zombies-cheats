@@ -4,7 +4,7 @@ use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
 
-use crate::{entities_loader::EntitiesLoader, game::Popcapgame};
+use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::VaseType};
 mod entities_loader;
 mod game;
 mod gui;
@@ -28,7 +28,15 @@ fn main() {
     //     println!("{:#?}", ents.cards);
     // }
     let proc = Popcapgame::default();
-    println!("{:#?}", proc.get_rect_size());
+
+    let ents = EntitiesLoader::load(&proc).unwrap();
+    println!(
+        "{:#?}",
+        ents.griditems
+            .iter()
+            .filter(|g| matches!(g.vase_type, VaseType::Plant))
+            .collect::<Vec<_>>()
+    )
 }
 
 fn _main() -> eframe::Result {

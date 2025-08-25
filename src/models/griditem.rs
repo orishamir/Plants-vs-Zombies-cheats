@@ -1,131 +1,61 @@
-use std::{fmt::Debug, mem::transmute};
-
+use super::{GriditemType, MemoryParseable, PlantType, VaseType, ZombieType};
+use byteorder::{LittleEndian, ReadBytesExt};
 use egui::Grid;
+use std::{
+    fmt::Debug,
+    io::{Cursor, Read, Seek},
+};
 
-use super::{PlantType, ZombieType};
-
-#[derive(Clone, Copy)]
-#[repr(C, packed)]
+#[allow(dead_code)]
+#[derive(Default, Debug)]
 pub struct Griditem {
-    _pad1: [u8; 8],
     pub griditem_type: GriditemType,
     pub vase_type: VaseType,
     pub column: u32,
     pub row: u32,
     pub timer_until_dead: u32,
-    _pad3: [u8; 4],
     pub is_deleted: bool,
-    _pad4: [u8; 27],
     pub zombie_type: ZombieType,
     pub plant_type: PlantType,
-    _pad5: [u8; 4],
     pub is_highlighted: bool,
-    _pad6: [u8; 3],
     pub opacity: u32,
-    _pad7: [u8; 156],
 }
 
-impl Default for Griditem {
-    fn default() -> Self {
+impl MemoryParseable for Griditem {
+    fn from_bytes(buf: Vec<u8>) -> Self {
+        assert_eq!(buf.len(), Self::size_of());
+        let mut rdr = Cursor::new(buf);
+
+        rdr.set_position(0x8);
+        let griditem_type: GriditemType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let vase_type: VaseType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let column = rdr.read_u32::<LittleEndian>().unwrap();
+        let row = rdr.read_u32::<LittleEndian>().unwrap();
+        let timer_until_dead = rdr.read_u32::<LittleEndian>().unwrap();
+        rdr.set_position(0x20);
+        let is_deleted = rdr.read_u8().unwrap() != 0;
+        rdr.set_position(0x3c);
+        let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        rdr.set_position(0x48);
+        let is_highlighted = rdr.read_u32::<LittleEndian>().unwrap() != 0;
+        let opacity = rdr.read_u32::<LittleEndian>().unwrap();
+
         Self {
-            _pad1: Default::default(),
-            griditem_type: GriditemType::Rake,
-            vase_type: VaseType::Mistery,
-            column: Default::default(),
-            row: Default::default(),
-            timer_until_dead: Default::default(),
-            _pad3: Default::default(),
-            is_deleted: Default::default(),
-            _pad4: Default::default(),
-            zombie_type: ZombieType::BackupDancer,
-            plant_type: Default::default(),
-            _pad5: Default::default(),
-            is_highlighted: Default::default(),
-            _pad6: Default::default(),
-            opacity: Default::default(),
-            _pad7: [0; _],
+            griditem_type,
+            vase_type,
+            column,
+            row,
+            timer_until_dead,
+            is_deleted,
+            zombie_type,
+            plant_type,
+            is_highlighted,
+            opacity,
         }
     }
-}
 
-impl Debug for Griditem {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Griditem")
-            .field("griditem_type", &{ self.griditem_type })
-            .field("vase_type", &{ self.vase_type })
-            .field("column", &{ self.column })
-            .field("row", &{ self.row })
-            .field("timer_until_dead", &{ self.timer_until_dead })
-            .field("is_deleted", &{ self.is_deleted })
-            .field("zombie_type", &{ self.zombie_type })
-            .field("plant_type", &{ self.plant_type })
-            .field("is_highlighted", &{ self.is_highlighted })
-            .field("opacity", &{ self.opacity })
-            .finish()
-    }
-}
-
-#[allow(dead_code)]
-#[derive(Clone, Copy)]
-#[repr(u32)]
-pub enum GriditemType {
-    Grave = 1,
-    DoomShroomCrater = 2,
-    Vase = 7,
-    Snail = 10,
-    Rake = 11,
-}
-
-impl Debug for GriditemType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let raw_value = unsafe { transmute::<&Self, &u32>(self) };
-        if !matches!(raw_value, 1 | 2 | 7 | 10 | 11) {
-            return write!(f, "{raw_value}");
-        }
-        match self {
-            Self::Grave => write!(f, "Grave"),
-            Self::DoomShroomCrater => write!(f, "DoomShroomCrater"),
-            Self::Vase => write!(f, "Vase"),
-            Self::Snail => write!(f, "Snail"),
-            Self::Rake => write!(f, "Rake"),
-        }
-    }
-}
-
-#[allow(dead_code)]
-#[derive(Clone, Copy)]
-#[repr(u32)]
-/// See [Kinds of vases](https://plantsvszombies.fandom.com/wiki/Vasebreaker?file=Scary_Pot.png)
-pub enum VaseType {
-    /// Normal vase
-    Mistery = 3,
-    /// The green vase
-    Plant = 4,
-    /// The zombie vase
-    Zombie = 5,
-}
-
-impl Debug for VaseType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let raw_value = unsafe { transmute::<&Self, &u32>(self) };
-        if !matches!(raw_value, 3..=5) {
-            return write!(f, "{raw_value}");
-        }
-
-        match self {
-            Self::Mistery => write!(f, "Mistery"),
-            Self::Plant => write!(f, "Plant"),
-            Self::Zombie => write!(f, "Zombie"),
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn validate_struct_size() {
-        assert_eq!(size_of::<Griditem>(), 236);
+    fn size_of() -> usize {
+        236
     }
 }

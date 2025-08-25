@@ -1,7 +1,9 @@
 use proc_mem::ProcMemError;
 
 use crate::game::Popcapgame;
-use crate::models::{Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie};
+use crate::models::{
+    Card, Coin, Entities, Griditem, Lawnmower, MemoryParseable, Plant, Projectile, Zombie,
+};
 
 #[allow(dead_code)]
 pub struct EntitiesLoader {
@@ -15,47 +17,47 @@ pub struct EntitiesLoader {
 }
 
 impl EntitiesLoader {
-    pub fn load(proc: &Popcapgame) -> Result<Self, ProcMemError> {
-        let ents = proc.read_with_base_addr::<Entities>(&[
+    pub fn load(game: &Popcapgame) -> Result<Self, ProcMemError> {
+        let ents = game.read_with_base_addr::<Entities>(&[
             0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4,
         ])?;
 
         let zombies =
-            Self::load_entity::<Zombie>(proc, ents.zombies_ptr, ents.zombies_count, |zombie| {
+            Self::load_entity::<Zombie>(game, ents.zombies_ptr, ents.zombies_count, |zombie| {
                 !zombie.is_dead
             });
 
         let plants =
-            Self::load_entity::<Plant>(proc, ents.plants_ptr, ents.plants_count, |plant| {
+            Self::load_entity::<Plant>(game, ents.plants_ptr, ents.plants_count, |plant| {
                 !plant.is_deleted
             });
 
         let projectiles = Self::load_entity::<Projectile>(
-            proc,
+            game,
             ents.projectiles_ptr,
             ents.projectiles_count,
             |projectile| !projectile.is_deleted,
         );
 
-        let coins = Self::load_entity::<Coin>(proc, ents.coins_ptr, ents.coins_count, |coin| {
+        let coins = Self::load_entity::<Coin>(game, ents.coins_ptr, ents.coins_count, |coin| {
             !coin.is_deleted
         });
 
         let lawnmowers = Self::load_entity::<Lawnmower>(
-            proc,
+            game,
             ents.lawnmower_ptr,
             ents.lawnmower_count,
             |lawnmower| !lawnmower.is_deleted,
         );
 
         let griditems = Self::load_entity::<Griditem>(
-            proc,
+            game,
             ents.griditems_ptr,
             ents.griditems_count,
             |griditem| !griditem.is_deleted,
         );
 
-        let cards = Self::load_cards(proc)?;
+        // let cards = Self::load_cards(game)?;
 
         Ok(Self {
             zombies,
@@ -64,45 +66,36 @@ impl EntitiesLoader {
             coins,
             lawnmowers,
             griditems,
-            cards,
+            cards: vec![],
         })
     }
 
-    fn load_entity<T: Default>(
-        proc: &Popcapgame,
+    pub fn load_entity<T: MemoryParseable + Default>(
+        game: &Popcapgame,
         base_ptr: usize,
         ent_count: u32,
         filter: impl Fn(&T) -> bool,
     ) -> Vec<T> {
         let mut tmp_ptr = base_ptr;
         std::iter::from_fn(move || {
-            let entity_or_err = proc.read_at::<T>(tmp_ptr);
-            tmp_ptr += size_of::<T>();
-            // TODO: Error handling?
-            if let Ok(entity) = entity_or_err {
-                Some(entity)
-            } else {
-                eprintln!(
-                    "WARNING: Couldn't load entity at {:x}\nsize_of:{}\n because: {:#?}",
-                    tmp_ptr - size_of::<T>(),
-                    size_of::<T>(),
-                    entity_or_err.err().unwrap()
-                );
-                None
-            }
+            let mut buf = vec![0; T::size_of()];
+            game.proc.read_bytes(tmp_ptr, buf.as_mut_ptr(), buf.len());
+            tmp_ptr += T::size_of();
+
+            Some(T::from_bytes(buf))
         })
         .filter(filter)
         .take(ent_count as usize)
         .collect()
     }
 
-    fn load_cards(proc: &Popcapgame) -> Result<Vec<Card>, ProcMemError> {
+    fn load_cards(game: &Popcapgame) -> Result<Vec<Card>, ProcMemError> {
         let cards_count: usize =
-            proc.read_with_base_addr(&[0x331C50, 0x320, 0x18, 0x0, 0x8, 0x15c, 0x24])?;
+            game.read_with_base_addr(&[0x331C50, 0x320, 0x18, 0x0, 0x8, 0x15c, 0x24])?;
 
         let cards: Vec<Card> = (0..cards_count)
             .filter_map(|i| {
-                proc.read_with_base_addr::<Card>(&[
+                game.read_with_base_addr::<Card>(&[
                     0x331C50,
                     0x320,
                     0x18,
