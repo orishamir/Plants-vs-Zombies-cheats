@@ -1,105 +1,77 @@
-#![allow(dead_code)]
+use super::{ArmorType, MemoryParseable, ZombieType};
+use byteorder::{LittleEndian, ReadBytesExt};
+use std::{
+    fmt::Debug,
+    io::{Cursor, Read, Seek},
+};
 
-use std::{fmt::Debug, mem::transmute};
-
-use super::ZombieType;
-
-#[repr(u32)]
-#[derive(Copy, Clone)]
-pub enum ArmorType {
-    None = 0,
-    Cone = 1,
-    Bucket = 2,
-    Football = 3,
-}
-
-impl Debug for ArmorType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let raw_value = unsafe { transmute::<&Self, &u32>(self) };
-        if !matches!(raw_value, 0..=2) {
-            return write!(f, "{raw_value}");
-        }
-
-        match self {
-            Self::None => write!(f, "None"),
-            Self::Cone => write!(f, "Cone"),
-            Self::Bucket => write!(f, "Bucket"),
-            Self::Football => write!(f, "Football"),
-        }
-    }
-}
-
-#[repr(C, packed)]
-#[derive(Clone, Copy)]
+#[allow(dead_code)]
+#[derive(Debug, Default)]
 pub struct Zombie {
-    _pad1: [u8; 8],
     pub display_pos_x: u32,
     pub display_pos_y: u32,
-    _pad2: [u8; 12],
     pub row: u32,
-    _pad3: [u8; 4],
     pub zombie_type: ZombieType,
-    _pad4: [u8; 4],
-    pub zombie_pos_x: f32,
-    pub zombie_pos_y: f32,
-    _pad5: [u8; 144],
+    pub pos_x: f32,
+    pub pos_y: f32,
+    pub freeze_timer: u32,
+    /// Is the zombie attacking other zombies
+    pub is_on_our_size: bool,
     pub armor_type: ArmorType,
     pub health: i32,
-    _pad6: [u8; 4],
+    pub original_health: i32,
     pub armor_hp: u32,
-    _pad7: [u8; 24],
+    pub original_armor_hp: u32,
     pub is_dead: bool,
-    _pad8: [u8; 123],
 }
 
-impl Default for Zombie {
-    fn default() -> Self {
+impl MemoryParseable for Zombie {
+    fn from_bytes(buf: Vec<u8>) -> Self {
+        assert_eq!(buf.len(), Self::size_of());
+        let mut rdr = Cursor::new(buf);
+
+        rdr.set_position(0x8);
+        let display_pos_x = rdr.read_u32::<LittleEndian>().unwrap();
+        let display_pos_y = rdr.read_u32::<LittleEndian>().unwrap();
+        rdr.set_position(0x1c);
+        let row = rdr.read_u32::<LittleEndian>().unwrap();
+        rdr.set_position(0x24);
+        let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        rdr.set_position(0x2c);
+        let pos_x = rdr.read_f32::<LittleEndian>().unwrap();
+        let pos_y = rdr.read_f32::<LittleEndian>().unwrap();
+        rdr.set_position(0xac);
+        let freeze_timer = rdr.read_u32::<LittleEndian>().unwrap();
+        rdr.set_position(0xb8);
+        let is_on_our_size = rdr.read_u8().unwrap() != 0;
+        rdr.set_position(0xc4);
+        let armor_type: ArmorType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let health = rdr.read_i32::<LittleEndian>().unwrap();
+        let original_health = rdr.read_i32::<LittleEndian>().unwrap();
+        let armor_hp = rdr.read_u32::<LittleEndian>().unwrap();
+        let original_armor_hp = rdr.read_u32::<LittleEndian>().unwrap();
+        rdr.set_position(0xec);
+        let is_dead = rdr.read_u8().unwrap() != 0;
+
         Self {
-            _pad1: Default::default(),
-            display_pos_x: Default::default(),
-            display_pos_y: Default::default(),
-            _pad2: Default::default(),
-            row: Default::default(),
-            _pad3: Default::default(),
-            zombie_type: ZombieType::Zombie,
-            _pad4: Default::default(),
-            zombie_pos_x: Default::default(),
-            zombie_pos_y: Default::default(),
-            _pad5: [0; _],
-            armor_type: ArmorType::None,
-            health: Default::default(),
-            _pad6: Default::default(),
-            armor_hp: Default::default(),
-            _pad7: Default::default(),
-            is_dead: Default::default(),
-            _pad8: [0; _],
+            display_pos_x,
+            display_pos_y,
+            row,
+            freeze_timer,
+            is_on_our_size,
+            zombie_type,
+            pos_x,
+            pos_y,
+            armor_type,
+            health,
+            original_health,
+            original_armor_hp,
+            armor_hp,
+            is_dead,
         }
     }
-}
 
-impl Debug for Zombie {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Zombie")
-            .field("display_pos_x", &{ self.display_pos_x })
-            .field("display_pos_y", &{ self.display_pos_y })
-            .field("row", &{ self.row })
-            .field("zombie_type", &{ self.zombie_type })
-            .field("zombie_pos_x", &{ self.zombie_pos_x })
-            .field("zombie_pos_y", &{ self.zombie_pos_y })
-            .field("armor_type", &{ self.armor_type })
-            .field("health", &{ self.health })
-            .field("armor_hp", &{ self.armor_hp })
-            .field("is_dead", &{ self.is_dead })
-            .finish()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn validate_struct_size() {
-        assert_eq!(size_of::<Zombie>(), 360);
+    fn size_of() -> usize {
+        360
     }
 }

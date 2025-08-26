@@ -1,45 +1,47 @@
-use std::{fmt::Debug, mem::transmute};
+use std::fmt::Debug;
 
 #[allow(dead_code)]
-#[repr(u32)]
-#[derive(Clone, Copy)]
+#[derive(Debug)]
 pub enum ProjectileType {
-    Pea = 0,
-    FrozenPea = 1,
-    Cabbage = 2,
-    Watermelon = 3,
-    Puff = 4,
-    WinterMelon = 5,
-    FlamingPea = 6,
-    Star = 7,
-    Cacti = 8,
-    Basketball = 9,
-    Corn = 10,
-    GiantCorn = 11,
-    Butterstick = 12,
+    Pea,
+    FrozenPea,
+    Cabbage,
+    Watermelon,
+    Puff,
+    WinterMelon,
+    FlamingPea,
+    Star,
+    Cacti,
+    Basketball,
+    Corn,
+    GiantCorn,
+    Butterstick,
+    Unknown(u32),
 }
 
-impl Debug for ProjectileType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let raw_value = unsafe { transmute::<&Self, &u32>(self) };
-        if !matches!(raw_value, 0..=12) {
-            return write!(f, "{raw_value}");
-        }
+impl Default for ProjectileType {
+    fn default() -> Self {
+        Self::Unknown(0)
+    }
+}
 
-        match self {
-            Self::Pea => write!(f, "Pea"),
-            Self::FrozenPea => write!(f, "FrozenPea"),
-            Self::Cabbage => write!(f, "Cabbage"),
-            Self::Watermelon => write!(f, "Watermelon"),
-            Self::Puff => write!(f, "Puff"),
-            Self::WinterMelon => write!(f, "WinterMelon"),
-            Self::FlamingPea => write!(f, "FlamingPea"),
-            Self::Star => write!(f, "Star"),
-            Self::Cacti => write!(f, "Cacti"),
-            Self::Basketball => write!(f, "Basketball"),
-            Self::Corn => write!(f, "Corn"),
-            Self::GiantCorn => write!(f, "GiantCorn"),
-            Self::Butterstick => write!(f, "Butterstick"),
+impl From<u32> for ProjectileType {
+    fn from(value: u32) -> Self {
+        match value {
+            0 => Self::Pea,
+            1 => Self::FrozenPea,
+            2 => Self::Cabbage,
+            3 => Self::Watermelon,
+            4 => Self::Puff,
+            5 => Self::WinterMelon,
+            6 => Self::FlamingPea,
+            7 => Self::Star,
+            8 => Self::Cacti,
+            9 => Self::Basketball,
+            10 => Self::Corn,
+            11 => Self::GiantCorn,
+            12 => Self::Butterstick,
+            val => Self::Unknown(val),
         }
     }
 }
