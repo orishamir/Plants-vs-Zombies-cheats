@@ -4,6 +4,8 @@ use windows::Win32::{
     UI::WindowsAndMessaging,
 };
 
+use crate::models::MemoryParseable;
+
 #[derive(Debug)]
 pub struct Popcapgame {
     proc: Process,
@@ -25,10 +27,42 @@ impl Popcapgame {
         rect
     }
 
+    // Parseable
+    pub fn read_parseable<T: MemoryParseable>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
+        let buf = self.read_bytes(offsets, T::size_of())?.unwrap();
+        Ok(T::from_bytes(buf))
+    }
+
+    pub fn read_parseable_with_base_addr<T: MemoryParseable>(
+        &self,
+        offsets: &[usize],
+    ) -> Result<T, ProcMemError> {
+        let mut out = offsets.to_vec();
+        out.insert(0, self.base_module.base_address());
+        self.read_parseable(&out)
+    }
+
+    pub fn read_parseable_at<T: MemoryParseable>(&self, addr: usize) -> Result<T, ProcMemError> {
+        let buf = self.read_bytes_at(addr, T::size_of()).unwrap();
+        Ok(T::from_bytes(buf))
+    }
+
+    // More flexible
     pub fn read<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
         self.proc.read_mem_chain::<T>(offsets.to_vec())
     }
 
+    pub fn read_with_base_addr<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
+        let mut out = offsets.to_vec();
+        out.insert(0, self.base_module.base_address());
+        self.read(&out)
+    }
+
+    pub fn read_at<T: Default>(&self, addr: usize) -> Result<T, ProcMemError> {
+        self.proc.read_mem::<T>(addr)
+    }
+
+    // Raw bytes
     pub fn read_bytes(
         &self,
         offsets: &[usize],
@@ -60,16 +94,6 @@ impl Popcapgame {
         } else {
             None
         }
-    }
-
-    pub fn read_with_base_addr<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
-        let mut out = offsets.to_vec();
-        out.insert(0, self.base_module.base_address());
-        self.read(&out)
-    }
-
-    pub fn read_at<T: Default>(&self, addr: usize) -> Result<T, ProcMemError> {
-        self.proc.read_mem::<T>(addr)
     }
 
     pub fn write_at<T: Default>(&self, addr: usize, value: T) -> bool {

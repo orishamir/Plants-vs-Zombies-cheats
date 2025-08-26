@@ -70,7 +70,7 @@ impl EntitiesLoader {
         })
     }
 
-    pub fn load_entity<T: MemoryParseable + Default>(
+    pub fn load_entity<T: MemoryParseable>(
         game: &Popcapgame,
         base_ptr: usize,
         ent_count: u32,
@@ -78,10 +78,9 @@ impl EntitiesLoader {
     ) -> Vec<T> {
         let mut tmp_ptr = base_ptr;
         std::iter::from_fn(move || {
-            let buf = game.read_bytes_at(tmp_ptr, T::size_of()).unwrap();
+            let ent = game.read_parseable_at::<T>(tmp_ptr).unwrap();
             tmp_ptr += T::size_of();
-
-            Some(T::from_bytes(buf))
+            Some(ent)
         })
         .filter(filter)
         .take(ent_count as usize)
@@ -94,22 +93,16 @@ impl EntitiesLoader {
 
         let cards: Vec<Card> = (0..cards_count)
             .map(|i| {
-                let buf = game
-                    .read_bytes_with_base_addr(
-                        &[
-                            0x331C50,
-                            0x320,
-                            0x18,
-                            0x0,
-                            0x8,
-                            0x15c,
-                            0x28 + i * Card::size_of(),
-                        ],
-                        Card::size_of(),
-                    )
-                    .unwrap()
-                    .unwrap();
-                Card::from_bytes(buf)
+                game.read_parseable_with_base_addr::<Card>(&[
+                    0x331C50,
+                    0x320,
+                    0x18,
+                    0x0,
+                    0x8,
+                    0x15c,
+                    0x28 + i * Card::size_of(),
+                ])
+                .unwrap()
             })
             .collect();
 

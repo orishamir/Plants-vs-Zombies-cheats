@@ -4,7 +4,7 @@ use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
 
-use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::VaseType};
+use crate::{entities_loader::EntitiesLoader, game::Popcapgame};
 mod entities_loader;
 mod game;
 mod gui;
@@ -30,7 +30,7 @@ fn main() {
     let proc = Popcapgame::default();
 
     let ents = EntitiesLoader::load(&proc).unwrap();
-    println!("{:#?}", ents.zombies)
+    println!("{:#?}", ents.cards)
 }
 
 fn _main() -> eframe::Result {
