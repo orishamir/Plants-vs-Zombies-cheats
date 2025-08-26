@@ -57,7 +57,7 @@ impl EntitiesLoader {
             |griditem| !griditem.is_deleted,
         );
 
-        // let cards = Self::load_cards(game)?;
+        let cards = Self::load_cards(game)?;
 
         Ok(Self {
             zombies,
@@ -66,7 +66,7 @@ impl EntitiesLoader {
             coins,
             lawnmowers,
             griditems,
-            cards: vec![],
+            cards,
         })
     }
 
@@ -78,8 +78,7 @@ impl EntitiesLoader {
     ) -> Vec<T> {
         let mut tmp_ptr = base_ptr;
         std::iter::from_fn(move || {
-            let mut buf = vec![0; T::size_of()];
-            game.proc.read_bytes(tmp_ptr, buf.as_mut_ptr(), buf.len());
+            let buf = game.read_bytes_at(tmp_ptr, T::size_of()).unwrap();
             tmp_ptr += T::size_of();
 
             Some(T::from_bytes(buf))
@@ -94,17 +93,23 @@ impl EntitiesLoader {
             game.read_with_base_addr(&[0x331C50, 0x320, 0x18, 0x0, 0x8, 0x15c, 0x24])?;
 
         let cards: Vec<Card> = (0..cards_count)
-            .filter_map(|i| {
-                game.read_with_base_addr::<Card>(&[
-                    0x331C50,
-                    0x320,
-                    0x18,
-                    0x0,
-                    0x8,
-                    0x15c,
-                    0x28 + i * size_of::<Card>(),
-                ])
-                .ok()
+            .map(|i| {
+                let buf = game
+                    .read_bytes_with_base_addr(
+                        &[
+                            0x331C50,
+                            0x320,
+                            0x18,
+                            0x0,
+                            0x8,
+                            0x15c,
+                            0x28 + i * Card::size_of(),
+                        ],
+                        Card::size_of(),
+                    )
+                    .unwrap()
+                    .unwrap();
+                Card::from_bytes(buf)
             })
             .collect();
 

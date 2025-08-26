@@ -1,5 +1,4 @@
-use super::MemoryParseable;
-use super::PlantType;
+use super::{MemoryParseable, PlantType};
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::{
     fmt::Debug,
@@ -16,7 +15,7 @@ pub struct Plant {
     pub column: u32,
     pub plant_state: u32,
     pub health: u32,
-    pub max_health: u32,
+    pub original_health: u32,
     /// Depends on the plant.
     /// - Chomper: The time left to digest the zombie.
     /// - Cob cannon: The time left until cob is ready to shoot.
@@ -41,7 +40,7 @@ impl MemoryParseable for Plant {
         rdr.set_position(0x3c);
         let plant_state = rdr.read_u32::<LittleEndian>().unwrap();
         let health = rdr.read_u32::<LittleEndian>().unwrap();
-        let max_health = rdr.read_u32::<LittleEndian>().unwrap();
+        let original_health = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(0x54);
         let plant_timer = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(0x141);
@@ -57,7 +56,7 @@ impl MemoryParseable for Plant {
             column,
             plant_state,
             health,
-            max_health,
+            original_health,
             plant_timer,
             is_deleted,
             is_considered_shoveling,

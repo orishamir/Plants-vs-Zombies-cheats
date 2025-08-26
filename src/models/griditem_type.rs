@@ -6,6 +6,8 @@ pub enum GriditemType {
     Vase,
     Snail,
     Rake,
+    /// The brain in the reverse-zombie puzzle thingy
+    Brain,
     Unknown(u32),
 }
 
@@ -17,6 +19,7 @@ impl From<u32> for GriditemType {
             7 => GriditemType::Vase,
             10 => GriditemType::Snail,
             11 => GriditemType::Rake,
+            12 => GriditemType::Brain,
             val => GriditemType::Unknown(val),
         }
     }

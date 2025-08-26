@@ -78,6 +78,7 @@ pub enum ArmorType {
     Cone,
     Bucket,
     Football,
+    Digger,
     Unknown(u32),
 }
 
@@ -94,6 +95,7 @@ impl From<u32> for ArmorType {
             1 => ArmorType::Cone,
             2 => ArmorType::Bucket,
             3 => ArmorType::Football,
+            4 => ArmorType::Digger,
             val => ArmorType::Unknown(val),
         }
     }

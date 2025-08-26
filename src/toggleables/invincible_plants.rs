@@ -8,18 +8,22 @@ pub struct InvinciblePlantsCheat {}
 
 impl Toggleable for InvinciblePlantsCheat {
     fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; 4]>(&INSTRUCTION_OFFSETS, [0x90; _]);
+        process
+            .write::<[u8; 4]>(&INSTRUCTION_OFFSETS, [0x90; _])
+            .unwrap();
 
         Ok(())
     }
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; 4]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0x83, 0x46, 0x40, 0xFC, // add dword ptr [esi + 0x40], -04
-            ],
-        );
+        process
+            .write::<[u8; 4]>(
+                &INSTRUCTION_OFFSETS,
+                [
+                    0x83, 0x46, 0x40, 0xFC, // add dword ptr [esi + 0x40], -04
+                ],
+            )
+            .unwrap();
 
         Ok(())
     }

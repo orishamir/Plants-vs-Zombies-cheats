@@ -30,13 +30,7 @@ fn main() {
     let proc = Popcapgame::default();
 
     let ents = EntitiesLoader::load(&proc).unwrap();
-    println!(
-        "{:#?}",
-        ents.griditems
-            .iter()
-            .filter(|g| matches!(g.vase_type, VaseType::Plant))
-            .collect::<Vec<_>>()
-    )
+    println!("{:#?}", ents.zombies)
 }
 
 fn _main() -> eframe::Result {

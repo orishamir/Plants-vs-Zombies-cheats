@@ -6,25 +6,60 @@ use windows::Win32::{
 
 #[derive(Debug)]
 pub struct Popcapgame {
-    pub proc: Process,
-    pub base_module: Module,
+    proc: Process,
+    base_module: Module,
 }
 
 #[allow(dead_code)]
 impl Popcapgame {
     pub fn get_rect_size(&self) -> RECT {
         let mut rect = RECT::default();
+
         unsafe {
             let _ = WindowsAndMessaging::GetWindowRect(
-                main_window_by_pid(self.proc.process_id).expect("asd"),
+                main_window_by_pid(self.proc.process_id).unwrap(),
                 &mut rect,
             );
         }
+
         rect
     }
 
     pub fn read<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
         self.proc.read_mem_chain::<T>(offsets.to_vec())
+    }
+
+    pub fn read_bytes(
+        &self,
+        offsets: &[usize],
+        count: usize,
+    ) -> Result<Option<Vec<u8>>, ProcMemError> {
+        let addr: usize = self.proc.read_ptr_chain(offsets.to_vec())?;
+        let mut buf = vec![0; count];
+        if self.proc.read_bytes(addr, buf.as_mut_ptr(), count) {
+            Ok(Some(buf))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub fn read_bytes_with_base_addr(
+        &self,
+        offsets: &[usize],
+        count: usize,
+    ) -> Result<Option<Vec<u8>>, ProcMemError> {
+        let mut out = offsets.to_vec();
+        out.insert(0, self.base_module.base_address());
+        self.read_bytes(&out, count)
+    }
+
+    pub fn read_bytes_at(&self, addr: usize, count: usize) -> Option<Vec<u8>> {
+        let mut buf = vec![0; count];
+        if self.proc.read_bytes(addr, buf.as_mut_ptr(), count) {
+            Some(buf)
+        } else {
+            None
+        }
     }
 
     pub fn read_with_base_addr<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {

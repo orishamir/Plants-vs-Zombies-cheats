@@ -43,81 +43,93 @@ impl From<ChomperState> for u8 {
 impl Toggleable for FastChomperCheat {
     fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xE
-        process.write::<[u8; _]>(
-            &INSTRUCTION_OFFSET1,
-            [
-                0xC7,
-                0x47,
-                0x3C,
-                ChomperState::FinishedEating.into(),
-                0x00,
-                0x00,
-                0x00,
-            ],
-        );
+        process
+            .write::<[u8; _]>(
+                &INSTRUCTION_OFFSET1,
+                [
+                    0xC7,
+                    0x47,
+                    0x3C,
+                    ChomperState::FinishedEating.into(),
+                    0x00,
+                    0x00,
+                    0x00,
+                ],
+            )
+            .unwrap();
 
         // mov [edi + 3C], 0xE
-        process.write::<[u8; _]>(
-            &INSTRUCTION_OFFSET2,
-            [
-                0xC7,
-                0x47,
-                0x3C,
-                ChomperState::FinishedEating.into(),
-                0x00,
-                0x00,
-                0x00,
-            ],
-        );
+        process
+            .write::<[u8; _]>(
+                &INSTRUCTION_OFFSET2,
+                [
+                    0xC7,
+                    0x47,
+                    0x3C,
+                    ChomperState::FinishedEating.into(),
+                    0x00,
+                    0x00,
+                    0x00,
+                ],
+            )
+            .unwrap();
 
         // Momenterally restore all currently-digesting Choppers
         // to their normal state by setting the timer to 0.
-        process.write::<[u8; 4]>(
-            &COOLDOWN_INSTRUCTION_OFFSET,
-            [
-                0x83, 0x67, 0x54, 0x00, // and dword ptr [edi + 54], 0x0
-            ],
-        );
+        process
+            .write::<[u8; 4]>(
+                &COOLDOWN_INSTRUCTION_OFFSET,
+                [
+                    0x83, 0x67, 0x54, 0x00, // and dword ptr [edi + 54], 0x0
+                ],
+            )
+            .unwrap();
         std::thread::sleep(Duration::from_millis(500));
-        process.write::<[u8; 4]>(
-            &COOLDOWN_INSTRUCTION_OFFSET,
-            [
-                0x48, // dec eax
-                0x89, 0x47, 0x54, // mov [edi + 54], eax
-            ],
-        );
+        process
+            .write::<[u8; 4]>(
+                &COOLDOWN_INSTRUCTION_OFFSET,
+                [
+                    0x48, // dec eax
+                    0x89, 0x47, 0x54, // mov [edi + 54], eax
+                ],
+            )
+            .unwrap();
 
         Ok(())
     }
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xD
-        process.write::<[u8; 7]>(
-            &INSTRUCTION_OFFSET1,
-            [
-                0xC7,
-                0x47,
-                0x3C,
-                ChomperState::Digesting.into(),
-                0x00,
-                0x00,
-                0x00,
-            ],
-        );
+        process
+            .write::<[u8; 7]>(
+                &INSTRUCTION_OFFSET1,
+                [
+                    0xC7,
+                    0x47,
+                    0x3C,
+                    ChomperState::Digesting.into(),
+                    0x00,
+                    0x00,
+                    0x00,
+                ],
+            )
+            .unwrap();
 
         // mov [edi + 3C], 0xB
-        process.write::<[u8; 7]>(
-            &INSTRUCTION_OFFSET2,
-            [
-                0xC7,
-                0x47,
-                0x3C,
-                ChomperState::KilledZombie.into(),
-                0x00,
-                0x00,
-                0x00,
-            ],
-        );
+        process
+            .write::<[u8; 7]>(
+                &INSTRUCTION_OFFSET2,
+                [
+                    0xC7,
+                    0x47,
+                    0x3C,
+                    ChomperState::KilledZombie.into(),
+                    0x00,
+                    0x00,
+                    0x00,
+                ],
+            )
+            .unwrap();
         Ok(())
     }
 
