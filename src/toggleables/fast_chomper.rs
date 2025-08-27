@@ -25,7 +25,7 @@ enum ChomperState {
     Targeting,
     KilledZombie,   // Not so sure about this
     Digesting,      // The one that takes most time
-    FinishedEating, // I'm not sure the difference between this and 1.
+    FinishedEating, // I'm not sure the difference between this and WaitingForPrey.
 }
 
 impl From<ChomperState> for u8 {

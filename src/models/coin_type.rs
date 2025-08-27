@@ -3,7 +3,9 @@
 pub enum CoinType {
     Silver,
     Gold,
+    Diamond,
     Sun,
+    MiniSun,
     DroppedCard,
     GiantBagOfCash,
     Unknown(u32),
@@ -20,7 +22,9 @@ impl From<u32> for CoinType {
         match value {
             1 => Self::Silver,
             2 => Self::Gold,
+            3 => Self::Diamond,
             4 => Self::Sun,
+            5 => Self::MiniSun,
             16 => Self::DroppedCard,
             18 => Self::GiantBagOfCash,
             val => Self::Unknown(val),

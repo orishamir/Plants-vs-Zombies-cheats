@@ -14,17 +14,17 @@ pub struct Popcapgame {
 
 #[allow(dead_code)]
 impl Popcapgame {
-    pub fn get_rect_size(&self) -> RECT {
+    pub fn get_rect_size(&self) -> Option<RECT> {
         let mut rect = RECT::default();
 
         unsafe {
             let _ = WindowsAndMessaging::GetWindowRect(
-                main_window_by_pid(self.proc.process_id).unwrap(),
+                main_window_by_pid(self.proc.process_id)?,
                 &mut rect,
             );
         }
 
-        rect
+        Some(rect)
     }
 
     // Parseable

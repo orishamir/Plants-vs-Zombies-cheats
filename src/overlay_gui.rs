@@ -9,7 +9,7 @@ pub struct OverlayGui {
 
 impl OverlayGui {
     pub fn start(self, ctx: &egui::Context) {
-        let rect = self.popcapgame.get_rect_size();
+        let rect = self.popcapgame.get_rect_size().unwrap();
         let width = (rect.right - rect.left) as f32;
         let height = (rect.bottom - rect.top) as f32;
 
