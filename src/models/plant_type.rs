@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum PlantType {
     Peashooter,
     Sunflower,
@@ -115,6 +115,63 @@ impl From<u32> for PlantType {
             47 => Self::CobCannon,
             52 => Self::ReverseRepeater,
             val => Self::Unknown(val),
+        }
+    }
+}
+
+impl From<PlantType> for u32 {
+    fn from(value: PlantType) -> Self {
+        match value {
+            PlantType::Peashooter => 0,
+            PlantType::Sunflower => 1,
+            PlantType::CherryBomb => 2,
+            PlantType::WallNut => 3,
+            PlantType::PotatoMine => 4,
+            PlantType::SnowPea => 5,
+            PlantType::Chomper => 6,
+            PlantType::Repeater => 7,
+            PlantType::PuffShroom => 8,
+            PlantType::SunShroom => 9,
+            PlantType::FumeShroom => 10,
+            PlantType::GraveBuster => 11,
+            PlantType::HypnoShroom => 12,
+            PlantType::ScaredyShroom => 13,
+            PlantType::IceShroom => 14,
+            PlantType::DoomShroom => 15,
+            PlantType::LilyPad => 16,
+            PlantType::Squash => 17,
+            PlantType::Threepeater => 18,
+            PlantType::TangleKelp => 19,
+            PlantType::Jalapeno => 20,
+            PlantType::Spikeweed => 21,
+            PlantType::Torchwood => 22,
+            PlantType::TallNut => 23,
+            PlantType::SeaShroom => 24,
+            PlantType::Plantern => 25,
+            PlantType::Cactus => 26,
+            PlantType::Blover => 27,
+            PlantType::SplitPea => 28,
+            PlantType::Starfruit => 29,
+            PlantType::Pumpkin => 30,
+            PlantType::MagnetShroom => 31,
+            PlantType::CabbagePult => 32,
+            PlantType::FlowerPot => 33,
+            PlantType::KernelPult => 34,
+            PlantType::CoffeeBean => 35,
+            PlantType::Garlic => 36,
+            PlantType::UmbrellaLeaf => 37,
+            PlantType::Marigold => 38,
+            PlantType::MelonPult => 39,
+            PlantType::GatlingPea => 40,
+            PlantType::TwinSunflower => 41,
+            PlantType::GloomShroom => 42,
+            PlantType::Cattail => 43,
+            PlantType::WinterMelon => 44,
+            PlantType::GoldMagnet => 45,
+            PlantType::Spikerock => 46,
+            PlantType::CobCannon => 47,
+            PlantType::ReverseRepeater => 52,
+            PlantType::Unknown(val) => val,
         }
     }
 }

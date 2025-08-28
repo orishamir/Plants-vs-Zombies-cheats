@@ -1,13 +1,14 @@
 use proc_mem::ProcMemError;
 
+use crate::cheated_entity::CheatedEntity;
 use crate::game::Popcapgame;
 use crate::models::{Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie};
-use crate::traits::ReadableEntity;
+use crate::traits::{ReadableEntity, WriteableEntity};
 
 #[allow(dead_code)]
 pub struct EntitiesLoader {
     pub zombies: Vec<Zombie>,
-    pub plants: Vec<Plant>,
+    pub plants: Vec<CheatedEntity<Plant>>,
     pub projectiles: Vec<Projectile>,
     pub coins: Vec<Coin>,
     pub lawnmowers: Vec<Lawnmower>,
@@ -27,7 +28,7 @@ impl EntitiesLoader {
             });
 
         let plants =
-            Self::load_entity::<Plant>(game, ents.plants_ptr, ents.plants_count, |plant| {
+            Self::load_cheated_entity::<Plant>(game, ents.plants_ptr, ents.plants_count, |plant| {
                 !plant.is_deleted
             });
 
@@ -82,6 +83,26 @@ impl EntitiesLoader {
             Some(ent)
         })
         .filter(filter)
+        .take(ent_count as usize)
+        .collect()
+    }
+
+    pub fn load_cheated_entity<T: ReadableEntity + WriteableEntity>(
+        game: &Popcapgame,
+        base_ptr: usize,
+        ent_count: u32,
+        filter: impl Fn(&T) -> bool,
+    ) -> Vec<CheatedEntity<T>> {
+        let mut tmp_ptr = base_ptr;
+        std::iter::from_fn(move || {
+            let ent = game.read_entity_at::<T>(tmp_ptr).unwrap();
+            let ret = Some(CheatedEntity::new(tmp_ptr, ent));
+
+            tmp_ptr += T::size_of();
+
+            ret
+        })
+        .filter(|cheated_ent| filter(&cheated_ent.entity))
         .take(ent_count as usize)
         .collect()
     }

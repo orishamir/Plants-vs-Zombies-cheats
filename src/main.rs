@@ -1,6 +1,6 @@
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{entities_loader::EntitiesLoader, game::Popcapgame};
+use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::PlantType};
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
@@ -10,10 +10,12 @@ mod entities_loader;
 mod game;
 mod gui;
 mod models;
+mod offsets;
 mod overlay_gui;
 mod parsers;
 mod toggleables;
 mod traits;
+mod writers;
 
 fn main() {
     // let proc = GameProcess::default();
@@ -32,8 +34,16 @@ fn main() {
     // }
     let proc = Popcapgame::default();
 
-    let ents = EntitiesLoader::load(&proc).unwrap();
-    println!("{:#?}", ents.cards)
+    let mut ents = EntitiesLoader::load(&proc).unwrap();
+    // println!("{:#?}", ents.lawnmowers)
+    for cheated_plant in ents
+        .plants
+        .iter_mut()
+        .filter(|plant| matches!(plant.entity.plant_type, PlantType::TallNut))
+    {
+        cheated_plant.entity.is_deleted = true;
+        cheated_plant.write_entity(&proc);
+    }
 }
 
 fn _main() -> eframe::Result {

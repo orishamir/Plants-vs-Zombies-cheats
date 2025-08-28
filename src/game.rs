@@ -96,8 +96,8 @@ impl Popcapgame {
         }
     }
 
-    pub fn write_at<T: Default>(&self, addr: usize, value: T) -> bool {
-        self.proc.write_mem::<T>(addr, value)
+    pub fn write_at<T: Default>(&self, addr: usize, offset: impl Into<usize>, value: T) -> bool {
+        self.proc.write_mem::<T>(addr + offset.into(), value)
     }
 
     pub fn write<T: Default>(&self, offsets: &[usize], value: T) -> Result<(), ProcMemError> {
