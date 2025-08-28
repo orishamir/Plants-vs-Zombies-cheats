@@ -1,9 +1,8 @@
 use proc_mem::ProcMemError;
 
 use crate::game::Popcapgame;
-use crate::models::{
-    Card, Coin, Entities, Griditem, Lawnmower, MemoryParseable, Plant, Projectile, Zombie,
-};
+use crate::models::{Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie};
+use crate::traits::ReadableEntity;
 
 #[allow(dead_code)]
 pub struct EntitiesLoader {
@@ -70,7 +69,7 @@ impl EntitiesLoader {
         })
     }
 
-    pub fn load_entity<T: MemoryParseable>(
+    pub fn load_entity<T: ReadableEntity>(
         game: &Popcapgame,
         base_ptr: usize,
         ent_count: u32,

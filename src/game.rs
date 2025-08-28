@@ -4,7 +4,7 @@ use windows::Win32::{
     UI::WindowsAndMessaging,
 };
 
-use crate::models::MemoryParseable;
+use crate::traits::ReadableEntity;
 
 #[derive(Debug)]
 pub struct Popcapgame {
@@ -28,12 +28,12 @@ impl Popcapgame {
     }
 
     // Parseable
-    pub fn read_parseable<T: MemoryParseable>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
+    pub fn read_parseable<T: ReadableEntity>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
         let buf = self.read_bytes(offsets, T::size_of())?.unwrap();
         Ok(T::from_bytes(buf))
     }
 
-    pub fn read_parseable_with_base_addr<T: MemoryParseable>(
+    pub fn read_parseable_with_base_addr<T: ReadableEntity>(
         &self,
         offsets: &[usize],
     ) -> Result<T, ProcMemError> {
@@ -42,7 +42,7 @@ impl Popcapgame {
         self.read_parseable(&out)
     }
 
-    pub fn read_parseable_at<T: MemoryParseable>(&self, addr: usize) -> Result<T, ProcMemError> {
+    pub fn read_parseable_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ProcMemError> {
         let buf = self.read_bytes_at(addr, T::size_of()).unwrap();
         Ok(T::from_bytes(buf))
     }

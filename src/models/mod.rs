@@ -12,7 +12,6 @@ mod plant;
 mod plant_type;
 mod projectile;
 mod projectile_type;
-mod traits;
 mod zombie;
 mod zombie_type;
 
@@ -29,6 +28,5 @@ pub use plant::Plant;
 pub use plant_type::PlantType;
 pub use projectile::Projectile;
 pub use projectile_type::ProjectileType;
-pub use traits::MemoryParseable;
 pub use zombie::Zombie;
 pub use zombie_type::{ArmorType, ZombieType};

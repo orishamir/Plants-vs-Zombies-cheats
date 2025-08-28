@@ -1,5 +1,6 @@
 use crate::game::Popcapgame;
 
+#[allow(dead_code)]
 pub trait Toggleable {
     fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError>;
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError>;

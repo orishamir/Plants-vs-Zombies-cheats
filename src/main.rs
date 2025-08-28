@@ -1,16 +1,19 @@
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use crate::{entities_loader::EntitiesLoader, game::Popcapgame};
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
 
-use crate::{entities_loader::EntitiesLoader, game::Popcapgame};
+mod cheated_entity;
 mod entities_loader;
 mod game;
 mod gui;
 mod models;
 mod overlay_gui;
+mod parsers;
 mod toggleables;
+mod traits;
 
 fn main() {
     // let proc = GameProcess::default();
