@@ -6,7 +6,7 @@ use crate::offsets::CoinOffset;
 use crate::traits::ReadableEntity;
 
 impl ReadableEntity for Coin {
-    fn from_bytes(buf: Vec<u8>) -> Self {
+    fn from_bytes(buf: &Vec<u8>) -> Self {
         assert_eq!(buf.len(), Self::size_of());
         let mut rdr = Cursor::new(buf);
 
