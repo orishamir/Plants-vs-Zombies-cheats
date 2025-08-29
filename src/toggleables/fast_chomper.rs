@@ -17,6 +17,7 @@ const COOLDOWN_INSTRUCTION_OFFSET: [usize; 1] = [0x69648]; // "popcapgame1.exe" 
 ///
 /// We can get away with just modifying the second one, but for minimal cooldown between attacks we modify both.
 #[derive(Default)]
+#[allow(dead_code)]
 pub struct FastChomperCheat {}
 
 #[allow(dead_code)]

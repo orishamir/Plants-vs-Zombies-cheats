@@ -18,6 +18,7 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x1924B];
 ///
 /// TODO: Hide "pause" menu
 #[derive(Default)]
+#[allow(dead_code)]
 pub struct NoPauseCheat {}
 
 impl Toggleable for NoPauseCheat {
