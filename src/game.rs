@@ -27,22 +27,22 @@ impl Popcapgame {
         Some(rect)
     }
 
-    // Parseable
-    pub fn read_parseable<T: ReadableEntity>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
+    // Reading entities
+    pub fn read_entity<T: ReadableEntity>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
         let buf = self.read_bytes(offsets, T::size_of())?.unwrap();
         Ok(T::from_bytes(buf))
     }
 
-    pub fn read_parseable_with_base_addr<T: ReadableEntity>(
+    pub fn read_entity_with_base_addr<T: ReadableEntity>(
         &self,
         offsets: &[usize],
     ) -> Result<T, ProcMemError> {
         let mut out = offsets.to_vec();
         out.insert(0, self.base_module.base_address());
-        self.read_parseable(&out)
+        self.read_entity(&out)
     }
 
-    pub fn read_parseable_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ProcMemError> {
+    pub fn read_entity_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ProcMemError> {
         let buf = self.read_bytes_at(addr, T::size_of()).unwrap();
         Ok(T::from_bytes(buf))
     }

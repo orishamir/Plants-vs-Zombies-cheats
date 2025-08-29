@@ -77,7 +77,7 @@ impl EntitiesLoader {
     ) -> Vec<T> {
         let mut tmp_ptr = base_ptr;
         std::iter::from_fn(move || {
-            let ent = game.read_parseable_at::<T>(tmp_ptr).unwrap();
+            let ent = game.read_entity_at::<T>(tmp_ptr).unwrap();
             tmp_ptr += T::size_of();
             Some(ent)
         })
@@ -92,7 +92,7 @@ impl EntitiesLoader {
 
         let cards: Vec<Card> = (0..cards_count)
             .map(|i| {
-                game.read_parseable_with_base_addr::<Card>(&[
+                game.read_entity_with_base_addr::<Card>(&[
                     0x331C50,
                     0x320,
                     0x18,
