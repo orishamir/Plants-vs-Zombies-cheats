@@ -20,9 +20,9 @@ impl ReadableEntity for Coin {
         let age_since_spawned = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(CoinOffset::AgeSinceReachedDestination as u64);
         let age_since_reached_destination = rdr.read_u32::<LittleEndian>().unwrap();
-        let coin_type: CoinType = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
+        let coin_type: CoinType = rdr.read_u32::<LittleEndian>().unwrap().into();
         rdr.set_position(CoinOffset::PlantType as u64);
-        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
+        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().into();
 
         Self {
             display_pos_x,

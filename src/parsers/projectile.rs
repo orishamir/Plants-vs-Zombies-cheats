@@ -20,8 +20,7 @@ impl ReadableEntity for Projectile {
         let collision_y = rdr.read_f32::<LittleEndian>().unwrap();
         let is_deleted = rdr.read_u32::<LittleEndian>().unwrap() != 0;
         rdr.set_position(ProjectileOffset::ProjectileType as u64);
-        let projectile_type: ProjectileType =
-            rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
+        let projectile_type: ProjectileType = rdr.read_u32::<LittleEndian>().unwrap().into();
 
         Self {
             display_pos_x,

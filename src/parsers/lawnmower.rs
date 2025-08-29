@@ -16,11 +16,10 @@ impl ReadableEntity for Lawnmower {
         rdr.set_position(LawnmowerOffset::Row as u64);
         let row = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(LawnmowerOffset::LawnmowerMode as u64);
-        let lawnmower_mode: LawnmowerMode =
-            rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
+        let lawnmower_mode: LawnmowerMode = rdr.read_u32::<LittleEndian>().unwrap().into();
         let is_deleted = rdr.read_u8().unwrap() != 0;
         rdr.set_position(LawnmowerOffset::LawnmowerType as u64);
-        let lawnmower_type = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
+        let lawnmower_type = rdr.read_u32::<LittleEndian>().unwrap().into();
 
         Self {
             display_pos_x,

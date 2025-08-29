@@ -35,15 +35,19 @@ fn main() {
     let proc = Popcapgame::default();
 
     let mut ents = EntitiesLoader::load(&proc).unwrap();
-    // println!("{:#?}", ents.lawnmowers)
-    for cheated_plant in ents
-        .plants
-        .iter_mut()
-        .filter(|plant| matches!(plant.entity.plant_type, PlantType::TallNut))
-    {
-        cheated_plant.entity.is_deleted = true;
-        cheated_plant.write_entity(&proc);
+
+    for card in ents.cards.iter_mut() {
+        card.entity.card_type = models::CardType::Plant(PlantType::Jalapeno);
+        card.write_entity(&proc);
     }
+    // for cheated_plant in ents
+    //     .plants
+    //     .iter_mut()
+    //     .filter(|plant| matches!(plant.entity.plant_type, PlantType::Chomper))
+    // {
+    //     cheated_plant.entity.is_deleted = true;
+    //     cheated_plant.write_entity(&proc);
+    // }
 }
 
 fn _main() -> eframe::Result {

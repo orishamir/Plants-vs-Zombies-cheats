@@ -1,7 +1,7 @@
-use num_enum::{IntoPrimitive, TryFromPrimitive};
+use num_enum::{FromPrimitive, IntoPrimitive};
 
 #[allow(dead_code)]
-#[derive(Debug, IntoPrimitive, TryFromPrimitive)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
 #[repr(u32)]
 pub enum GriditemType {
     Grave = 1,
@@ -22,7 +22,7 @@ impl Default for GriditemType {
 }
 
 #[allow(dead_code)]
-#[derive(Debug, IntoPrimitive, TryFromPrimitive)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
 #[repr(u32)]
 /// See [Kinds of vases](https://plantsvszombies.fandom.com/wiki/Vasebreaker?file=Scary_Pot.png)
 pub enum VaseType {

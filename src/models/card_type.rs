@@ -24,9 +24,7 @@ impl Default for CardType {
 impl From<u32> for CardType {
     fn from(value: u32) -> Self {
         match value {
-            plant_val if matches!(plant_val, 0..=47 | 52) => {
-                CardType::Plant(plant_val.try_into().unwrap())
-            }
+            plant_val if matches!(plant_val, 0..=47 | 52) => CardType::Plant(plant_val.into()),
 
             54 => CardType::ShufflePlants,
             55 => CardType::Crater,
@@ -56,9 +54,9 @@ impl From<u32> for CardType {
     }
 }
 
-impl Into<u32> for CardType {
-    fn into(self) -> u32 {
-        match self {
+impl From<CardType> for u32 {
+    fn from(val: CardType) -> Self {
+        match val {
             CardType::Plant(plant_type) => plant_type.into(),
             CardType::Zombie(ZombieType::Zombie) => 60,
             CardType::Zombie(ZombieType::ConeheadZombie) => 61,

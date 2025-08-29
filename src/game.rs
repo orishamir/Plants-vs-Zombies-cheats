@@ -28,18 +28,13 @@ impl Popcapgame {
     }
 
     // Reading entities
-    pub fn read_entity<T: ReadableEntity>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
-        let buf = self.read_bytes(offsets, T::size_of())?.unwrap();
-        Ok(T::from_bytes(buf))
-    }
-
-    pub fn read_entity_with_base_addr<T: ReadableEntity>(
+    pub fn read_entity<T: ReadableEntity>(
         &self,
         offsets: &[usize],
+        with_base_addr: bool,
     ) -> Result<T, ProcMemError> {
-        let mut out = offsets.to_vec();
-        out.insert(0, self.base_module.base_address());
-        self.read_entity(&out)
+        let addr = self.read_ptr_chain(offsets, with_base_addr)?;
+        self.read_entity_at::<T>(addr)
     }
 
     pub fn read_entity_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ProcMemError> {
@@ -48,14 +43,13 @@ impl Popcapgame {
     }
 
     // More flexible
-    pub fn read<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
-        self.proc.read_mem_chain::<T>(offsets.to_vec())
-    }
-
-    pub fn read_with_base_addr<T: Default>(&self, offsets: &[usize]) -> Result<T, ProcMemError> {
-        let mut out = offsets.to_vec();
-        out.insert(0, self.base_module.base_address());
-        self.read(&out)
+    pub fn read<T: Default>(
+        &self,
+        offsets: &[usize],
+        with_base_addr: bool,
+    ) -> Result<T, ProcMemError> {
+        let addr = self.read_ptr_chain(offsets, with_base_addr)?;
+        self.proc.read_mem::<T>(addr)
     }
 
     pub fn read_at<T: Default>(&self, addr: usize) -> Result<T, ProcMemError> {
@@ -67,24 +61,10 @@ impl Popcapgame {
         &self,
         offsets: &[usize],
         count: usize,
+        with_base_addr: bool,
     ) -> Result<Option<Vec<u8>>, ProcMemError> {
-        let addr: usize = self.proc.read_ptr_chain(offsets.to_vec())?;
-        let mut buf = vec![0; count];
-        if self.proc.read_bytes(addr, buf.as_mut_ptr(), count) {
-            Ok(Some(buf))
-        } else {
-            Ok(None)
-        }
-    }
-
-    pub fn read_bytes_with_base_addr(
-        &self,
-        offsets: &[usize],
-        count: usize,
-    ) -> Result<Option<Vec<u8>>, ProcMemError> {
-        let mut out = offsets.to_vec();
-        out.insert(0, self.base_module.base_address());
-        self.read_bytes(&out, count)
+        let addr: usize = self.read_ptr_chain(offsets, with_base_addr)?;
+        Ok(self.read_bytes_at(addr, count))
     }
 
     pub fn read_bytes_at(&self, addr: usize, count: usize) -> Option<Vec<u8>> {
@@ -108,6 +88,19 @@ impl Popcapgame {
             .write_mem::<T>(self.proc.read_ptr_chain(offsets)?, value);
 
         Ok(())
+    }
+
+    pub fn read_ptr_chain(
+        &self,
+        offsets: &[usize],
+        with_base_addr: bool,
+    ) -> Result<usize, ProcMemError> {
+        let mut out = offsets.to_vec();
+        if with_base_addr {
+            out.insert(0, self.base_module.base_address());
+        }
+
+        self.proc.read_ptr_chain(out)
     }
 
     pub fn init() -> Result<Self, ProcMemError> {

@@ -1,7 +1,7 @@
-use num_enum::{IntoPrimitive, TryFromPrimitive};
+use num_enum::{FromPrimitive, IntoPrimitive};
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
 #[repr(u32)]
 pub enum ZombieType {
     Zombie = 0,
@@ -42,7 +42,7 @@ impl Default for ZombieType {
     }
 }
 
-#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
 #[repr(u32)]
 pub enum ArmorType {
     None = 0,

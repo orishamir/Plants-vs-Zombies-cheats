@@ -7,50 +7,53 @@ use crate::traits::{ReadableEntity, WriteableEntity};
 
 #[allow(dead_code)]
 pub struct EntitiesLoader {
-    pub zombies: Vec<Zombie>,
+    pub zombies: Vec<CheatedEntity<Zombie>>,
     pub plants: Vec<CheatedEntity<Plant>>,
-    pub projectiles: Vec<Projectile>,
-    pub coins: Vec<Coin>,
-    pub lawnmowers: Vec<Lawnmower>,
-    pub griditems: Vec<Griditem>,
-    pub cards: Vec<Card>,
+    pub projectiles: Vec<CheatedEntity<Projectile>>,
+    pub coins: Vec<CheatedEntity<Coin>>,
+    pub lawnmowers: Vec<CheatedEntity<Lawnmower>>,
+    pub griditems: Vec<CheatedEntity<Griditem>>,
+    pub cards: Vec<CheatedEntity<Card>>,
 }
 
 impl EntitiesLoader {
     pub fn load(game: &Popcapgame) -> Result<Self, ProcMemError> {
-        let ents = game.read_with_base_addr::<Entities>(&[
-            0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4,
-        ])?;
+        let ents = game
+            .read::<Entities>(&[0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4], true)
+            .unwrap();
 
-        let zombies =
-            Self::load_entity::<Zombie>(game, ents.zombies_ptr, ents.zombies_count, |zombie| {
-                !zombie.is_dead
-            });
+        let zombies = Self::load_cheated_entity::<Zombie>(
+            game,
+            ents.zombies_ptr,
+            ents.zombies_count,
+            |zombie| !zombie.is_dead,
+        );
 
         let plants =
             Self::load_cheated_entity::<Plant>(game, ents.plants_ptr, ents.plants_count, |plant| {
                 !plant.is_deleted
             });
 
-        let projectiles = Self::load_entity::<Projectile>(
+        let projectiles = Self::load_cheated_entity::<Projectile>(
             game,
             ents.projectiles_ptr,
             ents.projectiles_count,
             |projectile| !projectile.is_deleted,
         );
 
-        let coins = Self::load_entity::<Coin>(game, ents.coins_ptr, ents.coins_count, |coin| {
-            !coin.is_deleted
-        });
+        let coins =
+            Self::load_cheated_entity::<Coin>(game, ents.coins_ptr, ents.coins_count, |coin| {
+                !coin.is_deleted
+            });
 
-        let lawnmowers = Self::load_entity::<Lawnmower>(
+        let lawnmowers = Self::load_cheated_entity::<Lawnmower>(
             game,
             ents.lawnmower_ptr,
             ents.lawnmower_count,
             |lawnmower| !lawnmower.is_deleted,
         );
 
-        let griditems = Self::load_entity::<Griditem>(
+        let griditems = Self::load_cheated_entity::<Griditem>(
             game,
             ents.griditems_ptr,
             ents.griditems_count,
@@ -70,6 +73,7 @@ impl EntitiesLoader {
         })
     }
 
+    #[allow(dead_code)]
     pub fn load_entity<T: ReadableEntity>(
         game: &Popcapgame,
         base_ptr: usize,
@@ -107,22 +111,29 @@ impl EntitiesLoader {
         .collect()
     }
 
-    fn load_cards(game: &Popcapgame) -> Result<Vec<Card>, ProcMemError> {
+    fn load_cards(game: &Popcapgame) -> Result<Vec<CheatedEntity<Card>>, ProcMemError> {
         let cards_count: usize =
-            game.read_with_base_addr(&[0x331C50, 0x320, 0x18, 0x0, 0x8, 0x15c, 0x24])?;
+            game.read(&[0x331C50, 0x320, 0x18, 0x0, 0x8, 0x15c, 0x24], true)?;
 
-        let cards: Vec<Card> = (0..cards_count)
+        let cards: Vec<CheatedEntity<Card>> = (0..cards_count)
             .map(|i| {
-                game.read_entity_with_base_addr::<Card>(&[
-                    0x331C50,
-                    0x320,
-                    0x18,
-                    0x0,
-                    0x8,
-                    0x15c,
-                    0x28 + i * Card::size_of(),
-                ])
-                .unwrap()
+                let addr = game
+                    .read_ptr_chain(
+                        &[
+                            0x331C50,
+                            0x320,
+                            0x18,
+                            0x0,
+                            0x8,
+                            0x15c,
+                            0x28 + i * Card::size_of(),
+                        ],
+                        true,
+                    )
+                    .unwrap();
+                let card = game.read_entity_at::<Card>(addr).unwrap();
+
+                CheatedEntity::new(addr, card)
             })
             .collect();
 
