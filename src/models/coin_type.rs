@@ -1,33 +1,23 @@
+use num_enum::{IntoPrimitive, TryFromPrimitive};
+
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
+#[repr(u32)]
 pub enum CoinType {
-    Silver,
-    Gold,
-    Diamond,
-    Sun,
-    MiniSun,
-    DroppedCard,
-    GiantBagOfCash,
+    Silver = 1,
+    Gold = 2,
+    Diamond = 3,
+    Sun = 4,
+    MiniSun = 5,
+    DroppedCard = 16,
+    GiantBagOfCash = 18,
+
+    #[num_enum(catch_all)]
     Unknown(u32),
 }
 
 impl Default for CoinType {
     fn default() -> Self {
         Self::Unknown(0)
-    }
-}
-
-impl From<u32> for CoinType {
-    fn from(value: u32) -> Self {
-        match value {
-            1 => Self::Silver,
-            2 => Self::Gold,
-            3 => Self::Diamond,
-            4 => Self::Sun,
-            5 => Self::MiniSun,
-            16 => Self::DroppedCard,
-            18 => Self::GiantBagOfCash,
-            val => Self::Unknown(val),
-        }
     }
 }

@@ -1,102 +1,61 @@
+use num_enum::{IntoPrimitive, TryFromPrimitive};
+
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
+#[repr(u32)]
 pub enum ZombieType {
-    Zombie,
-    FlagZombie,
-    ConeheadZombie,
-    PoleVaultingZombie,
-    BucketheadZombie,
-    NewspaperZombie,
-    ScreenDoorZombie,
-    FootballZombie,
-    DancingZombie,
-    BackupDancer,
-    DuckyTubeZombie,
-    SnorkelZombie,
-    Zomboni,
-    ZombieBobsledTeam,
-    DolphinRiderZombie,
-    JackInTheBoxZombie,
-    BalloonZombie,
-    DiggerZombie,
-    PogoZombie,
-    ZombieYeti,
-    BungeeZombie,
-    LadderZombie,
-    CatapultZombie,
-    Gargantuar,
-    Imp,
-    DrZomboss,
-    GigaGargantuar,
+    Zombie = 0,
+    FlagZombie = 1,
+    ConeheadZombie = 2,
+    PoleVaultingZombie = 3,
+    BucketheadZombie = 4,
+    NewspaperZombie = 5,
+    ScreenDoorZombie = 6,
+    FootballZombie = 7,
+    DancingZombie = 8,
+    BackupDancer = 9,
+    DuckyTubeZombie = 10,
+    SnorkelZombie = 11,
+    Zomboni = 12,
+    ZombieBobsledTeam = 13,
+    DolphinRiderZombie = 14,
+    JackInTheBoxZombie = 15,
+    BalloonZombie = 16,
+    DiggerZombie = 17,
+    PogoZombie = 18,
+    ZombieYeti = 19,
+    BungeeZombie = 20,
+    LadderZombie = 21,
+    CatapultZombie = 22,
+    Gargantuar = 23,
+    Imp = 24,
+    DrZomboss = 25,
+    GigaGargantuar = 32,
+
+    #[num_enum(catch_all)]
     Unknown(u32),
 }
 
 impl Default for ZombieType {
     fn default() -> Self {
-        Self::Unknown(0)
+        Self::Unknown(255)
     }
 }
 
-impl From<u32> for ZombieType {
-    fn from(value: u32) -> Self {
-        match value {
-            0 => ZombieType::Zombie,
-            1 => ZombieType::FlagZombie,
-            2 => ZombieType::ConeheadZombie,
-            3 => ZombieType::PoleVaultingZombie,
-            4 => ZombieType::BucketheadZombie,
-            5 => ZombieType::NewspaperZombie,
-            6 => ZombieType::ScreenDoorZombie,
-            7 => ZombieType::FootballZombie,
-            8 => ZombieType::DancingZombie,
-            9 => ZombieType::BackupDancer,
-            10 => ZombieType::DuckyTubeZombie,
-            11 => ZombieType::SnorkelZombie,
-            12 => ZombieType::Zomboni,
-            13 => ZombieType::ZombieBobsledTeam,
-            14 => ZombieType::DolphinRiderZombie,
-            15 => ZombieType::JackInTheBoxZombie,
-            16 => ZombieType::BalloonZombie,
-            17 => ZombieType::DiggerZombie,
-            18 => ZombieType::PogoZombie,
-            19 => ZombieType::ZombieYeti,
-            20 => ZombieType::BungeeZombie,
-            21 => ZombieType::LadderZombie,
-            22 => ZombieType::CatapultZombie,
-            23 => ZombieType::Gargantuar,
-            24 => ZombieType::Imp,
-            25 => ZombieType::DrZomboss,
-            32 => ZombieType::GigaGargantuar,
-            val => Self::Unknown(val),
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
+#[repr(u32)]
 pub enum ArmorType {
-    None,
-    Cone,
-    Bucket,
-    Football,
-    Digger,
+    None = 0,
+    Cone = 1,
+    Bucket = 2,
+    Football = 3,
+    Digger = 4,
+    #[num_enum(catch_all)]
     Unknown(u32),
 }
 
 impl Default for ArmorType {
     fn default() -> Self {
         Self::Unknown(0)
-    }
-}
-
-impl From<u32> for ArmorType {
-    fn from(value: u32) -> Self {
-        match value {
-            0 => ArmorType::None,
-            1 => ArmorType::Cone,
-            2 => ArmorType::Bucket,
-            3 => ArmorType::Football,
-            4 => ArmorType::Digger,
-            val => ArmorType::Unknown(val),
-        }
     }
 }

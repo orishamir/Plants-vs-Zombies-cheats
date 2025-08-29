@@ -1,28 +1,18 @@
-#[allow(dead_code)]
-#[derive(Debug)]
-pub enum GriditemType {
-    Grave,
-    DoomShroomCrater,
-    Vase,
-    Snail,
-    Rake,
-    /// The brain in the reverse-zombie puzzle thingy
-    Brain,
-    Unknown(u32),
-}
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-impl From<u32> for GriditemType {
-    fn from(value: u32) -> Self {
-        match value {
-            1 => GriditemType::Grave,
-            2 => GriditemType::DoomShroomCrater,
-            7 => GriditemType::Vase,
-            10 => GriditemType::Snail,
-            11 => GriditemType::Rake,
-            12 => GriditemType::Brain,
-            val => GriditemType::Unknown(val),
-        }
-    }
+#[allow(dead_code)]
+#[derive(Debug, IntoPrimitive, TryFromPrimitive)]
+#[repr(u32)]
+pub enum GriditemType {
+    Grave = 1,
+    DoomShroomCrater = 2,
+    Vase = 7,
+    Snail = 10,
+    Rake = 11,
+    /// The brain in the reverse-zombie puzzle thingy
+    Brain = 12,
+    #[num_enum(catch_all)]
+    Unknown(u32),
 }
 
 impl Default for GriditemType {
@@ -32,31 +22,22 @@ impl Default for GriditemType {
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, IntoPrimitive, TryFromPrimitive)]
+#[repr(u32)]
 /// See [Kinds of vases](https://plantsvszombies.fandom.com/wiki/Vasebreaker?file=Scary_Pot.png)
 pub enum VaseType {
     /// Normal vase
-    Mistery,
+    Mistery = 3,
     /// The green vase
-    Plant,
+    Plant = 4,
     /// The zombie vase
-    Zombie,
+    Zombie = 5,
+    #[num_enum(catch_all)]
     Unknown(u32),
 }
 
 impl Default for VaseType {
     fn default() -> Self {
         Self::Unknown(0)
-    }
-}
-
-impl From<u32> for VaseType {
-    fn from(value: u32) -> Self {
-        match value {
-            3 => VaseType::Mistery,
-            4 => VaseType::Plant,
-            5 => VaseType::Zombie,
-            val => VaseType::Unknown(val),
-        }
     }
 }

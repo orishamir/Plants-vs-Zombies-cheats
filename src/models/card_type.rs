@@ -1,6 +1,6 @@
 use super::{PlantType, ZombieType};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum CardType {
     Plant(PlantType),
     Zombie(ZombieType),
@@ -24,7 +24,9 @@ impl Default for CardType {
 impl From<u32> for CardType {
     fn from(value: u32) -> Self {
         match value {
-            plant_val if matches!(plant_val, 0..=47 | 52) => CardType::Plant(plant_val.into()),
+            plant_val if matches!(plant_val, 0..=47 | 52) => {
+                CardType::Plant(plant_val.try_into().unwrap())
+            }
 
             54 => CardType::ShufflePlants,
             55 => CardType::Crater,
@@ -50,6 +52,39 @@ impl From<u32> for CardType {
             74 => Self::Zombie(ZombieType::Imp),
 
             val => Self::Unknown(val),
+        }
+    }
+}
+
+impl Into<u32> for CardType {
+    fn into(self) -> u32 {
+        match self {
+            CardType::Plant(plant_type) => plant_type.into(),
+            CardType::Zombie(ZombieType::Zombie) => 60,
+            CardType::Zombie(ZombieType::ConeheadZombie) => 61,
+            CardType::Zombie(ZombieType::PoleVaultingZombie) => 62,
+            CardType::Zombie(ZombieType::BucketheadZombie) => 63,
+            CardType::Zombie(ZombieType::LadderZombie) => 64,
+            CardType::Zombie(ZombieType::DiggerZombie) => 65,
+            CardType::Zombie(ZombieType::BungeeZombie) => 66,
+            CardType::Zombie(ZombieType::FootballZombie) => 67,
+            CardType::Zombie(ZombieType::BalloonZombie) => 68,
+            CardType::Zombie(ZombieType::ScreenDoorZombie) => 69,
+            CardType::Zombie(ZombieType::Zomboni) => 70,
+            CardType::Zombie(ZombieType::PogoZombie) => 71,
+            CardType::Zombie(ZombieType::DancingZombie) => 72,
+            CardType::Zombie(ZombieType::GigaGargantuar) => 73,
+            CardType::Zombie(ZombieType::Imp) => 74,
+            CardType::ShufflePlants => 54,
+            CardType::Crater => 55,
+            CardType::Sun => 56,
+            CardType::Diamond => 57,
+            CardType::SnorkelZombie => 58,
+            CardType::GoldTrophie => 59,
+            CardType::Zombie(unknown_zombie) => {
+                unreachable!("Zombie type can't be used for a Card: {unknown_zombie:?}")
+            }
+            CardType::Unknown(val) => val,
         }
     }
 }

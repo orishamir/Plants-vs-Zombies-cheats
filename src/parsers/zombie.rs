@@ -16,7 +16,7 @@ impl ReadableEntity for Zombie {
         rdr.set_position(ZombieOffset::Row as u64);
         let row = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(ZombieOffset::ZombieType as u64);
-        let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
         rdr.set_position(ZombieOffset::PosX as u64);
         let pos_x = rdr.read_f32::<LittleEndian>().unwrap();
         let pos_y = rdr.read_f32::<LittleEndian>().unwrap();
@@ -25,7 +25,7 @@ impl ReadableEntity for Zombie {
         rdr.set_position(ZombieOffset::IsHypnotized as u64);
         let is_hypnotized = rdr.read_u8().unwrap() != 0;
         rdr.set_position(ZombieOffset::ArmorType as u64);
-        let armor_type: ArmorType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let armor_type: ArmorType = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
         let health = rdr.read_i32::<LittleEndian>().unwrap();
         let original_health = rdr.read_i32::<LittleEndian>().unwrap();
         let armor_hp = rdr.read_u32::<LittleEndian>().unwrap();

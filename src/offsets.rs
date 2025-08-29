@@ -1,3 +1,7 @@
+use num_enum::IntoPrimitive;
+
+#[derive(IntoPrimitive)]
+#[repr(usize)]
 pub enum PlantOffset {
     DisplayPosX = 0x8,
     DisplayPosY = 0xC,
@@ -12,12 +16,8 @@ pub enum PlantOffset {
     IsConsideredShoveling = 0x145,
 }
 
-impl Into<usize> for PlantOffset {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
-
+#[derive(IntoPrimitive)]
+#[repr(usize)]
 pub enum ProjectileOffset {
     DisplayPosX = 0x8,
     DisplayPosY = 0xC,
@@ -28,11 +28,8 @@ pub enum ProjectileOffset {
     ProjectileType = 0x5c,
 }
 
-impl Into<usize> for ProjectileOffset {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
+#[derive(IntoPrimitive)]
+#[repr(usize)]
 pub enum GriditemOffset {
     GriditemType = 0x8,
     VaseType = 0xC,
@@ -46,12 +43,8 @@ pub enum GriditemOffset {
     Opacity = 0x4c,
 }
 
-impl Into<usize> for GriditemOffset {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
-
+#[derive(IntoPrimitive)]
+#[repr(usize)]
 pub enum CoinOffset {
     DisplayPosX = 0x24,
     DisplayPosY = 0x28,
@@ -63,12 +56,8 @@ pub enum CoinOffset {
     PlantType = 0x68,
 }
 
-impl Into<usize> for CoinOffset {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
-
+#[derive(IntoPrimitive)]
+#[repr(usize)]
 pub enum LawnmowerOffset {
     DisplayPosX = 0x8,
     DisplayPosY = 0xc,
@@ -78,12 +67,8 @@ pub enum LawnmowerOffset {
     LawnmowerType = 0x34,
 }
 
-impl Into<usize> for LawnmowerOffset {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
-
+#[derive(IntoPrimitive)]
+#[repr(usize)]
 pub enum CardOffset {
     DisplayPosX = 0x8,
     DisplayPosY = 0xc,
@@ -98,14 +83,8 @@ pub enum CardOffset {
     UsageCount = 0x4c,
 }
 
-impl Into<usize> for CardOffset {
-    fn into(self) -> usize {
-        self as usize
-    }
-}
-
-#[derive(Into)]
-#[into(types(usize, u64))]
+#[derive(IntoPrimitive)]
+#[repr(usize)]
 pub enum ZombieOffset {
     DisplayPosX = 0x8,
     DisplayPosY = 0xc,
@@ -121,10 +100,4 @@ pub enum ZombieOffset {
     ArmorHealth = 0xd0,
     OriginalArmorHealth = 0xd4,
     IsDead = 0xec,
-}
-
-impl Into<usize> for ZombieOffset {
-    fn into(self) -> usize {
-        self as usize
-    }
 }

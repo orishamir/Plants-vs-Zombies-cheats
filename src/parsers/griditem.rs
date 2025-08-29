@@ -11,16 +11,17 @@ impl ReadableEntity for Griditem {
         let mut rdr = Cursor::new(buf);
 
         rdr.set_position(GriditemOffset::GriditemType as u64);
-        let griditem_type: GriditemType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        let vase_type: VaseType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let griditem_type: GriditemType =
+            rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
+        let vase_type: VaseType = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
         let column = rdr.read_u32::<LittleEndian>().unwrap();
         let row = rdr.read_u32::<LittleEndian>().unwrap();
         let timer_until_dead = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(GriditemOffset::IsDeleted as u64);
         let is_deleted = rdr.read_u8().unwrap() != 0;
         rdr.set_position(GriditemOffset::ZombieType as u64);
-        let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
+        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
         rdr.set_position(GriditemOffset::IsHighlighted as u64);
         let is_highlighted = rdr.read_u32::<LittleEndian>().unwrap() != 0;
         let opacity = rdr.read_u32::<LittleEndian>().unwrap();

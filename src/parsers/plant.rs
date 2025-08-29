@@ -16,7 +16,7 @@ impl ReadableEntity for Plant {
         rdr.set_position(PlantOffset::Row as u64);
         let row = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(PlantOffset::PlantType as u64);
-        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap();
         let column = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(PlantOffset::PlantState as u64);
         let plant_state = rdr.read_u32::<LittleEndian>().unwrap();
