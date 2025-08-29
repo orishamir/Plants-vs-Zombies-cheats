@@ -36,9 +36,14 @@ fn main() {
 
     let mut ents = EntitiesLoader::load(&proc).unwrap();
 
-    for card in ents.cards.iter_mut() {
-        card.entity.card_type = models::CardType::Plant(PlantType::Jalapeno);
-        card.write_entity(&proc);
+    for zombie in ents
+        .zombies
+        .iter_mut()
+        .filter(|z| z.entity.display_pos_x < 500)
+    {
+        zombie.entity.is_hypnotized = true;
+        zombie.entity.health += 10000;
+        zombie.write_entity(&proc);
     }
     // for cheated_plant in ents
     //     .plants
