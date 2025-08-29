@@ -41,3 +41,23 @@ impl Default for VaseType {
         Self::Unknown(0)
     }
 }
+
+#[allow(dead_code)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
+#[repr(u32)]
+pub enum VaseContentType {
+    /// Normal vase
+    Plant = 1,
+    /// A vase containing a Zombie
+    Zombie = 2,
+    /// A vase containing suns. The amount is determined by the `sun_count` field
+    Sun = 3,
+    #[num_enum(catch_all)]
+    Unknown(u32),
+}
+
+impl Default for VaseContentType {
+    fn default() -> Self {
+        Self::Unknown(0)
+    }
+}

@@ -21,7 +21,7 @@ pub use coin::Coin;
 pub use coin_type::CoinType;
 pub use entities::Entities;
 pub use griditem::Griditem;
-pub use griditem_type::{GriditemType, VaseType};
+pub use griditem_type::{GriditemType, VaseContentType, VaseType};
 pub use lawnmower::Lawnmower;
 pub use lawnmower_type::{LawnmowerMode, LawnmowerType};
 pub use plant::Plant;

@@ -14,7 +14,13 @@ impl WriteableEntity for Griditem {
         game.write_at(addr, GriditemOffset::IsDeleted, self.is_deleted);
         game.write_at::<u32>(addr, GriditemOffset::ZombieType, self.zombie_type.into());
         game.write_at::<u32>(addr, GriditemOffset::PlantType, self.plant_type.into());
+        game.write_at::<u32>(
+            addr,
+            GriditemOffset::VaseContentType,
+            self.vase_content_type.into(),
+        );
         game.write_at(addr, GriditemOffset::IsHighlighted, self.is_highlighted);
         game.write_at(addr, GriditemOffset::Opacity, self.opacity);
+        game.write_at(addr, GriditemOffset::SunCount, self.sun_count);
     }
 }

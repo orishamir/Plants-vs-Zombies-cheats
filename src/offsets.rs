@@ -39,8 +39,10 @@ pub enum GriditemOffset {
     IsDeleted = 0x20,
     ZombieType = 0x3c,
     PlantType = 0x40,
+    VaseContentType = 0x44,
     IsHighlighted = 0x48,
     Opacity = 0x4c,
+    SunCount = 0x50,
 }
 
 #[derive(IntoPrimitive)]

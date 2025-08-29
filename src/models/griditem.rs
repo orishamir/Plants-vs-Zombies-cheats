@@ -1,4 +1,4 @@
-use super::{GriditemType, PlantType, VaseType, ZombieType};
+use super::{GriditemType, PlantType, VaseContentType, VaseType, ZombieType};
 
 use std::fmt::Debug;
 
@@ -13,6 +13,8 @@ pub struct Griditem {
     pub is_deleted: bool,
     pub zombie_type: ZombieType,
     pub plant_type: PlantType,
+    pub vase_content_type: VaseContentType,
     pub is_highlighted: bool,
     pub opacity: u32,
+    pub sun_count: u32,
 }

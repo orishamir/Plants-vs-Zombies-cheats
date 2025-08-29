@@ -1,4 +1,4 @@
-use crate::models::{Griditem, GriditemType, PlantType, VaseType, ZombieType};
+use crate::models::{Griditem, GriditemType, PlantType, VaseContentType, VaseType, ZombieType};
 use crate::offsets::GriditemOffset;
 use crate::traits::ReadableEntity;
 
@@ -21,9 +21,10 @@ impl ReadableEntity for Griditem {
         rdr.set_position(GriditemOffset::ZombieType as u64);
         let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().into();
         let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        rdr.set_position(GriditemOffset::IsHighlighted as u64);
+        let vase_content_type: VaseContentType = rdr.read_u32::<LittleEndian>().unwrap().into();
         let is_highlighted = rdr.read_u32::<LittleEndian>().unwrap() != 0;
         let opacity = rdr.read_u32::<LittleEndian>().unwrap();
+        let sun_count = rdr.read_u32::<LittleEndian>().unwrap();
 
         Self {
             griditem_type,
@@ -34,8 +35,10 @@ impl ReadableEntity for Griditem {
             is_deleted,
             zombie_type,
             plant_type,
+            vase_content_type,
             is_highlighted,
             opacity,
+            sun_count,
         }
     }
 
