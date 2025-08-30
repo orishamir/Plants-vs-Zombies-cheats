@@ -1,6 +1,6 @@
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::GriditemType};
+use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::Griditem};
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
@@ -35,21 +35,34 @@ fn main() {
     let proc = Popcapgame::default();
 
     let mut ents = EntitiesLoader::load(&proc).unwrap();
-    // println!(
-    //     "{:#?}",
-    //     ents.griditems
-    //         .iter()
-    //         .filter(|g| matches!(g.entity.vase_content_type, VaseContentType::Sun))
-    //         .collect::<Vec<_>>()
-    // );
+    for mut griditem in ents.griditems {
+        let models::GriditemContent::Vase {
+            column,
+            row,
+            is_highlighted,
+            opacity,
+            vase_kind,
+            vase_content: _,
+        } = griditem.entity.content
+        else {
+            println!("bomboclat");
+            continue;
+        };
 
-    for cheated_vase in ents
-        .griditems
-        .iter_mut()
-        .filter(|cv| matches!(cv.entity.griditem_type, GriditemType::Vase))
-    {
-        cheated_vase.entity.is_deleted = true;
-        cheated_vase.write_entity(&proc);
+        griditem.entity = Griditem {
+            is_deleted: false,
+            content: models::GriditemContent::Vase {
+                column,
+                row,
+                is_highlighted: true,
+                opacity: 0,
+                vase_kind,
+                vase_content: models::VaseContent::Plant {
+                    plant_type: models::PlantType::CherryBomb,
+                },
+            },
+        };
+        griditem.write_entity(&proc);
     }
 }
 

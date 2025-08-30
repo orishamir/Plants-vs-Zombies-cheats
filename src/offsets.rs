@@ -32,11 +32,15 @@ pub enum ProjectileOffset {
 #[repr(usize)]
 pub enum GriditemOffset {
     GriditemType = 0x8,
-    VaseType = 0xC,
+    VaseKind = 0xC,
     Column = 0x10,
     Row = 0x14,
     TimerUntilDead = 0x18,
     IsDeleted = 0x20,
+    PosX = 0x24,
+    PosY = 0x28,
+    DestinationX = 0x2c,
+    DestinationY = 0x30,
     ZombieType = 0x3c,
     PlantType = 0x40,
     VaseContentType = 0x44,

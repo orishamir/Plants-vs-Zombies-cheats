@@ -1,4 +1,4 @@
-use crate::models::{Griditem, GriditemType, PlantType, VaseContentType, VaseType, ZombieType};
+use crate::models::{Griditem, GriditemContent, VaseContent, VaseKind};
 use crate::offsets::GriditemOffset;
 use crate::traits::ReadableEntity;
 
@@ -10,39 +10,95 @@ impl ReadableEntity for Griditem {
         assert_eq!(buf.len(), Self::size_of());
         let mut rdr = Cursor::new(buf);
 
-        rdr.set_position(GriditemOffset::GriditemType as u64);
-        let griditem_type: GriditemType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        let vase_type: VaseType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        let column = rdr.read_u32::<LittleEndian>().unwrap();
-        let row = rdr.read_u32::<LittleEndian>().unwrap();
-        let timer_until_dead = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(GriditemOffset::IsDeleted as u64);
         let is_deleted = rdr.read_u8().unwrap() != 0;
-        rdr.set_position(GriditemOffset::ZombieType as u64);
-        let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        let vase_content_type: VaseContentType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        let is_highlighted = rdr.read_u32::<LittleEndian>().unwrap() != 0;
-        let opacity = rdr.read_u32::<LittleEndian>().unwrap();
-        let sun_count = rdr.read_u32::<LittleEndian>().unwrap();
+
+        rdr.set_position(GriditemOffset::GriditemType as u64);
+        let content = match rdr.read_u32::<LittleEndian>().unwrap() {
+            1 => GriditemContent::GraveBuster,
+            2 => GriditemContent::DoomShroomCrater,
+            7 => Self::read_vase(&mut rdr),
+            // WateringCan / BugSpray / MusicPlayer / Chocolate
+            9 => GriditemContent::ZenGardenItem,
+            10 => Self::read_snail(&mut rdr),
+            11 => GriditemContent::Rake,
+            // The brain in the reverse-zombie puzzle thingy
+            12 => GriditemContent::Brain,
+            _ => unreachable!(),
+        };
 
         Self {
-            griditem_type,
-            vase_type,
-            column,
-            row,
-            timer_until_dead,
             is_deleted,
-            zombie_type,
-            plant_type,
-            vase_content_type,
-            is_highlighted,
-            opacity,
-            sun_count,
+            content,
         }
     }
 
     fn size_of() -> usize {
         236
+    }
+}
+
+impl Griditem {
+    fn read_snail(rdr: &mut Cursor<&[u8]>) -> GriditemContent {
+        rdr.set_position(GriditemOffset::PosX as u64);
+
+        GriditemContent::Snail {
+            pos_x: rdr.read_f32::<LittleEndian>().unwrap(),
+            pos_y: rdr.read_f32::<LittleEndian>().unwrap(),
+            destination_x: rdr.read_f32::<LittleEndian>().unwrap(),
+            destination_y: rdr.read_f32::<LittleEndian>().unwrap(),
+        }
+    }
+
+    fn read_vase(rdr: &mut Cursor<&[u8]>) -> GriditemContent {
+        rdr.set_position(GriditemOffset::Column as u64);
+        let column = rdr.read_u32::<LittleEndian>().unwrap();
+        let row = rdr.read_u32::<LittleEndian>().unwrap();
+
+        rdr.set_position(GriditemOffset::IsHighlighted as u64);
+        let is_highlighted = rdr.read_u32::<LittleEndian>().unwrap() != 0;
+        let opacity = rdr.read_u32::<LittleEndian>().unwrap();
+
+        rdr.set_position(GriditemOffset::VaseKind as u64);
+        let vase_kind: VaseKind = match rdr.read_u32::<LittleEndian>().unwrap() {
+            3 => VaseKind::Mistery,
+            4 => VaseKind::Plant,
+            5 => VaseKind::Zombie,
+            _ => unreachable!(),
+        };
+
+        rdr.set_position(GriditemOffset::VaseContentType as u64);
+        let vase_content: VaseContent = match rdr.read_u32::<LittleEndian>().unwrap() {
+            1 => {
+                rdr.set_position(GriditemOffset::PlantType as u64);
+                VaseContent::Plant {
+                    plant_type: rdr.read_u32::<LittleEndian>().unwrap().into(),
+                }
+            }
+            2 => {
+                rdr.set_position(GriditemOffset::ZombieType as u64);
+                VaseContent::Zombie {
+                    zombie_type: rdr.read_u32::<LittleEndian>().unwrap().into(),
+                }
+            }
+            // A vase containing suns. The amount is determined by the `sun_count` field
+            3 => {
+                rdr.set_position(GriditemOffset::SunCount as u64);
+                VaseContent::Sun {
+                    sun_count: rdr.read_u32::<LittleEndian>().unwrap(),
+                }
+            }
+            // TODO: Error handling in such cases
+            _ => unreachable!(),
+        };
+
+        GriditemContent::Vase {
+            column,
+            row,
+            is_highlighted,
+            opacity,
+            vase_kind,
+            vase_content,
+        }
     }
 }
