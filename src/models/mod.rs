@@ -17,7 +17,7 @@ pub use card::Card;
 pub use card_type::CardType;
 pub use coin::{Coin, CoinContent, CoinType};
 pub use entities::Entities;
-pub use griditem::{Griditem, GriditemContent, VaseContent, VaseKind};
+pub use griditem::{Griditem, GriditemContent, GriditemContentType, VaseContent, VaseKind};
 pub use lawnmower::Lawnmower;
 pub use lawnmower_type::{LawnmowerMode, LawnmowerType};
 pub use plant::Plant;

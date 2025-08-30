@@ -1,4 +1,4 @@
-use crate::models::{Griditem, GriditemContent, VaseContent, VaseKind};
+use crate::models::{Griditem, GriditemContent, GriditemContentType, VaseContent, VaseKind};
 use crate::offsets::GriditemOffset;
 use crate::traits::ReadableEntity;
 
@@ -14,17 +14,16 @@ impl ReadableEntity for Griditem {
         let is_deleted = rdr.read_u8().unwrap() != 0;
 
         rdr.set_position(GriditemOffset::GriditemType as u64);
-        let content = match rdr.read_u32::<LittleEndian>().unwrap() {
-            1 => GriditemContent::GraveBuster,
-            2 => GriditemContent::DoomShroomCrater,
-            7 => Self::read_vase(&mut rdr),
+        let content = match rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap() {
+            GriditemContentType::GraveBuster => GriditemContent::GraveBuster,
+            GriditemContentType::DoomShroomCrater => GriditemContent::DoomShroomCrater,
+            GriditemContentType::Vase => Self::read_vase(&mut rdr),
             // WateringCan / BugSpray / MusicPlayer / Chocolate
-            9 => GriditemContent::ZenGardenItem,
-            10 => Self::read_snail(&mut rdr),
-            11 => GriditemContent::Rake,
+            GriditemContentType::ZenGardenItem => GriditemContent::ZenGardenItem,
+            GriditemContentType::Snail => Self::read_snail(&mut rdr),
+            GriditemContentType::Rake => GriditemContent::Rake,
             // The brain in the reverse-zombie puzzle thingy
-            12 => GriditemContent::Brain,
-            _ => unreachable!(),
+            GriditemContentType::Brain => GriditemContent::Brain,
         };
 
         Self {

@@ -1,3 +1,5 @@
+use num_enum::{IntoPrimitive, TryFromPrimitive};
+
 use crate::models::{PlantType, ZombieType};
 
 use std::fmt::Debug;
@@ -48,4 +50,18 @@ pub enum VaseContent {
     Zombie { zombie_type: ZombieType },
     Plant { plant_type: PlantType },
     Sun { sun_count: u32 },
+}
+
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
+#[repr(u32)]
+pub enum GriditemContentType {
+    GraveBuster = 1,
+    DoomShroomCrater = 2,
+    Vase = 7,
+    // WateringCan / BugSpray / MusicPlayer / Chocolate
+    ZenGardenItem = 9,
+    Snail = 10,
+    Rake = 11,
+    // The brain in the reverse-zombie puzzle thingy
+    Brain = 12,
 }

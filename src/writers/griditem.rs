@@ -5,7 +5,7 @@ impl WriteableEntity for models::Griditem {
     fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {
         game.write_at(addr, GriditemOffset::IsDeleted, self.is_deleted);
 
-        let griditem_type: u32 = match self.content {
+        let griditem_type: models::GriditemContentType = match self.content {
             models::GriditemContent::Vase {
                 column,
                 row,
@@ -24,11 +24,13 @@ impl WriteableEntity for models::Griditem {
                     vase_kind,
                     vase_content,
                 );
-                7
+                models::GriditemContentType::Vase
             }
-            models::GriditemContent::GraveBuster => 1,
-            models::GriditemContent::DoomShroomCrater => 2,
-            models::GriditemContent::ZenGardenItem => 9,
+            models::GriditemContent::GraveBuster => models::GriditemContentType::GraveBuster,
+            models::GriditemContent::DoomShroomCrater => {
+                models::GriditemContentType::DoomShroomCrater
+            }
+            models::GriditemContent::ZenGardenItem => models::GriditemContentType::ZenGardenItem,
             models::GriditemContent::Snail {
                 pos_x,
                 pos_y,
@@ -39,13 +41,13 @@ impl WriteableEntity for models::Griditem {
                 game.write_at(addr, GriditemOffset::PosY, pos_y);
                 game.write_at(addr, GriditemOffset::DestinationX, destination_x);
                 game.write_at(addr, GriditemOffset::DestinationY, destination_y);
-                10
+                models::GriditemContentType::Snail
             }
-            models::GriditemContent::Rake => 11,
-            models::GriditemContent::Brain => 12,
+            models::GriditemContent::Rake => models::GriditemContentType::Rake,
+            models::GriditemContent::Brain => models::GriditemContentType::Brain,
         };
 
-        game.write_at::<u32>(addr, GriditemOffset::GriditemType, griditem_type);
+        game.write_at::<u32>(addr, GriditemOffset::GriditemType, griditem_type.into());
     }
 }
 
