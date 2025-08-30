@@ -1,6 +1,6 @@
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::GriditemType};
+use crate::{entities_loader::EntitiesLoader, game::Popcapgame};
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
@@ -43,14 +43,7 @@ fn main() {
     //         .collect::<Vec<_>>()
     // );
 
-    for cheated_vase in ents
-        .griditems
-        .iter_mut()
-        .filter(|cv| matches!(cv.entity.griditem_type, GriditemType::Vase))
-    {
-        cheated_vase.entity.is_deleted = true;
-        cheated_vase.write_entity(&proc);
-    }
+    println!("{:#?}", ents.griditems[0]);
 }
 
 fn _main() -> eframe::Result {
