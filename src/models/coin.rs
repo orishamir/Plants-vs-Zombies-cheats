@@ -26,6 +26,8 @@ pub enum CoinContent {
     MiniSun,
     DroppedCard { plant_type: PlantType },
     GiantBagOfCash,
+    GoldsunflowerTrophy,
+    Chocolate,
 }
 
 #[allow(dead_code)]
@@ -39,4 +41,12 @@ pub enum CoinType {
     MiniSun = 5,
     DroppedCard = 16,
     GiantBagOfCash = 18,
+    /// Beating a mini-game, Puzzle Mode, or Survival Mode level for the first time.
+    // Trophy = ?
+    /// Beating Adventure Mode for the first time.
+    // SilverSunflowerTrophy = ?
+    /// Beating every mini-game, puzzle, and Survival level for the first time
+    GoldSunflowerTrophy = 22,
+    /// You can pick up chocolates
+    Chocolate = 23,
 }

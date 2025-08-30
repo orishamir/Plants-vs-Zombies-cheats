@@ -31,6 +31,10 @@ pub enum GriditemContent {
         destination_x: f32,
         destination_y: f32,
     },
+    EatableBrain {
+        pos_x: f32,
+        pos_y: f32,
+    },
     Rake,
     Brain,
 }
@@ -59,6 +63,8 @@ pub enum GriditemContentType {
     GraveBuster = 1,
     DoomShroomCrater = 2,
     Portal = 5,
+    /// The ones you drop the zombies in "Zombiquarium"
+    EatableBrain = 6,
     Vase = 7,
     // WateringCan / BugSpray / MusicPlayer / Chocolate
     ZenGardenItem = 9,

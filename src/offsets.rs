@@ -84,6 +84,7 @@ pub enum CardOffset {
     Charge = 0x24,
     RechargeGoal = 0x28,
     Column = 0x2c,
+    PosXOffset = 0x30,
     CardType = 0x34,
     Selectable = 0x48,
     Recharging = 0x49,

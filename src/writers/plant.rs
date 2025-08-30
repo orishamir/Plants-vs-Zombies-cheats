@@ -12,6 +12,7 @@ impl WriteableEntity for Plant {
         game.write_at(addr, PlantOffset::OriginalHealth, self.original_health);
         game.write_at(addr, PlantOffset::PlantTimer, self.plant_timer);
         game.write_at::<bool>(addr, PlantOffset::IsDeleted, self.is_deleted);
+        game.write_at(addr, PlantOffset::HitCount, self.hit_counter);
         game.write_at::<bool>(
             addr,
             PlantOffset::IsConsideredShoveling,

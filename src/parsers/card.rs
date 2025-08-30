@@ -19,6 +19,9 @@ impl ReadableEntity for Card {
         let charge = rdr.read_u32::<LittleEndian>().unwrap();
         let recharge_goal = rdr.read_u32::<LittleEndian>().unwrap();
         let column = rdr.read_u32::<LittleEndian>().unwrap();
+
+        rdr.set_position(CardOffset::PosXOffset as u64);
+        let pos_x_offset = rdr.read_i32::<LittleEndian>().unwrap();
         rdr.set_position(CardOffset::CardType as u64);
         let card_type: CardType = rdr.read_u32::<LittleEndian>().unwrap().into();
         rdr.set_position(CardOffset::Selectable as u64);
@@ -35,6 +38,7 @@ impl ReadableEntity for Card {
             charge,
             recharge_goal,
             column,
+            pos_x_offset,
             card_type,
             selectable,
             recharging,

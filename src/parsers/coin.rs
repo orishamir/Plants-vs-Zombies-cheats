@@ -34,6 +34,8 @@ impl ReadableEntity for Coin {
                 CoinContent::DroppedCard { plant_type }
             }
             CoinType::GiantBagOfCash => CoinContent::GiantBagOfCash,
+            CoinType::GoldSunflowerTrophy => CoinContent::GoldsunflowerTrophy,
+            CoinType::Chocolate => CoinContent::Chocolate,
         };
 
         Self {

@@ -18,13 +18,19 @@ impl ReadableEntity for Griditem {
             GriditemContentType::GraveBuster => GriditemContent::GraveBuster,
             GriditemContentType::DoomShroomCrater => GriditemContent::DoomShroomCrater,
             GriditemContentType::Vase => Self::read_vase(&mut rdr),
-            // WateringCan / BugSpray / MusicPlayer / Chocolate
             GriditemContentType::ZenGardenItem => GriditemContent::ZenGardenItem,
             GriditemContentType::Snail => Self::read_snail(&mut rdr),
             GriditemContentType::Rake => GriditemContent::Rake,
-            // The brain in the reverse-zombie puzzle thingy
             GriditemContentType::Brain => GriditemContent::Brain,
             GriditemContentType::Portal => GriditemContent::Portal,
+            GriditemContentType::EatableBrain => {
+                rdr.set_position(GriditemOffset::PosX as u64);
+
+                GriditemContent::EatableBrain {
+                    pos_x: rdr.read_f32::<LittleEndian>().unwrap(),
+                    pos_y: rdr.read_f32::<LittleEndian>().unwrap(),
+                }
+            }
         };
 
         Self {

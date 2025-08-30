@@ -24,6 +24,8 @@ impl WriteableEntity for Coin {
                 CoinType::DroppedCard
             }
             CoinContent::GiantBagOfCash => CoinType::GiantBagOfCash,
+            CoinContent::GoldsunflowerTrophy => CoinType::GoldSunflowerTrophy,
+            CoinContent::Chocolate => CoinType::Chocolate,
         };
         game.write_at::<u32>(addr, CoinOffset::CoinType, coin_type.into());
     }

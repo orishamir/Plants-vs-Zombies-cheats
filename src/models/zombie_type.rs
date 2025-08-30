@@ -30,6 +30,12 @@ pub enum ZombieType {
     Gargantuar = 23,
     Imp = 24,
     DrZomboss = 25,
+    PeashooterZombie = 26,
+    WallnutZombie = 27,
+    JalapenoZombie = 28,
+    GatlingPeaZombie = 29,
+    SquashZombie = 30,
+    TallnutZombie = 31,
     GigaGargantuar = 32,
 
     #[num_enum(catch_all)]

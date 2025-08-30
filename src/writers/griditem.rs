@@ -46,6 +46,11 @@ impl WriteableEntity for models::Griditem {
             models::GriditemContent::Rake => models::GriditemContentType::Rake,
             models::GriditemContent::Brain => models::GriditemContentType::Brain,
             models::GriditemContent::Portal => models::GriditemContentType::Portal,
+            models::GriditemContent::EatableBrain { pos_x, pos_y } => {
+                game.write_at(addr, GriditemOffset::PosX, pos_x);
+                game.write_at(addr, GriditemOffset::PosY, pos_y);
+                models::GriditemContentType::EatableBrain
+            }
         };
 
         game.write_at::<u32>(addr, GriditemOffset::GriditemType, griditem_type.into());
