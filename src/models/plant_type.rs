@@ -54,6 +54,8 @@ pub enum PlantType {
     Spikerock = 46,
     CobCannon = 47,
     ExplodeONut = 49,
+    GiantWallnut = 50,
+    Sprout = 51,
     ReverseRepeater = 52,
 
     #[num_enum(catch_all)]
