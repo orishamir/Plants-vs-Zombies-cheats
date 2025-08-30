@@ -1,6 +1,6 @@
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::PlantType};
+use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::GriditemType};
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
@@ -35,24 +35,22 @@ fn main() {
     let proc = Popcapgame::default();
 
     let mut ents = EntitiesLoader::load(&proc).unwrap();
+    // println!(
+    //     "{:#?}",
+    //     ents.griditems
+    //         .iter()
+    //         .filter(|g| matches!(g.entity.vase_content_type, VaseContentType::Sun))
+    //         .collect::<Vec<_>>()
+    // );
 
-    for zombie in ents
-        .zombies
+    for cheated_vase in ents
+        .griditems
         .iter_mut()
-        .filter(|z| z.entity.display_pos_x < 500)
+        .filter(|cv| matches!(cv.entity.griditem_type, GriditemType::Vase))
     {
-        zombie.entity.is_hypnotized = true;
-        zombie.entity.health += 10000;
-        zombie.write_entity(&proc);
+        cheated_vase.entity.is_deleted = true;
+        cheated_vase.write_entity(&proc);
     }
-    // for cheated_plant in ents
-    //     .plants
-    //     .iter_mut()
-    //     .filter(|plant| matches!(plant.entity.plant_type, PlantType::Chomper))
-    // {
-    //     cheated_plant.entity.is_deleted = true;
-    //     cheated_plant.write_entity(&proc);
-    // }
 }
 
 fn _main() -> eframe::Result {

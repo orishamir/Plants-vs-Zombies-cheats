@@ -2,7 +2,7 @@ use crate::game::Popcapgame;
 
 pub trait ReadableEntity {
     /// You will get a buffer the size of your struct
-    fn from_bytes(buf: &Vec<u8>) -> Self;
+    fn from_bytes(buf: &[u8]) -> Self;
 
     fn size_of() -> usize;
 }
