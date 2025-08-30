@@ -7,6 +7,8 @@ pub enum GriditemType {
     Grave = 1,
     DoomShroomCrater = 2,
     Vase = 7,
+    /// WateringCan / BugSpray / MusicPlayer / Chocolate
+    ZenGardenItem = 9,
     Snail = 10,
     Rake = 11,
     /// The brain in the reverse-zombie puzzle thingy
