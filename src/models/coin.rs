@@ -1,11 +1,12 @@
-use super::{CoinType, PlantType};
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-use byteorder::{LittleEndian, ReadBytesExt};
+use super::PlantType;
+
 use std::fmt::Debug;
 
 /// Game memory calls this a Coin, but it is any pickable item
 #[allow(dead_code)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Coin {
     pub display_pos_x: f32,
     pub display_pos_y: f32,
@@ -13,8 +14,29 @@ pub struct Coin {
     pub destination_y: u32,
     pub age_since_spawned: u32,
     pub age_since_reached_destination: u32,
-    pub coin_type: CoinType,
-    /// If CoinType is DroppedCard, this is the plant.
-    /// For example winning a new card or a broken vase's drop.
-    pub plant_type: PlantType,
+    pub content: CoinContent,
+}
+
+#[derive(Debug)]
+pub enum CoinContent {
+    Silver,
+    Gold,
+    Diamond,
+    Sun,
+    MiniSun,
+    DroppedCard { plant_type: PlantType },
+    GiantBagOfCash,
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
+#[repr(u32)]
+pub enum CoinType {
+    Silver = 1,
+    Gold = 2,
+    Diamond = 3,
+    Sun = 4,
+    MiniSun = 5,
+    DroppedCard = 16,
+    GiantBagOfCash = 18,
 }

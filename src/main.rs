@@ -1,6 +1,10 @@
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{entities_loader::EntitiesLoader, game::Popcapgame, models::Griditem};
+use crate::{
+    entities_loader::EntitiesLoader,
+    game::Popcapgame,
+    models::{Coin, Griditem},
+};
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
 use gui::MyApp;
@@ -35,34 +39,22 @@ fn main() {
     let proc = Popcapgame::default();
 
     let mut ents = EntitiesLoader::load(&proc).unwrap();
-    for mut griditem in ents.griditems {
-        let models::GriditemContent::Vase {
-            column,
-            row,
-            is_highlighted,
-            opacity,
-            vase_kind,
-            vase_content: _,
-        } = griditem.entity.content
-        else {
+    for mut coin in ents.coins {
+        let models::CoinContent::Sun = coin.entity.content else {
             println!("bomboclat");
             continue;
         };
 
-        griditem.entity = Griditem {
-            is_deleted: false,
-            content: models::GriditemContent::Vase {
-                column,
-                row,
-                is_highlighted: true,
-                opacity: 0,
-                vase_kind,
-                vase_content: models::VaseContent::Plant {
-                    plant_type: models::PlantType::CherryBomb,
-                },
-            },
+        coin.entity = Coin {
+            display_pos_x: coin.entity.display_pos_x,
+            display_pos_y: coin.entity.display_pos_y,
+            is_deleted: coin.entity.is_deleted,
+            destination_y: coin.entity.destination_y,
+            age_since_spawned: coin.entity.age_since_spawned,
+            age_since_reached_destination: coin.entity.age_since_reached_destination,
+            content: models::CoinContent::Diamond,
         };
-        griditem.write_entity(&proc);
+        coin.write_entity(&proc);
     }
 }
 
