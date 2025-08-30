@@ -12,6 +12,7 @@ pub struct Griditem {
 
 #[derive(Debug, Clone, Copy)]
 pub enum GriditemContent {
+    Portal,
     Vase {
         column: u32,
         row: u32,
@@ -57,6 +58,7 @@ pub enum VaseContent {
 pub enum GriditemContentType {
     GraveBuster = 1,
     DoomShroomCrater = 2,
+    Portal = 5,
     Vase = 7,
     // WateringCan / BugSpray / MusicPlayer / Chocolate
     ZenGardenItem = 9,

@@ -12,6 +12,7 @@ pub enum PlantOffset {
     Health = 0x40,
     OriginalHealth = 0x44,
     PlantTimer = 0x54,
+    HitCount = 0x58,
     IsDeleted = 0x141,
     IsConsideredShoveling = 0x145,
 }

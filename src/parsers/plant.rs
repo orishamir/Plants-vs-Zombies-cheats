@@ -24,6 +24,8 @@ impl ReadableEntity for Plant {
         let original_health = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(PlantOffset::PlantTimer as u64);
         let plant_timer = rdr.read_u32::<LittleEndian>().unwrap();
+        rdr.set_position(PlantOffset::HitCount as u64);
+        let hit_counter = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(PlantOffset::IsDeleted as u64);
         let is_deleted = rdr.read_u8().unwrap() != 0;
         rdr.set_position(PlantOffset::IsConsideredShoveling as u64);
@@ -39,6 +41,7 @@ impl ReadableEntity for Plant {
             health,
             original_health,
             plant_timer,
+            hit_counter,
             is_deleted,
             is_considered_shoveling,
         }

@@ -9,6 +9,8 @@ pub struct Plant {
     pub row: u32,
     pub plant_type: PlantType,
     pub column: u32,
+    /// A field which value depends on the plant type.
+    /// If its a bowling wall-nut, determines the direction that the wallnut bowls
     pub plant_state: u32,
     pub health: u32,
     pub original_health: u32,
@@ -16,6 +18,8 @@ pub struct Plant {
     /// - Chomper: The time left to digest the zombie.
     /// - Cob cannon: The time left until cob is ready to shoot.
     pub plant_timer: u32,
+    /// In bowling wallnuts, how many zombies the wallnut hit
+    pub hit_counter: u32,
     pub is_deleted: bool,
     pub is_considered_shoveling: bool,
 }

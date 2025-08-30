@@ -24,6 +24,7 @@ impl ReadableEntity for Griditem {
             GriditemContentType::Rake => GriditemContent::Rake,
             // The brain in the reverse-zombie puzzle thingy
             GriditemContentType::Brain => GriditemContent::Brain,
+            GriditemContentType::Portal => GriditemContent::Portal,
         };
 
         Self {
