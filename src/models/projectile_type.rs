@@ -21,9 +21,3 @@ pub enum ProjectileType {
     #[num_enum(catch_all)]
     Unknown(u32),
 }
-
-impl Default for ProjectileType {
-    fn default() -> Self {
-        Self::Unknown(0)
-    }
-}

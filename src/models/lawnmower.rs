@@ -3,7 +3,7 @@ use super::{LawnmowerMode, LawnmowerType};
 use std::fmt::Debug;
 
 #[allow(dead_code)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Lawnmower {
     pub display_pos_x: f32,
     pub display_pos_y: f32,

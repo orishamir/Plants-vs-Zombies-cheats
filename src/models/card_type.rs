@@ -15,12 +15,6 @@ pub enum CardType {
     Unknown(u32),
 }
 
-impl Default for CardType {
-    fn default() -> Self {
-        Self::Unknown(0)
-    }
-}
-
 impl From<u32> for CardType {
     fn from(value: u32) -> Self {
         match value {

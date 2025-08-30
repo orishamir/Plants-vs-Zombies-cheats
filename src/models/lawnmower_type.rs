@@ -12,12 +12,6 @@ pub enum LawnmowerType {
     Unknown(u32),
 }
 
-impl Default for LawnmowerType {
-    fn default() -> Self {
-        Self::Unknown(0)
-    }
-}
-
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
 #[repr(u32)]
@@ -27,10 +21,4 @@ pub enum LawnmowerMode {
     Running = 2,
     #[num_enum(catch_all)]
     Unknown(u32),
-}
-
-impl Default for LawnmowerMode {
-    fn default() -> Self {
-        Self::Unknown(0)
-    }
 }

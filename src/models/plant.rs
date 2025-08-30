@@ -2,7 +2,7 @@ use super::PlantType;
 use std::fmt::Debug;
 
 #[allow(dead_code)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Plant {
     pub display_pos_x: u32,
     pub display_pos_y: u32,

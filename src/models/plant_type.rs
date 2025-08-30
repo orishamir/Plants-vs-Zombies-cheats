@@ -58,9 +58,3 @@ pub enum PlantType {
     #[num_enum(catch_all)]
     Unknown(u32),
 }
-
-impl Default for PlantType {
-    fn default() -> Self {
-        Self::Unknown(255)
-    }
-}

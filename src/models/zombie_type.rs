@@ -36,12 +36,6 @@ pub enum ZombieType {
     Unknown(u32),
 }
 
-impl Default for ZombieType {
-    fn default() -> Self {
-        Self::Unknown(255)
-    }
-}
-
 #[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
 #[repr(u32)]
 pub enum ArmorType {
@@ -52,10 +46,4 @@ pub enum ArmorType {
     Digger = 4,
     #[num_enum(catch_all)]
     Unknown(u32),
-}
-
-impl Default for ArmorType {
-    fn default() -> Self {
-        Self::Unknown(0)
-    }
 }
