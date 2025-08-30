@@ -49,6 +49,7 @@ impl Griditem {
             destination_y: rdr.read_f32::<LittleEndian>().unwrap(),
         }
     }
+
     fn read_vase(rdr: &mut Cursor<&[u8]>) -> GriditemContent {
         rdr.set_position(GriditemOffset::Column as u64);
         let column = rdr.read_u32::<LittleEndian>().unwrap();
@@ -58,7 +59,7 @@ impl Griditem {
         let is_highlighted = rdr.read_u32::<LittleEndian>().unwrap() != 0;
         let opacity = rdr.read_u32::<LittleEndian>().unwrap();
 
-        rdr.set_position(GriditemOffset::VaseHint as u64);
+        rdr.set_position(GriditemOffset::VaseKind as u64);
         let vase_kind: VaseKind = match rdr.read_u32::<LittleEndian>().unwrap() {
             3 => VaseKind::Mistery,
             4 => VaseKind::Plant,
@@ -87,6 +88,7 @@ impl Griditem {
                     sun_count: rdr.read_u32::<LittleEndian>().unwrap(),
                 }
             }
+            // TODO: Error handling in such cases
             _ => unreachable!(),
         };
 

@@ -8,7 +8,7 @@ pub struct Griditem {
     pub content: GriditemContent,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum GriditemContent {
     Vase {
         column: u32,
@@ -31,7 +31,7 @@ pub enum GriditemContent {
     Brain,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 /// See [Kinds of vases](https://plantsvszombies.fandom.com/wiki/Vasebreaker?file=Scary_Pot.png)
 pub enum VaseKind {
     /// Normal vase
@@ -42,7 +42,7 @@ pub enum VaseKind {
     Zombie,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum VaseContent {
     Zombie { zombie_type: ZombieType },
     Plant { plant_type: PlantType },
