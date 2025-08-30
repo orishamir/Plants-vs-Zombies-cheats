@@ -1,3 +1,4 @@
+use crate::models::{CoinContent, CoinType};
 use crate::{models::Coin, offsets::CoinOffset, traits::WriteableEntity};
 
 impl WriteableEntity for Coin {
@@ -12,7 +13,18 @@ impl WriteableEntity for Coin {
             CoinOffset::AgeSinceReachedDestination,
             self.age_since_reached_destination,
         );
-        game.write_at::<u32>(addr, CoinOffset::CoinType, self.coin_type.into());
-        game.write_at::<u32>(addr, CoinOffset::PlantType, self.plant_type.into());
+        let coin_type = match self.content {
+            CoinContent::Silver => CoinType::Silver,
+            CoinContent::Gold => CoinType::Gold,
+            CoinContent::Diamond => CoinType::Diamond,
+            CoinContent::Sun => CoinType::Sun,
+            CoinContent::MiniSun => CoinType::MiniSun,
+            CoinContent::DroppedCard { plant_type } => {
+                game.write_at::<u32>(addr, CoinOffset::PlantType, plant_type.into());
+                CoinType::DroppedCard
+            }
+            CoinContent::GiantBagOfCash => CoinType::GiantBagOfCash,
+        };
+        game.write_at::<u32>(addr, CoinOffset::CoinType, coin_type.into());
     }
 }

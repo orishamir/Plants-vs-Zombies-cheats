@@ -1,7 +1,7 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
 
-use crate::models::{Coin, CoinType, PlantType};
+use crate::models::{Coin, CoinContent, CoinType, PlantType};
 use crate::offsets::CoinOffset;
 use crate::traits::ReadableEntity;
 
@@ -20,9 +20,21 @@ impl ReadableEntity for Coin {
         let age_since_spawned = rdr.read_u32::<LittleEndian>().unwrap();
         rdr.set_position(CoinOffset::AgeSinceReachedDestination as u64);
         let age_since_reached_destination = rdr.read_u32::<LittleEndian>().unwrap();
-        let coin_type: CoinType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        rdr.set_position(CoinOffset::PlantType as u64);
-        let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().into();
+        rdr.set_position(CoinOffset::CoinType as u64);
+        let content: CoinContent = match rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap()
+        {
+            CoinType::Silver => CoinContent::Silver,
+            CoinType::Gold => CoinContent::Gold,
+            CoinType::Diamond => CoinContent::Diamond,
+            CoinType::Sun => CoinContent::Sun,
+            CoinType::MiniSun => CoinContent::MiniSun,
+            CoinType::DroppedCard => {
+                rdr.set_position(CoinOffset::PlantType as u64);
+                let plant_type: PlantType = rdr.read_u32::<LittleEndian>().unwrap().into();
+                CoinContent::DroppedCard { plant_type }
+            }
+            CoinType::GiantBagOfCash => CoinContent::GiantBagOfCash,
+        };
 
         Self {
             display_pos_x,
@@ -31,8 +43,7 @@ impl ReadableEntity for Coin {
             destination_y,
             age_since_spawned,
             age_since_reached_destination,
-            coin_type,
-            plant_type,
+            content,
         }
     }
 

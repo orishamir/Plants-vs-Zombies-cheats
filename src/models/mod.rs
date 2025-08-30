@@ -2,7 +2,6 @@
 mod card;
 mod card_type;
 mod coin;
-mod coin_type;
 mod entities;
 mod griditem;
 mod lawnmower;
@@ -16,8 +15,7 @@ mod zombie_type;
 
 pub use card::Card;
 pub use card_type::CardType;
-pub use coin::Coin;
-pub use coin_type::CoinType;
+pub use coin::{Coin, CoinContent, CoinType};
 pub use entities::Entities;
 pub use griditem::{Griditem, GriditemContent, VaseContent, VaseKind};
 pub use lawnmower::Lawnmower;
