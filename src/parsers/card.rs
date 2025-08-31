@@ -1,50 +1,27 @@
-use crate::models::{Card, CardType};
+use crate::models::Card;
 use crate::offsets::CardOffset;
+use crate::parsers::reader_at::ReaderAt;
 use crate::traits::ReadableEntity;
-
-use byteorder::{LittleEndian, ReadBytesExt};
-use std::io::Cursor;
 
 impl ReadableEntity for Card {
     const SIZE: usize = 80;
 
-    fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::SIZE);
-        let mut rdr = Cursor::new(buf);
-
-        rdr.set_position(CardOffset::DisplayPosX as u64);
-        let display_pos_x = rdr.read_u32::<LittleEndian>().unwrap();
-        let display_pos_y = rdr.read_u32::<LittleEndian>().unwrap();
-        let selectable_width = rdr.read_u32::<LittleEndian>().unwrap();
-        let selectable_height = rdr.read_u32::<LittleEndian>().unwrap();
-        rdr.set_position(CardOffset::Charge as u64);
-        let charge = rdr.read_u32::<LittleEndian>().unwrap();
-        let recharge_goal = rdr.read_u32::<LittleEndian>().unwrap();
-        let column = rdr.read_u32::<LittleEndian>().unwrap();
-
-        rdr.set_position(CardOffset::PosXOffset as u64);
-        let pos_x_offset = rdr.read_i32::<LittleEndian>().unwrap();
-        rdr.set_position(CardOffset::CardType as u64);
-        let card_type: CardType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        rdr.set_position(CardOffset::Selectable as u64);
-        let selectable = rdr.read_u8().unwrap() != 0;
-        let recharging = rdr.read_u8().unwrap() != 0;
-        rdr.set_position(CardOffset::UsageCount as u64);
-        let usage_count = rdr.read_u32::<LittleEndian>().unwrap();
+    fn read(reader: ReaderAt) -> Self {
+        assert_eq!(reader.len(), Self::SIZE);
 
         Self {
-            display_pos_x,
-            display_pos_y,
-            selectable_width,
-            selectable_height,
-            charge,
-            recharge_goal,
-            column,
-            pos_x_offset,
-            card_type,
-            selectable,
-            recharging,
-            usage_count,
+            display_pos_x: reader.read_u32(CardOffset::DisplayPosX).unwrap(),
+            display_pos_y: reader.read_u32(CardOffset::DisplayPosY).unwrap(),
+            selectable_width: reader.read_u32(CardOffset::SelectableWidth).unwrap(),
+            selectable_height: reader.read_u32(CardOffset::SelectableHeight).unwrap(),
+            charge: reader.read_u32(CardOffset::Charge).unwrap(),
+            recharge_goal: reader.read_u32(CardOffset::RechargeGoal).unwrap(),
+            column: reader.read_u32(CardOffset::Column).unwrap(),
+            pos_x_offset: reader.read_i32(CardOffset::PosXOffset).unwrap(),
+            card_type: reader.read_u32(CardOffset::CardType).unwrap().into(),
+            selectable: reader.read_u8(CardOffset::Selectable).unwrap() != 0,
+            recharging: reader.read_u8(CardOffset::Recharging).unwrap() != 0,
+            usage_count: reader.read_u32(CardOffset::UsageCount).unwrap(),
         }
     }
 }
