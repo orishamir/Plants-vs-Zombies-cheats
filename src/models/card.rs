@@ -1,6 +1,5 @@
 use super::CardType;
 
-use byteorder::{LittleEndian, ReadBytesExt};
 use std::fmt::Debug;
 
 #[allow(dead_code)]

@@ -14,5 +14,4 @@ eframe = { version = "0.32.1" }
 egui = "0.32.1"
 env_logger = "0.11.8"
 proc_mem = "0.1.6"
-byteorder = "1.5.0"
 num_enum = "0.7.4"
