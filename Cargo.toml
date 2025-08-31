@@ -1,7 +1,13 @@
 [package]
-name = "pvz_sdk"
+name = "pvz_cheats"
 version = "0.1.0"
 edition = "2024"
+
+[lib]
+name = "pvz_sdk"
+
+[[bin]]
+name = "gui"
 
 [dependencies]
 windows = { version = "0.61.3", features = [
@@ -10,8 +16,8 @@ windows = { version = "0.61.3", features = [
     "Win32_System_Diagnostics_ToolHelp",
     "Win32_UI_WindowsAndMessaging",
 ] }
-eframe = { version = "0.32.1" }
-egui = "0.32.1"
 env_logger = "0.11.8"
 proc_mem = "0.1.6"
 num_enum = "0.7.4"
+eframe = { version = "0.32.1" }
+egui = "0.32.1"

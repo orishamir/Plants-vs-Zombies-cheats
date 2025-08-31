@@ -1,9 +1,11 @@
 use proc_mem::ProcMemError;
 
-use crate::cheated_entity::CheatedEntity;
-use crate::game::Popcapgame;
-use crate::models::{Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie};
-use crate::traits::{ReadableEntity, WriteableEntity};
+use crate::pvz_sdk::cheated_entity::CheatedEntity;
+use crate::pvz_sdk::game::Popcapgame;
+use crate::pvz_sdk::models::{
+    Card, Coin, Entities, Griditem, Lawnmower, Plant, Projectile, Zombie,
+};
+use crate::pvz_sdk::traits::{ReadableEntity, WriteableEntity};
 
 #[allow(dead_code)]
 pub struct EntitiesLoader {

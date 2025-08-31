@@ -1,9 +1,9 @@
-use crate::game::Popcapgame;
-use crate::toggleables::{
+use egui::{self, Color32, Frame, RichText, Ui};
+use pvz_sdk::game::Popcapgame;
+use pvz_sdk::toggleables::{
     FastChomperCheat, FreePlantsCheat, InstantRechargeCheat, InvinciblePlantsCheat, NoPauseCheat,
     PlantAnywhereCheat, SeethroughVasesCheat, Toggleable,
 };
-use egui::{self, Color32, Frame, RichText, Ui};
 
 pub struct MyApp {
     toggleables: Vec<Box<dyn Toggleable>>,
