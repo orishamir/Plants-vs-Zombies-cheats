@@ -21,7 +21,11 @@ impl ReadableEntity for Coin {
             CoinType::Sun => CoinContent::Sun,
             CoinType::MiniSun => CoinContent::MiniSun,
             CoinType::DroppedCard => CoinContent::DroppedCard {
-                plant_type: reader.read_u32(CoinOffset::PlantType).unwrap().into(),
+                plant_type: reader
+                    .read_u32(CoinOffset::PlantType)
+                    .unwrap()
+                    .try_into()
+                    .unwrap(),
             },
             CoinType::GiantBagOfCash => CoinContent::GiantBagOfCash,
             CoinType::GoldSunflowerTrophy => CoinContent::GoldsunflowerTrophy,

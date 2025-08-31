@@ -16,12 +16,14 @@ impl ReadableEntity for Lawnmower {
             mode: reader
                 .read_u32(LawnmowerOffset::LawnmowerMode)
                 .unwrap()
-                .into(),
+                .try_into()
+                .unwrap(),
             is_deleted: reader.read_bool(LawnmowerOffset::IsDeleted).unwrap(),
             lawnmower_type: reader
-                .read_u32(LawnmowerOffset::DisplayPosX)
+                .read_u32(LawnmowerOffset::LawnmowerType)
                 .unwrap()
-                .into(),
+                .try_into()
+                .unwrap(),
         }
     }
 }

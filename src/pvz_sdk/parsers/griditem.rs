@@ -65,10 +65,18 @@ impl Griditem {
         let vase_content: VaseContent =
             match reader.read_u32(GriditemOffset::VaseContentType).unwrap() {
                 1 => VaseContent::Plant {
-                    plant_type: reader.read_u32(GriditemOffset::PlantType).unwrap().into(),
+                    plant_type: reader
+                        .read_u32(GriditemOffset::PlantType)
+                        .unwrap()
+                        .try_into()
+                        .unwrap(),
                 },
                 2 => VaseContent::Zombie {
-                    zombie_type: reader.read_u32(GriditemOffset::ZombieType).unwrap().into(),
+                    zombie_type: reader
+                        .read_u32(GriditemOffset::ZombieType)
+                        .unwrap()
+                        .try_into()
+                        .unwrap(),
                 },
                 // A vase containing suns. The amount is determined by the `sun_count` field
                 3 => VaseContent::Sun {

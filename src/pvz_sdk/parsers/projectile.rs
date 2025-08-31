@@ -17,7 +17,8 @@ impl ReadableEntity for Projectile {
             projectile_type: reader
                 .read_u32(ProjectileOffset::ProjectileType)
                 .unwrap()
-                .into(),
+                .try_into()
+                .unwrap(),
         }
     }
 }

@@ -9,7 +9,11 @@ impl WriteableEntity for Card {
         game.write_at(addr, CardOffset::Charge, self.charge);
         game.write_at(addr, CardOffset::RechargeGoal, self.recharge_goal);
         game.write_at(addr, CardOffset::Column, self.column);
-        game.write_at::<u32>(addr, CardOffset::CardType, self.card_type.into());
+        game.write_at::<u32>(
+            addr,
+            CardOffset::CardType,
+            self.card_type.try_into().unwrap(),
+        );
         game.write_at(addr, CardOffset::Selectable, self.selectable);
         game.write_at(addr, CardOffset::Recharging, self.recharging);
         game.write_at(addr, CardOffset::UsageCount, self.usage_count);

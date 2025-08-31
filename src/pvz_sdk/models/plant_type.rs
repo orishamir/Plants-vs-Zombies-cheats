@@ -1,8 +1,8 @@
-use num_enum::{FromPrimitive, IntoPrimitive};
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::fmt::Debug;
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[repr(u32)]
 pub enum PlantType {
     Peashooter = 0,
@@ -57,7 +57,4 @@ pub enum PlantType {
     GiantWallnut = 50,
     Sprout = 51,
     ReverseRepeater = 52,
-
-    #[num_enum(catch_all)]
-    Unknown(u32),
 }

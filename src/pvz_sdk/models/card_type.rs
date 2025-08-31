@@ -11,14 +11,16 @@ pub enum CardType {
     Diamond,
     SnorkelZombie,
     GoldTrophie,
-
-    Unknown(u32),
 }
 
-impl From<u32> for CardType {
-    fn from(value: u32) -> Self {
-        match value {
-            plant_val if matches!(plant_val, 0..=47 | 52) => CardType::Plant(plant_val.into()),
+impl TryFrom<u32> for CardType {
+    type Error = u32;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        Ok(match value {
+            plant_val if matches!(plant_val, 0..=47 | 52) => {
+                CardType::Plant(plant_val.try_into().unwrap())
+            }
 
             54 => CardType::ShufflePlants,
             55 => CardType::Crater,
@@ -43,14 +45,16 @@ impl From<u32> for CardType {
             73 => Self::Zombie(ZombieType::GigaGargantuar),
             74 => Self::Zombie(ZombieType::Imp),
 
-            val => Self::Unknown(val),
-        }
+            val => return Err(val),
+        })
     }
 }
 
-impl From<CardType> for u32 {
-    fn from(val: CardType) -> Self {
-        match val {
+impl TryFrom<CardType> for u32 {
+    type Error = ZombieType;
+
+    fn try_from(value: CardType) -> Result<Self, Self::Error> {
+        Ok(match value {
             CardType::Plant(plant_type) => plant_type.into(),
             CardType::Zombie(ZombieType::Zombie) => 60,
             CardType::Zombie(ZombieType::ConeheadZombie) => 61,
@@ -74,9 +78,9 @@ impl From<CardType> for u32 {
             CardType::SnorkelZombie => 58,
             CardType::GoldTrophie => 59,
             CardType::Zombie(unknown_zombie) => {
-                unreachable!("Zombie type can't be used for a Card: {unknown_zombie:?}")
+                println!("WARNING: Zombie type can't be used for a Card: {unknown_zombie:?}");
+                return Err(unknown_zombie);
             }
-            CardType::Unknown(val) => val,
-        }
+        })
     }
 }

@@ -18,7 +18,11 @@ impl ReadableEntity for Card {
             recharge_goal: reader.read_u32(CardOffset::RechargeGoal).unwrap(),
             column: reader.read_u32(CardOffset::Column).unwrap(),
             pos_x_offset: reader.read_i32(CardOffset::PosXOffset).unwrap(),
-            card_type: reader.read_u32(CardOffset::CardType).unwrap().into(),
+            card_type: reader
+                .read_u32(CardOffset::CardType)
+                .unwrap()
+                .try_into()
+                .unwrap(),
             selectable: reader.read_bool(CardOffset::Selectable).unwrap(),
             recharging: reader.read_bool(CardOffset::Recharging).unwrap(),
             usage_count: reader.read_u32(CardOffset::UsageCount).unwrap(),

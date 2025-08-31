@@ -13,7 +13,11 @@ impl ReadableEntity for Plant {
             display_pos_x: reader.read_u32(PlantOffset::DisplayPosX).unwrap(),
             display_pos_y: reader.read_u32(PlantOffset::DisplayPosY).unwrap(),
             row: reader.read_u32(PlantOffset::Row).unwrap(),
-            plant_type: reader.read_u32(PlantOffset::PlantType).unwrap().into(),
+            plant_type: reader
+                .read_u32(PlantOffset::PlantType)
+                .unwrap()
+                .try_into()
+                .unwrap(),
             column: reader.read_u32(PlantOffset::Column).unwrap(),
             plant_state: reader.read_u32(PlantOffset::PlantState).unwrap(),
             health: reader.read_u32(PlantOffset::Health).unwrap(),

@@ -1,8 +1,7 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
+use std::fmt::Debug;
 
 use crate::models::{PlantType, ZombieType};
-
-use std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct Griditem {

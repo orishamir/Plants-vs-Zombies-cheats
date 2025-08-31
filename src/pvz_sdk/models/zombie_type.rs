@@ -1,7 +1,7 @@
-use num_enum::{FromPrimitive, IntoPrimitive};
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[repr(u32)]
 pub enum ZombieType {
     Zombie = 0,
@@ -37,12 +37,9 @@ pub enum ZombieType {
     SquashZombie = 30,
     TallnutZombie = 31,
     GigaGargantuar = 32,
-
-    #[num_enum(catch_all)]
-    Unknown(u32),
 }
 
-#[derive(Debug, Clone, Copy, IntoPrimitive, FromPrimitive)]
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[repr(u32)]
 pub enum ArmorType {
     None = 0,
@@ -50,6 +47,4 @@ pub enum ArmorType {
     Bucket = 2,
     Football = 3,
     Digger = 4,
-    #[num_enum(catch_all)]
-    Unknown(u32),
 }
