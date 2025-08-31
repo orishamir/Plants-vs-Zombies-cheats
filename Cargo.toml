@@ -1,5 +1,5 @@
 [package]
-name = "plants_vs_zombies_cheats"
+name = "pvz_sdk"
 version = "0.1.0"
 edition = "2024"
 

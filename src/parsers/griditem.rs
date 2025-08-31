@@ -1,6 +1,6 @@
+use crate::ReaderAt;
 use crate::models::{Griditem, GriditemContent, GriditemContentType, VaseContent, VaseKind};
 use crate::offsets::GriditemOffset;
-use crate::parsers::reader_at::ReaderAt;
 use crate::traits::ReadableEntity;
 
 impl ReadableEntity for Griditem {

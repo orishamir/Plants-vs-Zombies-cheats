@@ -1,4 +1,4 @@
-use crate::{game::Popcapgame, parsers::reader_at::ReaderAt};
+use crate::{ReaderAt, game::Popcapgame};
 
 pub trait ReadableEntity {
     const SIZE: usize;

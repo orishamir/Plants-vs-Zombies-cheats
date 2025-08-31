@@ -4,7 +4,7 @@ use windows::Win32::{
     UI::WindowsAndMessaging,
 };
 
-use crate::{parsers::reader_at::ReaderAt, traits::ReadableEntity};
+use crate::{ReaderAt, traits::ReadableEntity};
 
 #[derive(Debug)]
 pub struct Popcapgame {

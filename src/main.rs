@@ -1,25 +1,12 @@
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::{
-    entities_loader::EntitiesLoader,
-    game::Popcapgame,
-    models::{Coin, Griditem},
-};
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
-use gui::MyApp;
-
-mod cheated_entity;
-mod entities_loader;
-mod game;
-mod gui;
-mod models;
-mod offsets;
-mod overlay_gui;
-mod parsers;
-mod toggleables;
-mod traits;
-mod writers;
+use pvz_sdk::gui::MyApp;
+use pvz_sdk::{
+    EntitiesLoader, Popcapgame,
+    models::{Coin, CoinContent},
+};
 
 fn main() {
     // let proc = GameProcess::default();
@@ -40,7 +27,7 @@ fn main() {
 
     let mut ents = EntitiesLoader::load(&proc).unwrap();
     for mut coin in ents.coins {
-        let models::CoinContent::Sun = coin.entity.content else {
+        let CoinContent::Sun = coin.entity.content else {
             println!("bomboclat");
             continue;
         };
@@ -52,7 +39,7 @@ fn main() {
             destination_y: coin.entity.destination_y,
             age_since_spawned: coin.entity.age_since_spawned,
             age_since_reached_destination: coin.entity.age_since_reached_destination,
-            content: models::CoinContent::Diamond,
+            content: CoinContent::Diamond,
         };
         coin.write_entity(&proc);
     }

@@ -1,4 +1,4 @@
-use super::reader_at::ReaderAt;
+use crate::ReaderAt;
 use crate::models::Zombie;
 use crate::offsets::ZombieOffset;
 use crate::traits::ReadableEntity;

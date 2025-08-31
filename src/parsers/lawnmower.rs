@@ -1,6 +1,6 @@
+use crate::ReaderAt;
 use crate::models::Lawnmower;
 use crate::offsets::LawnmowerOffset;
-use crate::parsers::reader_at::ReaderAt;
 use crate::traits::ReadableEntity;
 
 impl ReadableEntity for Lawnmower {

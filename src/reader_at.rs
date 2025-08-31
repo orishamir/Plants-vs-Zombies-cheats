@@ -11,6 +11,10 @@ impl ReaderAt {
         self.inner.len()
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn read(&self, offset: impl Into<usize>, count: usize) -> Option<&[u8]> {
         let o: usize = offset.into();
         self.inner.get(o..o + count)
@@ -19,11 +23,6 @@ impl ReaderAt {
     pub fn read_u32(&self, offset: impl Into<usize>) -> Option<u32> {
         let bytes = self.read(offset, 4)?;
         Some(u32::from_le_bytes(bytes.try_into().ok()?))
-    }
-
-    pub fn read_u8(&self, offset: impl Into<usize>) -> Option<u8> {
-        let byte = self.read(offset, 1)?;
-        Some(byte[0])
     }
 
     pub fn read_bool(&self, offset: impl Into<usize>) -> Option<bool> {

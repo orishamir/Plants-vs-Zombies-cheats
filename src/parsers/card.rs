@@ -1,6 +1,6 @@
+use crate::ReaderAt;
 use crate::models::Card;
 use crate::offsets::CardOffset;
-use crate::parsers::reader_at::ReaderAt;
 use crate::traits::ReadableEntity;
 
 impl ReadableEntity for Card {
@@ -19,8 +19,8 @@ impl ReadableEntity for Card {
             column: reader.read_u32(CardOffset::Column).unwrap(),
             pos_x_offset: reader.read_i32(CardOffset::PosXOffset).unwrap(),
             card_type: reader.read_u32(CardOffset::CardType).unwrap().into(),
-            selectable: reader.read_u8(CardOffset::Selectable).unwrap() != 0,
-            recharging: reader.read_u8(CardOffset::Recharging).unwrap() != 0,
+            selectable: reader.read_bool(CardOffset::Selectable).unwrap(),
+            recharging: reader.read_bool(CardOffset::Recharging).unwrap(),
             usage_count: reader.read_u32(CardOffset::UsageCount).unwrap(),
         }
     }

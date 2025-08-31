@@ -1,5 +1,5 @@
+use crate::ReaderAt;
 use crate::offsets::ProjectileOffset;
-use crate::parsers::reader_at::ReaderAt;
 use crate::{models::Projectile, traits::ReadableEntity};
 
 impl ReadableEntity for Projectile {

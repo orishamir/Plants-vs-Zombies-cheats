@@ -1,6 +1,6 @@
+use crate::ReaderAt;
 use crate::models::Plant;
 use crate::offsets::PlantOffset;
-use crate::parsers::reader_at::ReaderAt;
 use crate::traits::ReadableEntity;
 
 impl ReadableEntity for Plant {
