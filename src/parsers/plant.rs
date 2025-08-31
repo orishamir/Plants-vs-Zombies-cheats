@@ -6,8 +6,10 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
 
 impl ReadableEntity for Plant {
+    const SIZE: usize = 332;
+
     fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::size_of());
+        assert_eq!(buf.len(), Self::SIZE);
         let mut rdr = Cursor::new(buf);
 
         rdr.set_position(PlantOffset::DisplayPosX as u64);
@@ -45,9 +47,5 @@ impl ReadableEntity for Plant {
             is_deleted,
             is_considered_shoveling,
         }
-    }
-
-    fn size_of() -> usize {
-        332
     }
 }

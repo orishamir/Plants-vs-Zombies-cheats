@@ -6,8 +6,10 @@ use crate::offsets::CoinOffset;
 use crate::traits::ReadableEntity;
 
 impl ReadableEntity for Coin {
+    const SIZE: usize = 216;
+
     fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::size_of());
+        assert_eq!(buf.len(), Self::SIZE);
         let mut rdr = Cursor::new(buf);
 
         rdr.set_position(CoinOffset::DisplayPosX as u64);
@@ -47,9 +49,5 @@ impl ReadableEntity for Coin {
             age_since_reached_destination,
             content,
         }
-    }
-
-    fn size_of() -> usize {
-        216
     }
 }

@@ -6,8 +6,9 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
 
 impl ReadableEntity for Projectile {
+    const SIZE: usize = 148;
     fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::size_of());
+        assert_eq!(buf.len(), Self::SIZE);
         let mut rdr = Cursor::new(buf);
 
         rdr.set_position(ProjectileOffset::DisplayPosX as u64);
@@ -31,9 +32,5 @@ impl ReadableEntity for Projectile {
             is_deleted,
             projectile_type,
         }
-    }
-
-    fn size_of() -> usize {
-        148
     }
 }

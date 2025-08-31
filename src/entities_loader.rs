@@ -83,7 +83,7 @@ impl EntitiesLoader {
         let mut tmp_ptr = base_ptr;
         std::iter::from_fn(move || {
             let ent = game.read_entity_at::<T>(tmp_ptr).unwrap();
-            tmp_ptr += T::size_of();
+            tmp_ptr += T::SIZE;
             Some(ent)
         })
         .filter(filter)
@@ -102,7 +102,7 @@ impl EntitiesLoader {
             let ent = game.read_entity_at::<T>(tmp_ptr).unwrap();
             let ret = Some(CheatedEntity::new(tmp_ptr, ent));
 
-            tmp_ptr += T::size_of();
+            tmp_ptr += T::SIZE;
 
             ret
         })
@@ -126,7 +126,7 @@ impl EntitiesLoader {
                             0x0,
                             0x8,
                             0x15c,
-                            0x28 + i * Card::size_of(),
+                            0x28 + i * Card::SIZE,
                         ],
                         true,
                     )

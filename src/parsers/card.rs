@@ -6,8 +6,10 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
 
 impl ReadableEntity for Card {
+    const SIZE: usize = 80;
+
     fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::size_of());
+        assert_eq!(buf.len(), Self::SIZE);
         let mut rdr = Cursor::new(buf);
 
         rdr.set_position(CardOffset::DisplayPosX as u64);
@@ -44,9 +46,5 @@ impl ReadableEntity for Card {
             recharging,
             usage_count,
         }
-    }
-
-    fn size_of() -> usize {
-        80
     }
 }

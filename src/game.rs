@@ -38,7 +38,7 @@ impl Popcapgame {
     }
 
     pub fn read_entity_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ProcMemError> {
-        let buf = self.read_bytes_at(addr, T::size_of()).unwrap();
+        let buf = self.read_bytes_at(addr, T::SIZE).unwrap();
         Ok(T::from_bytes(&buf))
     }
 

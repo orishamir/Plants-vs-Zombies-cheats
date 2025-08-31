@@ -6,8 +6,10 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
 
 impl ReadableEntity for Lawnmower {
+    const SIZE: usize = 72;
+
     fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::size_of());
+        assert_eq!(buf.len(), Self::SIZE);
         let mut rdr = Cursor::new(buf);
 
         rdr.set_position(LawnmowerOffset::DisplayPosX as u64);
@@ -29,9 +31,5 @@ impl ReadableEntity for Lawnmower {
             is_deleted,
             lawnmower_type,
         }
-    }
-
-    fn size_of() -> usize {
-        72
     }
 }

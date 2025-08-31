@@ -6,8 +6,10 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
 
 impl ReadableEntity for Griditem {
+    const SIZE: usize = 236;
+
     fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::size_of());
+        assert_eq!(buf.len(), Self::SIZE);
         let mut rdr = Cursor::new(buf);
 
         rdr.set_position(GriditemOffset::IsDeleted as u64);
@@ -37,10 +39,6 @@ impl ReadableEntity for Griditem {
             is_deleted,
             content,
         }
-    }
-
-    fn size_of() -> usize {
-        236
     }
 }
 
