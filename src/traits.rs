@@ -1,12 +1,11 @@
-use crate::game::Popcapgame;
+use crate::{game::Popcapgame, parsers::reader_at::ReaderAt};
 
 pub trait ReadableEntity {
     const SIZE: usize;
-    /// You will get a buffer the size of your struct
-    fn from_bytes(buf: &[u8]) -> Self;
+    /// You should get a buffer the size of your struct
+    fn read(reader: ReaderAt) -> Self;
 }
 
-#[allow(dead_code)]
 pub trait WriteableEntity {
     fn write_entity(&self, addr: usize, game: &Popcapgame);
 }

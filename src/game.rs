@@ -4,7 +4,7 @@ use windows::Win32::{
     UI::WindowsAndMessaging,
 };
 
-use crate::traits::ReadableEntity;
+use crate::{parsers::reader_at::ReaderAt, traits::ReadableEntity};
 
 #[derive(Debug)]
 pub struct Popcapgame {
@@ -39,7 +39,7 @@ impl Popcapgame {
 
     pub fn read_entity_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ProcMemError> {
         let buf = self.read_bytes_at(addr, T::SIZE).unwrap();
-        Ok(T::from_bytes(&buf))
+        Ok(T::read(ReaderAt::new(buf)))
     }
 
     // More flexible

@@ -1,55 +1,29 @@
-use crate::models::{ArmorType, Zombie, ZombieType};
+use super::reader_at::ReaderAt;
+use crate::models::Zombie;
 use crate::offsets::ZombieOffset;
 use crate::traits::ReadableEntity;
-
-use byteorder::{LittleEndian, ReadBytesExt};
-use std::io::Cursor;
 
 impl ReadableEntity for Zombie {
     const SIZE: usize = 360;
 
-    fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::SIZE);
-        let mut rdr = Cursor::new(buf);
-
-        rdr.set_position(ZombieOffset::DisplayPosX as u64);
-        let display_pos_x = rdr.read_u32::<LittleEndian>().unwrap();
-        let display_pos_y = rdr.read_u32::<LittleEndian>().unwrap();
-        rdr.set_position(ZombieOffset::Row as u64);
-        let row = rdr.read_u32::<LittleEndian>().unwrap();
-        rdr.set_position(ZombieOffset::ZombieType as u64);
-        let zombie_type: ZombieType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        rdr.set_position(ZombieOffset::PosX as u64);
-        let pos_x = rdr.read_f32::<LittleEndian>().unwrap();
-        let pos_y = rdr.read_f32::<LittleEndian>().unwrap();
-        rdr.set_position(ZombieOffset::FreezeTimer as u64);
-        let freeze_timer = rdr.read_u32::<LittleEndian>().unwrap();
-        rdr.set_position(ZombieOffset::IsHypnotized as u64);
-        let is_hypnotized = rdr.read_u8().unwrap() != 0;
-        rdr.set_position(ZombieOffset::ArmorType as u64);
-        let armor_type: ArmorType = rdr.read_u32::<LittleEndian>().unwrap().into();
-        let health = rdr.read_i32::<LittleEndian>().unwrap();
-        let original_health = rdr.read_i32::<LittleEndian>().unwrap();
-        let armor_hp = rdr.read_u32::<LittleEndian>().unwrap();
-        let original_armor_hp = rdr.read_u32::<LittleEndian>().unwrap();
-        rdr.set_position(ZombieOffset::IsDead as u64);
-        let is_dead = rdr.read_u8().unwrap() != 0;
+    fn read(reader: ReaderAt) -> Self {
+        assert_eq!(reader.len(), Self::SIZE);
 
         Self {
-            display_pos_x,
-            display_pos_y,
-            row,
-            freeze_timer,
-            is_hypnotized,
-            zombie_type,
-            pos_x,
-            pos_y,
-            armor_type,
-            health,
-            original_health,
-            original_armor_hp,
-            armor_hp,
-            is_dead,
+            display_pos_x: reader.read_u32(ZombieOffset::DisplayPosX).unwrap(),
+            display_pos_y: reader.read_u32(ZombieOffset::DisplayPosY).unwrap(),
+            row: reader.read_u32(ZombieOffset::Row).unwrap(),
+            zombie_type: reader.read_u32(ZombieOffset::ZombieType).unwrap().into(),
+            pos_x: reader.read_f32(ZombieOffset::PosX).unwrap(),
+            pos_y: reader.read_f32(ZombieOffset::PosY).unwrap(),
+            freeze_timer: reader.read_u32(ZombieOffset::FreezeTimer).unwrap(),
+            is_hypnotized: reader.read_bool(ZombieOffset::IsHypnotized).unwrap(),
+            armor_type: reader.read_u32(ZombieOffset::ArmorType).unwrap().into(),
+            health: reader.read_i32(ZombieOffset::Health).unwrap(),
+            original_health: reader.read_i32(ZombieOffset::OriginalHealth).unwrap(),
+            armor_hp: reader.read_u32(ZombieOffset::ArmorHealth).unwrap(),
+            original_armor_hp: reader.read_u32(ZombieOffset::OriginalArmorHealth).unwrap(),
+            is_dead: reader.read_bool(ZombieOffset::IsDead).unwrap(),
         }
     }
 }

@@ -1,38 +1,34 @@
 use crate::models::{Griditem, GriditemContent, GriditemContentType, VaseContent, VaseKind};
 use crate::offsets::GriditemOffset;
+use crate::parsers::reader_at::ReaderAt;
 use crate::traits::ReadableEntity;
-
-use byteorder::{LittleEndian, ReadBytesExt};
-use std::io::Cursor;
 
 impl ReadableEntity for Griditem {
     const SIZE: usize = 236;
 
-    fn from_bytes(buf: &[u8]) -> Self {
-        assert_eq!(buf.len(), Self::SIZE);
-        let mut rdr = Cursor::new(buf);
+    fn read(reader: ReaderAt) -> Self {
+        assert_eq!(reader.len(), Self::SIZE);
 
-        rdr.set_position(GriditemOffset::IsDeleted as u64);
-        let is_deleted = rdr.read_u8().unwrap() != 0;
+        let is_deleted = reader.read_bool(GriditemOffset::IsDeleted).unwrap();
 
-        rdr.set_position(GriditemOffset::GriditemType as u64);
-        let content = match rdr.read_u32::<LittleEndian>().unwrap().try_into().unwrap() {
+        let content = match reader
+            .read_u32(GriditemOffset::GriditemType)
+            .unwrap()
+            .try_into()
+            .unwrap()
+        {
             GriditemContentType::GraveBuster => GriditemContent::GraveBuster,
             GriditemContentType::DoomShroomCrater => GriditemContent::DoomShroomCrater,
-            GriditemContentType::Vase => Self::read_vase(&mut rdr),
+            GriditemContentType::Vase => Self::read_vase(&reader),
             GriditemContentType::ZenGardenItem => GriditemContent::ZenGardenItem,
-            GriditemContentType::Snail => Self::read_snail(&mut rdr),
+            GriditemContentType::Snail => Self::read_snail(&reader),
             GriditemContentType::Rake => GriditemContent::Rake,
             GriditemContentType::Brain => GriditemContent::Brain,
             GriditemContentType::Portal => GriditemContent::Portal,
-            GriditemContentType::EatableBrain => {
-                rdr.set_position(GriditemOffset::PosX as u64);
-
-                GriditemContent::EatableBrain {
-                    pos_x: rdr.read_f32::<LittleEndian>().unwrap(),
-                    pos_y: rdr.read_f32::<LittleEndian>().unwrap(),
-                }
-            }
+            GriditemContentType::EatableBrain => GriditemContent::EatableBrain {
+                pos_x: reader.read_f32(GriditemOffset::PosX).unwrap(),
+                pos_y: reader.read_f32(GriditemOffset::PosY).unwrap(),
+            },
         };
 
         Self {
@@ -43,58 +39,44 @@ impl ReadableEntity for Griditem {
 }
 
 impl Griditem {
-    fn read_snail(rdr: &mut Cursor<&[u8]>) -> GriditemContent {
-        rdr.set_position(GriditemOffset::PosX as u64);
-
+    fn read_snail(reader: &ReaderAt) -> GriditemContent {
         GriditemContent::Snail {
-            pos_x: rdr.read_f32::<LittleEndian>().unwrap(),
-            pos_y: rdr.read_f32::<LittleEndian>().unwrap(),
-            destination_x: rdr.read_f32::<LittleEndian>().unwrap(),
-            destination_y: rdr.read_f32::<LittleEndian>().unwrap(),
+            pos_x: reader.read_f32(GriditemOffset::PosX).unwrap(),
+            pos_y: reader.read_f32(GriditemOffset::PosY).unwrap(),
+            destination_x: reader.read_f32(GriditemOffset::DestinationX).unwrap(),
+            destination_y: reader.read_f32(GriditemOffset::DestinationY).unwrap(),
         }
     }
 
-    fn read_vase(rdr: &mut Cursor<&[u8]>) -> GriditemContent {
-        rdr.set_position(GriditemOffset::Column as u64);
-        let column = rdr.read_u32::<LittleEndian>().unwrap();
-        let row = rdr.read_u32::<LittleEndian>().unwrap();
+    fn read_vase(reader: &ReaderAt) -> GriditemContent {
+        let column = reader.read_u32(GriditemOffset::Column).unwrap();
+        let row = reader.read_u32(GriditemOffset::Row).unwrap();
 
-        rdr.set_position(GriditemOffset::IsHighlighted as u64);
-        let is_highlighted = rdr.read_u32::<LittleEndian>().unwrap() != 0;
-        let opacity = rdr.read_u32::<LittleEndian>().unwrap();
+        let is_highlighted = reader.read_bool(GriditemOffset::IsHighlighted).unwrap();
+        let opacity = reader.read_u32(GriditemOffset::Opacity).unwrap();
 
-        rdr.set_position(GriditemOffset::VaseKind as u64);
-        let vase_kind: VaseKind = match rdr.read_u32::<LittleEndian>().unwrap() {
+        let vase_kind: VaseKind = match reader.read_u32(GriditemOffset::VaseKind).unwrap() {
             3 => VaseKind::Mistery,
             4 => VaseKind::Plant,
             5 => VaseKind::Zombie,
             _ => unreachable!(),
         };
 
-        rdr.set_position(GriditemOffset::VaseContentType as u64);
-        let vase_content: VaseContent = match rdr.read_u32::<LittleEndian>().unwrap() {
-            1 => {
-                rdr.set_position(GriditemOffset::PlantType as u64);
-                VaseContent::Plant {
-                    plant_type: rdr.read_u32::<LittleEndian>().unwrap().into(),
-                }
-            }
-            2 => {
-                rdr.set_position(GriditemOffset::ZombieType as u64);
-                VaseContent::Zombie {
-                    zombie_type: rdr.read_u32::<LittleEndian>().unwrap().into(),
-                }
-            }
-            // A vase containing suns. The amount is determined by the `sun_count` field
-            3 => {
-                rdr.set_position(GriditemOffset::SunCount as u64);
-                VaseContent::Sun {
-                    sun_count: rdr.read_u32::<LittleEndian>().unwrap(),
-                }
-            }
-            // TODO: Error handling in such cases
-            _ => unreachable!(),
-        };
+        let vase_content: VaseContent =
+            match reader.read_u32(GriditemOffset::VaseContentType).unwrap() {
+                1 => VaseContent::Plant {
+                    plant_type: reader.read_u32(GriditemOffset::PlantType).unwrap().into(),
+                },
+                2 => VaseContent::Zombie {
+                    zombie_type: reader.read_u32(GriditemOffset::ZombieType).unwrap().into(),
+                },
+                // A vase containing suns. The amount is determined by the `sun_count` field
+                3 => VaseContent::Sun {
+                    sun_count: reader.read_u32(GriditemOffset::SunCount).unwrap(),
+                },
+                // TODO: Error handling in such cases
+                _ => unreachable!(),
+            };
 
         GriditemContent::Vase {
             column,

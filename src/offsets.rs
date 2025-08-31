@@ -1,5 +1,7 @@
 use num_enum::IntoPrimitive;
 
+// type Offset = impl Into<usize>;
+
 #[derive(IntoPrimitive)]
 #[repr(usize)]
 pub enum PlantOffset {
