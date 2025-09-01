@@ -1,4 +1,5 @@
 use egui::{self, Color32, Frame, RichText, Ui};
+use log::info;
 use pvz_sdk::game::Popcapgame;
 use pvz_sdk::toggleables::{
     FastChomperCheat, FreePlantsCheat, InstantRechargeCheat, InvinciblePlantsCheat, NoPauseCheat,
@@ -32,7 +33,7 @@ impl MyApp {
                     .changed()
                 {
                     toggleable.toggle(&self.popcapgame, *toggled).unwrap();
-                    println!("Detected change in {} to {toggled}", toggleable.name());
+                    info!("Detected change in {} to {toggled}", toggleable.name());
                 }
                 ui.end_row();
             }
@@ -68,7 +69,7 @@ impl eframe::App for MyApp {
 }
 impl Default for MyApp {
     fn default() -> Self {
-        let popcapgame = Popcapgame::default();
+        let popcapgame = Popcapgame::init().unwrap();
 
         let toggleables: Vec<Box<dyn Toggleable>> = vec![
             Box::new(InvinciblePlantsCheat {}),

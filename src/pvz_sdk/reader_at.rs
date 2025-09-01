@@ -1,5 +1,17 @@
+use std::array::TryFromSliceError;
+use thiserror::Error;
+
 pub struct ReaderAt {
     inner: Vec<u8>,
+}
+
+#[derive(Debug, Error)]
+pub enum ReaderError {
+    #[error("tried reading bytes but reached end of buffer")]
+    ReadOutOfBounds,
+
+    #[error("internal error: try from slice failed {0}")]
+    SliceToArrayFailed(#[from] TryFromSliceError),
 }
 
 impl ReaderAt {
@@ -15,28 +27,30 @@ impl ReaderAt {
         self.len() == 0
     }
 
-    pub fn read(&self, offset: impl Into<usize>, count: usize) -> Option<&[u8]> {
-        let o: usize = offset.into();
-        self.inner.get(o..o + count)
+    pub fn read(&self, offset: impl Into<usize>, count: usize) -> Result<&[u8], ReaderError> {
+        let offset: usize = offset.into();
+        self.inner
+            .get(offset..offset + count)
+            .ok_or(ReaderError::ReadOutOfBounds)
     }
 
-    pub fn read_u32(&self, offset: impl Into<usize>) -> Option<u32> {
+    pub fn read_u32(&self, offset: impl Into<usize>) -> Result<u32, ReaderError> {
         let bytes = self.read(offset, 4)?;
-        Some(u32::from_le_bytes(bytes.try_into().ok()?))
+        Ok(u32::from_le_bytes(bytes.try_into()?))
     }
 
-    pub fn read_bool(&self, offset: impl Into<usize>) -> Option<bool> {
+    pub fn read_bool(&self, offset: impl Into<usize>) -> Result<bool, ReaderError> {
         let byte = self.read(offset, 1)?;
-        Some(byte[0] != 0)
+        Ok(byte[0] != 0)
     }
 
-    pub fn read_i32(&self, offset: impl Into<usize>) -> Option<i32> {
+    pub fn read_i32(&self, offset: impl Into<usize>) -> Result<i32, ReaderError> {
         let bytes = self.read(offset, 4)?;
-        Some(i32::from_le_bytes(bytes.try_into().ok()?))
+        Ok(i32::from_le_bytes(bytes.try_into()?))
     }
 
-    pub fn read_f32(&self, offset: impl Into<usize>) -> Option<f32> {
+    pub fn read_f32(&self, offset: impl Into<usize>) -> Result<f32, ReaderError> {
         let bytes = self.read(offset, 4)?;
-        Some(f32::from_le_bytes(bytes.try_into().ok()?))
+        Ok(f32::from_le_bytes(bytes.try_into()?))
     }
 }

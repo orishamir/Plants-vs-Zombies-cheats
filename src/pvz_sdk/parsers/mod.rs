@@ -1,5 +1,6 @@
 mod card;
 mod coin;
+// mod errors;
 mod griditem;
 mod lawnmower;
 mod plant;

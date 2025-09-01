@@ -1,3 +1,8 @@
+use anyhow::{anyhow, bail};
+use log::warn;
+
+use crate::traits::ReadEntityError;
+
 use super::{PlantType, ZombieType};
 
 #[derive(Debug, Clone, Copy)]
@@ -14,7 +19,7 @@ pub enum CardType {
 }
 
 impl TryFrom<u32> for CardType {
-    type Error = u32;
+    type Error = ReadEntityError;
 
     fn try_from(value: u32) -> Result<Self, Self::Error> {
         Ok(match value {
@@ -45,13 +50,18 @@ impl TryFrom<u32> for CardType {
             73 => Self::Zombie(ZombieType::GigaGargantuar),
             74 => Self::Zombie(ZombieType::Imp),
 
-            val => return Err(val),
+            val => {
+                return Err(ReadEntityError::UnknownEnumMember(
+                    format!("No discriminant in enum `CardType` matches the value `{val}`")
+                        .to_string(),
+                ));
+            }
         })
     }
 }
 
 impl TryFrom<CardType> for u32 {
-    type Error = ZombieType;
+    type Error = anyhow::Error;
 
     fn try_from(value: CardType) -> Result<Self, Self::Error> {
         Ok(match value {
@@ -78,8 +88,7 @@ impl TryFrom<CardType> for u32 {
             CardType::SnorkelZombie => 58,
             CardType::GoldTrophie => 59,
             CardType::Zombie(unknown_zombie) => {
-                println!("WARNING: Zombie type can't be used for a Card: {unknown_zombie:?}");
-                return Err(unknown_zombie);
+                bail!("Invalid zombie type for card: {unknown_zombie:?}");
             }
         })
     }

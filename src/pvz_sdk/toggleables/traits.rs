@@ -1,3 +1,6 @@
+use proc_mem::ProcMemError;
+use thiserror::Error;
+
 use crate::game::Popcapgame;
 
 #[allow(dead_code)]
@@ -14,14 +17,15 @@ pub trait Toggleable {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 #[allow(dead_code)]
 pub enum ToggleCheatError {
-    IoError(std::io::Error),
+    #[error("A memory error occured")]
+    MemoryError(ProcMemError),
 }
 
-impl From<std::io::Error> for ToggleCheatError {
-    fn from(value: std::io::Error) -> Self {
-        ToggleCheatError::IoError(value)
+impl From<ProcMemError> for ToggleCheatError {
+    fn from(value: ProcMemError) -> Self {
+        Self::MemoryError(value)
     }
 }

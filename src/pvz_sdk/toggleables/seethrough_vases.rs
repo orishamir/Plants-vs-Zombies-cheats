@@ -24,29 +24,17 @@ pub struct SeethroughVasesCheat {}
 
 impl Toggleable for SeethroughVasesCheat {
     fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process
-            .write::<[u8; _]>(&RESET_OPACITY_AWAY_OFFSET, [0xeb, 0x04])
-            .unwrap();
-        process
-            .write::<[u8; 6]>(&CHECK_OPACITY_OFFSET, [0x90; _])
-            .unwrap();
-        process
-            .write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x83, 0xc0, 0x50])
-            .unwrap();
+        process.write::<[u8; _]>(&RESET_OPACITY_AWAY_OFFSET, [0xeb, 0x04])?;
+        process.write::<[u8; 6]>(&CHECK_OPACITY_OFFSET, [0x90; _])?;
+        process.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x83, 0xc0, 0x50])?;
 
         Ok(())
     }
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process
-            .write::<[u8; _]>(&RESET_OPACITY_AWAY_OFFSET, [0x7e, 0x04])
-            .unwrap();
-        process
-            .write::<[u8; _]>(&CHECK_OPACITY_OFFSET, [0x0f, 0x8e, 0x35, 0x03, 0x00, 0x00])
-            .unwrap();
-        process
-            .write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x8b, 0x45, 0x4c])
-            .unwrap();
+        process.write::<[u8; _]>(&RESET_OPACITY_AWAY_OFFSET, [0x7e, 0x04])?;
+        process.write::<[u8; _]>(&CHECK_OPACITY_OFFSET, [0x0f, 0x8e, 0x35, 0x03, 0x00, 0x00])?;
+        process.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x8b, 0x45, 0x4c])?;
 
         Ok(())
     }
