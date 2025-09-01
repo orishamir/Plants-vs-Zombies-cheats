@@ -4,7 +4,10 @@ use windows::Win32::{
     UI::WindowsAndMessaging,
 };
 
-use crate::{ReaderAt, traits::ReadableEntity};
+use crate::{
+    ReaderAt,
+    traits::{ReadEntityError, ReadableEntity},
+};
 
 #[derive(Debug)]
 pub struct Popcapgame {
@@ -32,14 +35,14 @@ impl Popcapgame {
         &self,
         offsets: &[usize],
         with_base_addr: bool,
-    ) -> Result<T, ProcMemError> {
+    ) -> Result<T, ReadEntityError> {
         let addr = self.read_ptr_chain(offsets, with_base_addr)?;
         self.read_entity_at::<T>(addr)
     }
 
-    pub fn read_entity_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ProcMemError> {
+    pub fn read_entity_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ReadEntityError> {
         let buf = self.read_bytes_at(addr, T::SIZE).unwrap();
-        Ok(T::read(ReaderAt::new(buf)))
+        T::read(ReaderAt::new(buf))
     }
 
     // More flexible
@@ -107,12 +110,6 @@ impl Popcapgame {
         let proc = Process::with_name("popcapgame1.exe")?;
         let base_module = proc.module("popcapgame1.exe")?;
         Ok(Self { proc, base_module })
-    }
-}
-
-impl Default for Popcapgame {
-    fn default() -> Self {
-        Popcapgame::init().unwrap()
     }
 }
 

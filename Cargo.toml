@@ -2,6 +2,8 @@
 name = "pvz_cheats"
 version = "0.1.0"
 edition = "2024"
+default-run = "testing"
+
 
 [lib]
 name = "pvz_sdk"
@@ -24,3 +26,6 @@ proc_mem = "0.1.6"
 num_enum = "0.7.4"
 eframe = { version = "0.32.1" }
 egui = "0.32.1"
+thiserror = "2.0.16"
+log = "0.4.27"
+anyhow = "1.0.99"
