@@ -4,11 +4,6 @@ use windows::Win32::{
     UI::WindowsAndMessaging,
 };
 
-use crate::{
-    ReaderAt,
-    traits::{ReadEntityError, ReadableEntity},
-};
-
 #[derive(Debug)]
 pub struct Popcapgame {
     proc: Process,
@@ -28,35 +23,6 @@ impl Popcapgame {
         }
 
         Some(rect)
-    }
-
-    // Reading entities
-    pub fn read_entity<T: ReadableEntity>(
-        &self,
-        offsets: &[usize],
-        with_base_addr: bool,
-    ) -> Result<T, ReadEntityError> {
-        let addr = self.read_ptr_chain(offsets, with_base_addr)?;
-        self.read_entity_at::<T>(addr)
-    }
-
-    pub fn read_entity_at<T: ReadableEntity>(&self, addr: usize) -> Result<T, ReadEntityError> {
-        let buf = self.read_bytes_at(addr, T::SIZE).unwrap();
-        T::read(ReaderAt::new(buf))
-    }
-
-    // More flexible
-    pub fn read<T: Default>(
-        &self,
-        offsets: &[usize],
-        with_base_addr: bool,
-    ) -> Result<T, ProcMemError> {
-        let addr = self.read_ptr_chain(offsets, with_base_addr)?;
-        self.proc.read_mem::<T>(addr)
-    }
-
-    pub fn read_at<T: Default>(&self, addr: usize) -> Result<T, ProcMemError> {
-        self.proc.read_mem::<T>(addr)
     }
 
     // Raw bytes

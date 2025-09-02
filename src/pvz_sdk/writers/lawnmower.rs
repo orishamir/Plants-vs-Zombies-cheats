@@ -1,4 +1,4 @@
-use crate::{models::Lawnmower, offsets::LawnmowerOffset, traits::WriteableEntity};
+use crate::{entities::Lawnmower, offsets::LawnmowerOffset, traits::WriteableEntity};
 
 impl WriteableEntity for Lawnmower {
     fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {

@@ -1,10 +1,22 @@
-use super::CardType;
+use super::SlotType;
 
 use std::fmt::Debug;
 
+#[derive(Debug)]
+pub struct Slots {
+    pub pos_x: i32,
+    pub pos_y: i32,
+    pub width: u32,
+    pub height: u32,
+    pub slots_count: u32,
+    pub slots: Vec<Slot>,
+}
+
 #[allow(dead_code)]
 #[derive(Debug)]
-pub struct Card {
+pub struct Slot {
+    pub addr: usize,
+
     pub display_pos_x: u32,
     pub display_pos_y: u32,
     pub selectable_width: u32,
@@ -15,7 +27,7 @@ pub struct Card {
     /// For a conveyor belt level, this value starts at ~1000 and slowly gets decreased
     /// When rendering, it is added to [display_pos_x].
     pub pos_x_offset: i32,
-    pub card_type: CardType,
+    pub card_type: SlotType,
     pub selectable: bool,
     pub recharging: bool,
     pub usage_count: u32,

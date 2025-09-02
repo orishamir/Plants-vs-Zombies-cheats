@@ -4,10 +4,19 @@ use super::PlantType;
 
 use std::fmt::Debug;
 
+#[derive(Debug)]
+pub struct Coins {
+    pub capacity: u32,
+    pub next_index: u32,
+    pub count: u32,
+    pub coins: Vec<Coin>,
+}
+
 /// Game memory calls this a Coin, but it is any pickable item
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Coin {
+    pub addr: usize,
     pub display_pos_x: f32,
     pub display_pos_y: f32,
     pub is_deleted: bool,

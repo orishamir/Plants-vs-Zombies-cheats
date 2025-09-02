@@ -1,4 +1,4 @@
-use crate::{models::Projectile, offsets::ProjectileOffset, traits::WriteableEntity};
+use crate::{entities::Projectile, offsets::ProjectileOffset, traits::WriteableEntity};
 
 impl WriteableEntity for Projectile {
     fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {

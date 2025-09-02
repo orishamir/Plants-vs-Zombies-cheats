@@ -1,6 +1,14 @@
 use super::PlantType;
 use std::fmt::Debug;
 
+#[derive(Debug)]
+pub struct Plants {
+    pub capacity: u32,
+    pub next_index: u32,
+    pub count: u32,
+    pub plants: Vec<Plant>,
+}
+
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Plant {

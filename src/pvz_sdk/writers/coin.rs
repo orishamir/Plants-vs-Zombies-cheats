@@ -1,5 +1,5 @@
-use crate::models::{CoinContent, CoinType};
-use crate::{models::Coin, offsets::CoinOffset, traits::WriteableEntity};
+use crate::entities::{CoinContent, CoinType};
+use crate::{entities::Coin, offsets::CoinOffset, traits::WriteableEntity};
 
 impl WriteableEntity for Coin {
     fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {

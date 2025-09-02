@@ -1,10 +1,20 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::fmt::Debug;
 
-use crate::models::{PlantType, ZombieType};
+use crate::entities::{PlantType, ZombieType};
+
+#[derive(Debug)]
+pub struct Griditems {
+    pub capacity: u32,
+    pub next_index: u32,
+    pub count: u32,
+    pub griditems: Vec<Griditem>,
+}
 
 #[derive(Debug)]
 pub struct Griditem {
+    pub addr: usize,
+
     pub is_deleted: bool,
     pub content: GriditemContent,
 }
