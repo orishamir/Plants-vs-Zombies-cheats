@@ -4,7 +4,6 @@ use crate::game::Popcapgame;
 const INSTRUCTION_OFFSETS: [usize; 1] = [0x1334D];
 
 #[derive(Default)]
-#[allow(dead_code)]
 pub struct PlantAnywhereCheat {}
 
 impl Toggleable for PlantAnywhereCheat {

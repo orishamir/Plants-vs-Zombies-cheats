@@ -10,7 +10,6 @@ pub struct Projectiles {
     pub projectiles: Vec<Projectile>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Projectile {
     pub addr: usize,

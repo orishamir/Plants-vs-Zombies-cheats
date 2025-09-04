@@ -12,7 +12,6 @@ pub struct Slots {
     pub slots: Vec<Slot>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Slot {
     pub addr: usize,

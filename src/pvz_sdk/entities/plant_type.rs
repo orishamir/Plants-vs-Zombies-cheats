@@ -1,7 +1,6 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::fmt::Debug;
 
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[repr(u32)]
 pub enum PlantType {

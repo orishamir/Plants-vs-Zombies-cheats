@@ -9,7 +9,6 @@ pub struct Plants {
     pub plants: Vec<Plant>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Plant {
     pub display_pos_x: u32,

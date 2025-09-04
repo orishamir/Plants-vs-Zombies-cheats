@@ -4,7 +4,6 @@ use crate::game::Popcapgame;
 const INSTRUCTION_OFFSETS: [usize; 1] = [0x958BC];
 
 #[derive(Default)]
-#[allow(dead_code)]
 pub struct InstantRechargeCheat {}
 
 impl Toggleable for InstantRechargeCheat {

@@ -10,7 +10,6 @@ pub struct Popcapgame {
     base_module: Module,
 }
 
-#[allow(dead_code)]
 impl Popcapgame {
     pub fn get_rect_size(&self) -> Option<RECT> {
         let mut rect = RECT::default();

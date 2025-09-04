@@ -18,7 +18,6 @@ pub trait Toggleable {
 }
 
 #[derive(Debug, Error)]
-#[allow(dead_code)]
 pub enum ToggleCheatError {
     #[error("A memory error occured")]
     MemoryError(ProcMemError),

@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2024"
 default-run = "testing"
 
+[lints.rust]
+unfulfilled_lint_expectations = "deny"
+
 
 [lib]
 name = "pvz_sdk"

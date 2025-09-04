@@ -10,7 +10,6 @@ pub struct Zombies {
     pub zombies: Vec<Zombie>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Zombie {
     pub display_pos_x: u32,

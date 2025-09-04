@@ -13,7 +13,6 @@ pub struct Coins {
 }
 
 /// Game memory calls this a Coin, but it is any pickable item
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Coin {
     pub addr: usize,
@@ -39,7 +38,6 @@ pub enum CoinContent {
     Chocolate,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[repr(u32)]
 pub enum CoinType {

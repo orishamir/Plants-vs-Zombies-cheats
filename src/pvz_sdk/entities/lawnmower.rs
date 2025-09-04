@@ -10,7 +10,6 @@ pub struct Lawnmowers {
     pub lawnmowers: Vec<Lawnmower>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Lawnmower {
     pub addr: usize,
