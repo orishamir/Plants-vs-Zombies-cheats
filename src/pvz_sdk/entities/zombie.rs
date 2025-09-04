@@ -2,7 +2,14 @@ use super::{ArmorType, ZombieType};
 
 use std::fmt::Debug;
 
-#[allow(dead_code)]
+#[derive(Debug)]
+pub struct Zombies {
+    pub capacity: u32,
+    pub next_index: u32,
+    pub count: u32,
+    pub zombies: Vec<Zombie>,
+}
+
 #[derive(Debug)]
 pub struct Zombie {
     pub display_pos_x: u32,

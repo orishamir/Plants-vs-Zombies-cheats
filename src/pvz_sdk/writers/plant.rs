@@ -1,4 +1,4 @@
-use crate::{models::Plant, offsets::PlantOffset, traits::WriteableEntity};
+use crate::{entities::Plant, offsets::PlantOffset, traits::WriteableEntity};
 
 impl WriteableEntity for Plant {
     fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {

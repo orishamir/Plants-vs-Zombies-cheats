@@ -19,7 +19,6 @@ const DRAW_OPACITY_OFFSET: [usize; 1] = [0x52aa8];
 /// + popcapgame1.exe+52AA8 - 83 C0 32              - add eax, 32
 /// ```
 #[derive(Default)]
-#[allow(dead_code)]
 pub struct SeethroughVasesCheat {}
 
 impl Toggleable for SeethroughVasesCheat {

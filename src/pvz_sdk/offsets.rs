@@ -4,6 +4,26 @@ use num_enum::IntoPrimitive;
 
 #[derive(IntoPrimitive)]
 #[repr(usize)]
+pub enum EntityOffset {
+    Zombies = 0xa4,
+    Plants = 0xC0,
+    Lawnmowers = 0x114,
+    Coins = 0xf8,
+    Griditems = 0x130,
+    Projectiles = 0xDC,
+}
+
+#[derive(IntoPrimitive)]
+#[repr(usize)]
+pub enum EntityInformationOffset {
+    Capacity = 0x4,
+    NextIndex = 0xc,
+    Count = 0x10,
+    ArrayPtr = 0x0,
+}
+
+#[derive(IntoPrimitive)]
+#[repr(usize)]
 pub enum PlantOffset {
     DisplayPosX = 0x8,
     DisplayPosY = 0xC,
@@ -78,7 +98,18 @@ pub enum LawnmowerOffset {
 
 #[derive(IntoPrimitive)]
 #[repr(usize)]
-pub enum CardOffset {
+pub enum SlotsOffset {
+    PosX = 0x8,
+    PosY = 0xc,
+    Width = 0x10,
+    Height = 0x14,
+    Count = 0x24,
+    Array = 0x28,
+}
+
+#[derive(IntoPrimitive)]
+#[repr(usize)]
+pub enum SlotOffset {
     DisplayPosX = 0x8,
     DisplayPosY = 0xc,
     SelectableWidth = 0x10,

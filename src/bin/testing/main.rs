@@ -1,49 +1,29 @@
-use log::warn;
 use pvz_sdk::{
-    EntitiesLoader, Popcapgame,
-    models::{Coin, CoinContent},
+    Popcapgame,
+    entities::{Coins, Griditems, Lawnmowers, Plants, Projectiles, Slots, Zombies},
+    readers::ReadableEntity,
 };
 
 fn main() {
-    unsafe { std::env::set_var("RUST_LOG", "trace") };
-    env_logger::init();
+    let game = Popcapgame::init().unwrap();
 
-    // let proc = GameProcess::default();
-    // let addr = proc.base_module.base_address();
-    // let ents = proc
-    //     .proc
-    //     .read_mem_chain::<u32>(vec![
-    //         addr, 0x32f39c, 0x540, 0x48c, 0x0, 0x3dc, 0x4, 0x0, 0xa4,
-    //     ])
-    //     .unwrap();
-    // println!("{:x}", ents)
-    // let proc = GameProcess::init().expect("problem with game process");
-    // loop {
-    //     let ents = EntitiesLoader::load(&proc).unwrap();
-    //     println!("{:#?}", ents.cards);
-    // }
-    let proc = Popcapgame::init().unwrap();
+    let slots = Slots::read(&game);
+    let coins = Coins::read(&game);
+    let lawnmowers = Lawnmowers::read(&game);
+    let griditems = Griditems::read(&game);
+    let projectiles = Projectiles::read(&game);
+    let plants = Plants::read(&game);
+    let zombies = Zombies::read(&game);
 
-    let ents = EntitiesLoader::load(&proc).unwrap();
-    // println!("{:#?}", ents.cards);
-    // println!("{:#?}", ents.coins);
-    println!("{:#?}", ents.griditems);
-    // println!("{:#?}", ents.lawnmowers);
-    // for mut coin in ents.coins {
-    //     let CoinContent::Sun = coin.entity.content else {
-    //         warn!("bomboclat");
-    //         continue;
-    //     };
-
-    //     coin.entity = Coin {
-    //         display_pos_x: coin.entity.display_pos_x,
-    //         display_pos_y: coin.entity.display_pos_y,
-    //         is_deleted: coin.entity.is_deleted,
-    //         destination_y: coin.entity.destination_y,
-    //         age_since_spawned: coin.entity.age_since_spawned,
-    //         age_since_reached_destination: coin.entity.age_since_reached_destination,
-    //         content: CoinContent::Diamond,
-    //     };
-    //     coin.write_entity(&proc);
-    // }
+    println!("{coins:#?}");
+    println!("-----------------------------");
+    println!("{lawnmowers:#?}");
+    println!("-----------------------------");
+    println!("{griditems:#?}");
+    println!("-----------------------------");
+    println!("{projectiles:#?}");
+    println!("-----------------------------");
+    println!("{plants:#?}");
+    println!("-----------------------------");
+    println!("{zombies:#?}");
 }

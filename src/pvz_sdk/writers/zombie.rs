@@ -1,4 +1,4 @@
-use crate::{models::Zombie, offsets::ZombieOffset, traits::WriteableEntity};
+use crate::{entities::Zombie, offsets::ZombieOffset, traits::WriteableEntity};
 
 impl WriteableEntity for Zombie {
     fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {

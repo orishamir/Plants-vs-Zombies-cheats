@@ -1,22 +1,61 @@
-use crate::ReaderAt;
-use crate::models::{Griditem, GriditemContent, GriditemContentType, VaseContent, VaseKind};
-use crate::offsets::GriditemOffset;
-use crate::traits::{ReadEntityError, ReadableEntity};
+use crate::Popcapgame;
+use crate::entities::{
+    Griditem, GriditemContent, GriditemContentType, Griditems, VaseContent, VaseKind,
+};
+use crate::offsets::{EntityInformationOffset, EntityOffset, GriditemOffset};
+use crate::readers::OffsetReader;
+use crate::readers::traits::{ReadEntityError, ReadableEntity};
 
-impl ReadableEntity for Griditem {
-    const SIZE: usize = 236;
+const GRIDITEM_MEMORY_SIZE: usize = 236;
 
-    fn read(reader: ReaderAt) -> Result<Self, ReadEntityError> {
-        assert_eq!(reader.len(), Self::SIZE);
+impl ReadableEntity for Griditems {
+    fn read(game: &Popcapgame) -> Result<Self, ReadEntityError> {
+        let base_addr = game.read_ptr_chain(
+            &[
+                0x32f39c,
+                0x540,
+                0x48c,
+                0x0,
+                0x3dc,
+                0x4,
+                0x0,
+                EntityOffset::Griditems.into(),
+            ],
+            true,
+        )?;
+        let reader = OffsetReader::new(base_addr, game);
 
+        let array_addr = reader.read_usize(EntityInformationOffset::ArrayPtr)?;
+        let capacity = reader.read_u32(EntityInformationOffset::Capacity)?;
+
+        let griditems: Vec<Griditem> = (0..capacity)
+            .filter_map(|i| {
+                let entity_reader =
+                    OffsetReader::new(array_addr + i as usize * GRIDITEM_MEMORY_SIZE, game);
+                Self::read_griditem(&entity_reader).ok()
+            })
+            .filter(|griditem| !griditem.is_deleted)
+            .collect();
+
+        Ok(Self {
+            capacity,
+            next_index: reader.read_u32(EntityInformationOffset::NextIndex)?,
+            count: reader.read_u32(EntityInformationOffset::Count)?,
+            griditems,
+        })
+    }
+}
+
+impl Griditems {
+    fn read_griditem(reader: &OffsetReader) -> Result<Griditem, ReadEntityError> {
         let is_deleted = reader.read_bool(GriditemOffset::IsDeleted)?;
 
         let content = match reader.read_u32(GriditemOffset::GriditemType)?.try_into()? {
             GriditemContentType::GraveBuster => GriditemContent::GraveBuster,
             GriditemContentType::DoomShroomCrater => GriditemContent::DoomShroomCrater,
-            GriditemContentType::Vase => Self::read_vase(&reader)?,
+            GriditemContentType::Vase => Self::read_vase(reader)?,
             GriditemContentType::ZenGardenItem => GriditemContent::ZenGardenItem,
-            GriditemContentType::Snail => Self::read_snail(&reader)?,
+            GriditemContentType::Snail => Self::read_snail(reader)?,
             GriditemContentType::Rake => GriditemContent::Rake,
             GriditemContentType::Brain => GriditemContent::Brain,
             GriditemContentType::Portal => GriditemContent::Portal,
@@ -26,15 +65,13 @@ impl ReadableEntity for Griditem {
             },
         };
 
-        Ok(Self {
+        Ok(Griditem {
+            addr: reader.base_addr,
             is_deleted,
             content,
         })
     }
-}
-
-impl Griditem {
-    fn read_snail(reader: &ReaderAt) -> Result<GriditemContent, ReadEntityError> {
+    fn read_snail(reader: &OffsetReader) -> Result<GriditemContent, ReadEntityError> {
         Ok(GriditemContent::Snail {
             pos_x: reader.read_f32(GriditemOffset::PosX)?,
             pos_y: reader.read_f32(GriditemOffset::PosY)?,
@@ -43,7 +80,7 @@ impl Griditem {
         })
     }
 
-    fn read_vase(reader: &ReaderAt) -> Result<GriditemContent, ReadEntityError> {
+    fn read_vase(reader: &OffsetReader) -> Result<GriditemContent, ReadEntityError> {
         let column = reader.read_u32(GriditemOffset::Column)?;
         let row = reader.read_u32(GriditemOffset::Row)?;
 
