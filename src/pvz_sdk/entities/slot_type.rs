@@ -1,5 +1,4 @@
-use anyhow::{anyhow, bail};
-use log::warn;
+use anyhow::bail;
 
 use super::{PlantType, ZombieType};
 

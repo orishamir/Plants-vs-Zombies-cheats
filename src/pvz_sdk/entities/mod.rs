@@ -1,4 +1,3 @@
-#![allow(unused_imports)]
 mod coin;
 mod griditem;
 mod lawnmower;
