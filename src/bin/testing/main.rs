@@ -7,13 +7,13 @@ use pvz_sdk::{
 fn main() {
     let game = Popcapgame::init().unwrap();
 
-    let slots = Slots::read(&game);
-    let coins = Coins::read(&game);
-    let lawnmowers = Lawnmowers::read(&game);
-    let griditems = Griditems::read(&game);
-    let projectiles = Projectiles::read(&game);
-    let plants = Plants::read(&game);
-    let zombies = Zombies::read(&game);
+    let slots = Slots::read(&game).unwrap();
+    let coins = Coins::read(&game).unwrap();
+    let lawnmowers = Lawnmowers::read(&game).unwrap();
+    let griditems = Griditems::read(&game).unwrap();
+    let projectiles = Projectiles::read(&game).unwrap();
+    let plants = Plants::read(&game).unwrap();
+    let zombies = Zombies::read(&game).unwrap();
 
     println!("{coins:#?}");
     println!("-----------------------------");

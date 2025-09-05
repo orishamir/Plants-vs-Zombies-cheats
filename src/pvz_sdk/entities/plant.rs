@@ -11,6 +11,8 @@ pub struct Plants {
 
 #[derive(Debug)]
 pub struct Plant {
+    pub addr: usize,
+
     pub display_pos_x: u32,
     pub display_pos_y: u32,
     pub row: u32,
@@ -28,5 +30,6 @@ pub struct Plant {
     /// In bowling wallnuts, how many zombies the wallnut hit
     pub hit_counter: u32,
     pub is_deleted: bool,
+    pub is_asleep: bool,
     pub is_considered_shoveling: bool,
 }

@@ -47,6 +47,7 @@ impl ReadableEntity for Plants {
 impl Plants {
     fn read_plant(reader: &OffsetReader) -> Result<Plant, ReadEntityError> {
         Ok(Plant {
+            addr: reader.base_addr,
             display_pos_x: reader.read_u32(PlantOffset::DisplayPosX)?,
             display_pos_y: reader.read_u32(PlantOffset::DisplayPosY)?,
             row: reader.read_u32(PlantOffset::Row)?,
@@ -58,6 +59,7 @@ impl Plants {
             plant_timer: reader.read_u32(PlantOffset::PlantTimer)?,
             hit_counter: reader.read_u32(PlantOffset::HitCount)?,
             is_deleted: reader.read_bool(PlantOffset::IsDeleted)?,
+            is_asleep: reader.read_bool(PlantOffset::IsAsleep)?,
             is_considered_shoveling: reader.read_bool(PlantOffset::IsConsideredShoveling)?,
         })
     }
