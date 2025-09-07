@@ -67,6 +67,7 @@ impl eframe::App for MyApp {
             });
     }
 }
+
 impl Default for MyApp {
     fn default() -> Self {
         let popcapgame = Popcapgame::init().unwrap();

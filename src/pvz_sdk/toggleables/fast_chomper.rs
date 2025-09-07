@@ -1,5 +1,7 @@
 use std::time::Duration;
 
+use num_enum::IntoPrimitive;
+
 use super::{ToggleCheatError, Toggleable};
 use crate::game::Popcapgame;
 
@@ -16,9 +18,10 @@ const COOLDOWN_INSTRUCTION_OFFSET: [usize; 1] = [0x69648]; // "popcapgame1.exe" 
 /// Second one is responsible for setting the Chomper's state to "Digesting"
 ///
 /// We can get away with just modifying the second one, but for minimal cooldown between attacks we modify both.
-#[derive(Default)]
 pub struct FastChomperCheat {}
 
+#[derive(Debug, IntoPrimitive)]
+#[repr(u8)]
 #[expect(dead_code)]
 enum ChomperState {
     WaitingForPrey, // Pretty much "idle"
@@ -26,18 +29,6 @@ enum ChomperState {
     KilledZombie,   // Not so sure about this
     Digesting,      // The one that takes most time
     FinishedEating, // I'm not sure the difference between this and WaitingForPrey.
-}
-
-impl From<ChomperState> for u8 {
-    fn from(val: ChomperState) -> Self {
-        match val {
-            ChomperState::WaitingForPrey => 1,
-            ChomperState::Targeting => 10,
-            ChomperState::KilledZombie => 11,
-            ChomperState::Digesting => 13,
-            ChomperState::FinishedEating => 14,
-        }
-    }
 }
 
 impl Toggleable for FastChomperCheat {
@@ -72,14 +63,14 @@ impl Toggleable for FastChomperCheat {
 
         // Momenterally restore all currently-digesting Choppers
         // to their normal state by setting the timer to 0.
-        process.write::<[u8; 4]>(
+        process.write::<[u8; _]>(
             &COOLDOWN_INSTRUCTION_OFFSET,
             [
                 0x83, 0x67, 0x54, 0x00, // and dword ptr [edi + 54], 0x0
             ],
         )?;
         std::thread::sleep(Duration::from_millis(500));
-        process.write::<[u8; 4]>(
+        process.write::<[u8; _]>(
             &COOLDOWN_INSTRUCTION_OFFSET,
             [
                 0x48, // dec eax
@@ -92,7 +83,7 @@ impl Toggleable for FastChomperCheat {
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xD
-        process.write::<[u8; 7]>(
+        process.write::<[u8; _]>(
             &INSTRUCTION_OFFSET1,
             [
                 0xC7,
@@ -106,7 +97,7 @@ impl Toggleable for FastChomperCheat {
         )?;
 
         // mov [edi + 3C], 0xB
-        process.write::<[u8; 7]>(
+        process.write::<[u8; _]>(
             &INSTRUCTION_OFFSET2,
             [
                 0xC7,

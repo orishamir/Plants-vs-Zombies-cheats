@@ -3,12 +3,11 @@ use crate::game::Popcapgame;
 
 const INSTRUCTION_OFFSETS: [usize; 1] = [0x1F634];
 
-#[derive(Default)]
 pub struct FreePlantsCheat {}
 
 impl Toggleable for FreePlantsCheat {
     fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; 2]>(
+        process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0x90, 0x90, // NOPs
