@@ -1,12 +1,12 @@
-use crate::entities;
+use crate::entities::{Griditem, GriditemContent, GriditemContentType, VaseContent, VaseKind};
 use crate::{offsets::GriditemOffset, traits::WriteableEntity};
 
-impl WriteableEntity for entities::Griditem {
+impl WriteableEntity for Griditem {
     fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {
         game.write_at(addr, GriditemOffset::IsDeleted, self.is_deleted);
 
-        let griditem_type: entities::GriditemContentType = match self.content {
-            entities::GriditemContent::Vase {
+        let griditem_type: GriditemContentType = match self.content {
+            GriditemContent::Vase {
                 column,
                 row,
                 is_highlighted,
@@ -24,16 +24,12 @@ impl WriteableEntity for entities::Griditem {
                     vase_kind,
                     vase_content,
                 );
-                entities::GriditemContentType::Vase
+                GriditemContentType::Vase
             }
-            entities::GriditemContent::GraveBuster => entities::GriditemContentType::GraveBuster,
-            entities::GriditemContent::DoomShroomCrater => {
-                entities::GriditemContentType::DoomShroomCrater
-            }
-            entities::GriditemContent::ZenGardenItem => {
-                entities::GriditemContentType::ZenGardenItem
-            }
-            entities::GriditemContent::Snail {
+            GriditemContent::GraveBuster => GriditemContentType::GraveBuster,
+            GriditemContent::DoomShroomCrater => GriditemContentType::DoomShroomCrater,
+            GriditemContent::ZenGardenItem => GriditemContentType::ZenGardenItem,
+            GriditemContent::Snail {
                 pos_x,
                 pos_y,
                 destination_x,
@@ -43,15 +39,15 @@ impl WriteableEntity for entities::Griditem {
                 game.write_at(addr, GriditemOffset::PosY, pos_y);
                 game.write_at(addr, GriditemOffset::DestinationX, destination_x);
                 game.write_at(addr, GriditemOffset::DestinationY, destination_y);
-                entities::GriditemContentType::Snail
+                GriditemContentType::Snail
             }
-            entities::GriditemContent::Rake => entities::GriditemContentType::Rake,
-            entities::GriditemContent::Brain => entities::GriditemContentType::Brain,
-            entities::GriditemContent::Portal => entities::GriditemContentType::Portal,
-            entities::GriditemContent::EatableBrain { pos_x, pos_y } => {
+            GriditemContent::Rake => GriditemContentType::Rake,
+            GriditemContent::Brain => GriditemContentType::Brain,
+            GriditemContent::Portal => GriditemContentType::Portal,
+            GriditemContent::EatableBrain { pos_x, pos_y } => {
                 game.write_at(addr, GriditemOffset::PosX, pos_x);
                 game.write_at(addr, GriditemOffset::PosY, pos_y);
-                entities::GriditemContentType::EatableBrain
+                GriditemContentType::EatableBrain
             }
         };
 
@@ -59,7 +55,7 @@ impl WriteableEntity for entities::Griditem {
     }
 }
 
-impl entities::Griditem {
+impl Griditem {
     #[allow(clippy::too_many_arguments)]
     fn write_vase(
         &self,
@@ -69,8 +65,8 @@ impl entities::Griditem {
         row: u32,
         is_highlighted: bool,
         opacity: u32,
-        vase_kind: entities::VaseKind,
-        vase_content: entities::VaseContent,
+        vase_kind: VaseKind,
+        vase_content: VaseContent,
     ) {
         game.write_at(addr, GriditemOffset::Column, column);
         game.write_at(addr, GriditemOffset::Row, row);
@@ -80,21 +76,21 @@ impl entities::Griditem {
             addr,
             GriditemOffset::VaseKind,
             match vase_kind {
-                entities::VaseKind::Mistery => 3,
-                entities::VaseKind::Plant => 4,
-                entities::VaseKind::Zombie => 5,
+                VaseKind::Mistery => 3,
+                VaseKind::Plant => 4,
+                VaseKind::Zombie => 5,
             },
         );
         let vase_content_type: u32 = match vase_content {
-            crate::entities::VaseContent::Plant { plant_type } => {
+            VaseContent::Plant { plant_type } => {
                 game.write_at::<u32>(addr, GriditemOffset::PlantType, plant_type.into());
                 1
             }
-            crate::entities::VaseContent::Zombie { zombie_type } => {
+            VaseContent::Zombie { zombie_type } => {
                 game.write_at::<u32>(addr, GriditemOffset::ZombieType, zombie_type.into());
                 2
             }
-            crate::entities::VaseContent::Sun { sun_count } => {
+            VaseContent::Sun { sun_count } => {
                 game.write_at(addr, GriditemOffset::SunCount, sun_count);
                 3
             }
