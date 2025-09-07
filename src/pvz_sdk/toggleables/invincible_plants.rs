@@ -3,7 +3,6 @@ use crate::game::Popcapgame;
 
 const INSTRUCTION_OFFSETS: [usize; 1] = [0x1447a0];
 
-#[derive(Default)]
 pub struct InvinciblePlantsCheat {}
 
 impl Toggleable for InvinciblePlantsCheat {
@@ -14,7 +13,7 @@ impl Toggleable for InvinciblePlantsCheat {
     }
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; 4]>(
+        process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0x83, 0x46, 0x40, 0xFC, // add dword ptr [esi + 0x40], -04

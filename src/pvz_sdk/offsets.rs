@@ -1,8 +1,9 @@
 use num_enum::IntoPrimitive;
+use strum::EnumIter;
 
 // type Offset = impl Into<usize>;
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum EntityOffset {
     Zombies = 0xa4,
@@ -13,7 +14,7 @@ pub enum EntityOffset {
     Projectiles = 0xDC,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum EntityInformationOffset {
     Capacity = 0x4,
@@ -22,7 +23,7 @@ pub enum EntityInformationOffset {
     ArrayPtr = 0x0,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum PlantOffset {
     DisplayPosX = 0x8,
@@ -40,7 +41,7 @@ pub enum PlantOffset {
     IsConsideredShoveling = 0x145,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum ProjectileOffset {
     DisplayPosX = 0x8,
@@ -52,7 +53,7 @@ pub enum ProjectileOffset {
     ProjectileType = 0x5c,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum GriditemOffset {
     GriditemType = 0x8,
@@ -73,7 +74,7 @@ pub enum GriditemOffset {
     SunCount = 0x50,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum CoinOffset {
     DisplayPosX = 0x24,
@@ -86,7 +87,7 @@ pub enum CoinOffset {
     PlantType = 0x68,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum LawnmowerOffset {
     DisplayPosX = 0x8,
@@ -97,7 +98,7 @@ pub enum LawnmowerOffset {
     LawnmowerType = 0x34,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum SlotsOffset {
     PosX = 0x8,
@@ -108,7 +109,7 @@ pub enum SlotsOffset {
     Array = 0x28,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum SlotOffset {
     DisplayPosX = 0x8,
@@ -125,7 +126,7 @@ pub enum SlotOffset {
     UsageCount = 0x4c,
 }
 
-#[derive(IntoPrimitive)]
+#[derive(IntoPrimitive, EnumIter)]
 #[repr(usize)]
 pub enum ZombieOffset {
     DisplayPosX = 0x8,

@@ -1,21 +1,26 @@
+use strum::IntoEnumIterator;
+
 use crate::{entities::Slot, offsets::SlotOffset, traits::WriteableEntity};
 
 impl WriteableEntity for Slot {
     fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {
-        game.write_at(addr, SlotOffset::DisplayPosX, self.display_pos_x);
-        game.write_at(addr, SlotOffset::DisplayPosY, self.display_pos_y);
-        game.write_at(addr, SlotOffset::SelectableWidth, self.selectable_width);
-        game.write_at(addr, SlotOffset::SelectableHeight, self.selectable_height);
-        game.write_at(addr, SlotOffset::Charge, self.charge);
-        game.write_at(addr, SlotOffset::RechargeGoal, self.recharge_goal);
-        game.write_at(addr, SlotOffset::Column, self.column);
-        game.write_at::<u32>(
-            addr,
-            SlotOffset::CardType,
-            self.card_type.try_into().unwrap(),
-        );
-        game.write_at(addr, SlotOffset::Selectable, self.selectable);
-        game.write_at(addr, SlotOffset::Recharging, self.recharging);
-        game.write_at(addr, SlotOffset::UsageCount, self.usage_count);
+        for off in SlotOffset::iter() {
+            match off {
+                SlotOffset::DisplayPosX => game.write_at(addr, off, self.display_pos_x),
+                SlotOffset::DisplayPosY => game.write_at(addr, off, self.display_pos_y),
+                SlotOffset::SelectableWidth => game.write_at(addr, off, self.selectable_width),
+                SlotOffset::SelectableHeight => game.write_at(addr, off, self.selectable_height),
+                SlotOffset::Charge => game.write_at(addr, off, self.charge),
+                SlotOffset::RechargeGoal => game.write_at(addr, off, self.recharge_goal),
+                SlotOffset::Column => game.write_at(addr, off, self.column),
+                SlotOffset::PosXOffset => game.write_at(addr, off, self.pos_x_offset),
+                SlotOffset::CardType => {
+                    game.write_at::<u32>(addr, off, self.card_type.try_into().unwrap())
+                }
+                SlotOffset::Selectable => game.write_at(addr, off, self.selectable),
+                SlotOffset::Recharging => game.write_at(addr, off, self.recharging),
+                SlotOffset::UsageCount => game.write_at(addr, off, self.usage_count),
+            };
+        }
     }
 }

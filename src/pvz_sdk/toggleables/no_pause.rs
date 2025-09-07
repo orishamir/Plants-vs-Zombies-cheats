@@ -17,22 +17,22 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x1924B];
 /// I change it to run regardless.
 ///
 /// TODO: Hide "pause" menu
-#[derive(Default)]
 pub struct NoPauseCheat {}
 
 impl Toggleable for NoPauseCheat {
     fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; 2]>(
+        process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0xEB, 0x37, // jmp popcapgame1.exe+19284
             ],
         )?;
+
         Ok(())
     }
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; 2]>(
+        process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0x74, 0x37, // je popcapgame1.exe+19284
