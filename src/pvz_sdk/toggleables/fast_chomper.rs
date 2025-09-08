@@ -24,11 +24,11 @@ pub struct FastChomperCheat {}
 #[repr(u8)]
 #[expect(dead_code)]
 enum ChomperState {
-    WaitingForPrey, // Pretty much "idle"
-    Targeting,
-    KilledZombie,   // Not so sure about this
-    Digesting,      // The one that takes most time
-    FinishedEating, // I'm not sure the difference between this and WaitingForPrey.
+    WaitingForPrey = 1, // Pretty much "idle"
+    Targeting = 10,
+    KilledZombie = 11,   // Not so sure about this
+    Digesting = 13,      // The one that takes most time
+    FinishedEating = 14, // I'm not sure the difference between this and WaitingForPrey.
 }
 
 impl Toggleable for FastChomperCheat {
