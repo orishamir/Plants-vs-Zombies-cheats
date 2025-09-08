@@ -7,7 +7,7 @@ pub trait Toggleable {
     fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError>;
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError>;
     fn name(&self) -> &'static str;
-    fn toggle(&mut self, process: &Popcapgame, toggled: bool) -> Result<(), ToggleCheatError> {
+    fn toggle(&self, process: &Popcapgame, toggled: bool) -> Result<(), ToggleCheatError> {
         if toggled {
             self.activate(process)
         } else {
