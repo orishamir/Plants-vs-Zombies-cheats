@@ -6,8 +6,8 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x958BC];
 pub struct InstantRechargeCheat {}
 
 impl Toggleable for InstantRechargeCheat {
-    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(
+    fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
+        game.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0x81, 0x47, 0x24, 0x0, 0x2, 0x0, 0x0,  // add [edi+24], 000200
@@ -34,5 +34,13 @@ impl Toggleable for InstantRechargeCheat {
 
     fn name(&self) -> &'static str {
         "Instant Plant Recharge"
+    }
+
+    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
+        let current_instructions = game
+            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSETS, true)?, 4)
+            .unwrap();
+
+        Ok(current_instructions[0..4] == [0x81, 0x47, 0x24, 0x0])
     }
 }

@@ -115,4 +115,21 @@ impl Toggleable for FastChomperCheat {
     fn name(&self) -> &'static str {
         "Hungry Chompers"
     }
+
+    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
+        let current_instructions = game
+            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSET1, true)?, 7)
+            .unwrap();
+
+        Ok(current_instructions[0..7]
+            == [
+                0xC7,
+                0x47,
+                0x3C,
+                ChomperState::FinishedEating.into(),
+                0x00,
+                0x00,
+                0x00,
+            ])
+    }
 }

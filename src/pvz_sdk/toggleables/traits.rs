@@ -4,14 +4,15 @@ use thiserror::Error;
 use crate::game::Popcapgame;
 
 pub trait Toggleable {
-    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError>;
-    fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError>;
+    fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError>;
+    fn deactivate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError>;
+    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError>;
     fn name(&self) -> &'static str;
-    fn toggle(&self, process: &Popcapgame, toggled: bool) -> Result<(), ToggleCheatError> {
+    fn toggle(&self, game: &Popcapgame, toggled: bool) -> Result<(), ToggleCheatError> {
         if toggled {
-            self.activate(process)
+            self.activate(game)
         } else {
-            self.deactivate(process)
+            self.deactivate(game)
         }
     }
 }

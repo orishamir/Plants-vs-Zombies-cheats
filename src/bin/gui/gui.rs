@@ -82,8 +82,13 @@ impl Default for MyApp {
             Box::new(SeethroughVasesCheat {}),
         ];
 
+        let toggled: Vec<bool> = toggleables
+            .iter()
+            .map(|toggleable| toggleable.is_activated(&popcapgame).unwrap())
+            .collect();
+
         Self {
-            toggled: vec![false; toggleables.len()],
+            toggled,
             toggleables,
             popcapgame,
         }

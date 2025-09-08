@@ -20,8 +20,8 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x1924B];
 pub struct NoPauseCheat {}
 
 impl Toggleable for NoPauseCheat {
-    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(
+    fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
+        game.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
             [
                 0xEB, 0x37, // jmp popcapgame1.exe+19284
@@ -44,5 +44,13 @@ impl Toggleable for NoPauseCheat {
 
     fn name(&self) -> &'static str {
         "No Pause"
+    }
+
+    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
+        let current_instructions = game
+            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSETS, true)?, 2)
+            .unwrap();
+
+        Ok(current_instructions[0..2] == [0xeb, 0x37])
     }
 }
