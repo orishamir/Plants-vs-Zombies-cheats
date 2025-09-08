@@ -12,14 +12,14 @@ pub struct MyApp {
     popcapgame: Popcapgame,
 }
 
-#[inline]
+#[inline(always)]
 fn toggleables_header_font() -> RichText {
     RichText::new("Toggleables")
         .size(30.)
         .color(Color32::MAGENTA)
 }
 
-#[inline]
+#[inline(always)]
 fn togglecheat_font(name: &'static str) -> RichText {
     RichText::new(name).size(24.).strong()
 }
@@ -27,7 +27,7 @@ fn togglecheat_font(name: &'static str) -> RichText {
 impl MyApp {
     fn render_toggleables(&mut self, ui: &mut Ui) {
         egui::Grid::new("id_salt").striped(true).show(ui, |ui| {
-            for (toggleable, toggled) in self.toggleables.iter_mut().zip(&mut self.toggled) {
+            for (toggleable, toggled) in self.toggleables.iter().zip(&mut self.toggled) {
                 if ui
                     .checkbox(toggled, togglecheat_font(toggleable.name()))
                     .changed()

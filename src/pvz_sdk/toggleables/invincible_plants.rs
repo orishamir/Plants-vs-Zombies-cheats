@@ -6,6 +6,11 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x1447a0];
 pub struct InvinciblePlantsCheat {}
 
 impl Toggleable for InvinciblePlantsCheat {
+    #[inline(always)]
+    fn name(&self) -> &'static str {
+        "Invincible Plants"
+    }
+
     fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
         game.write::<[u8; 4]>(&INSTRUCTION_OFFSETS, [0x90; _])?;
 
@@ -21,10 +26,6 @@ impl Toggleable for InvinciblePlantsCheat {
         )?;
 
         Ok(())
-    }
-
-    fn name(&self) -> &'static str {
-        "Invincible Plants"
     }
 
     fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {

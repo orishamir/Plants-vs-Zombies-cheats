@@ -32,6 +32,11 @@ enum ChomperState {
 }
 
 impl Toggleable for FastChomperCheat {
+    #[inline(always)]
+    fn name(&self) -> &'static str {
+        "Hungry Chompers"
+    }
+
     fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         // mov [edi + 3C], 0xE
         process.write::<[u8; _]>(
@@ -110,10 +115,6 @@ impl Toggleable for FastChomperCheat {
             ],
         )?;
         Ok(())
-    }
-
-    fn name(&self) -> &'static str {
-        "Hungry Chompers"
     }
 
     fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {

@@ -20,6 +20,11 @@ const INSTRUCTION_OFFSETS: [usize; 1] = [0x1924B];
 pub struct NoPauseCheat {}
 
 impl Toggleable for NoPauseCheat {
+    #[inline(always)]
+    fn name(&self) -> &'static str {
+        "No Pause"
+    }
+
     fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
         game.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
@@ -40,10 +45,6 @@ impl Toggleable for NoPauseCheat {
         )?;
 
         Ok(())
-    }
-
-    fn name(&self) -> &'static str {
-        "No Pause"
     }
 
     fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {

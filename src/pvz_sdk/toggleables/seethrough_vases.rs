@@ -21,6 +21,11 @@ const DRAW_OPACITY_OFFSET: [usize; 1] = [0x52aa8];
 pub struct SeethroughVasesCheat {}
 
 impl Toggleable for SeethroughVasesCheat {
+    #[inline(always)]
+    fn name(&self) -> &'static str {
+        "Seethrough Vases"
+    }
+
     fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
         game.write::<[u8; _]>(&RESET_OPACITY_AWAY_OFFSET, [0xeb, 0x04])?;
         game.write::<[u8; 6]>(&CHECK_OPACITY_OFFSET, [0x90; _])?;
@@ -35,10 +40,6 @@ impl Toggleable for SeethroughVasesCheat {
         game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x8b, 0x45, 0x4c])?;
 
         Ok(())
-    }
-
-    fn name(&self) -> &'static str {
-        "Seethrough Vases"
     }
 
     fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
