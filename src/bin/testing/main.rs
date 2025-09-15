@@ -1,7 +1,7 @@
 use pvz_sdk::{
     Popcapgame,
     entities::{Coins, Griditems, Lawnmowers, Plants, Projectiles, Slots, Zombies},
-    readers::ReadableEntity,
+    traits::ReadableEntity,
 };
 
 fn main() {

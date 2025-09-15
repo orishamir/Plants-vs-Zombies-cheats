@@ -1,12 +1,17 @@
-pub mod cheated_entity;
+pub(crate) mod cheated_entity;
 pub mod entities;
-pub mod game;
-pub mod offsets;
-pub mod readers;
+pub(crate) mod game;
+pub(crate) mod offsets;
+pub(crate) mod readers;
 pub mod toggleables;
-pub mod traits;
-pub mod writers;
+pub(crate) mod writers;
 
-// pub use entities_loader::EntitiesLoader;
 pub use game::Popcapgame;
-// pub use traits::{ReadableEntity, WriteableEntity};
+
+pub mod traits {
+    pub use super::{
+        readers::{MemoryReaderError, ReadEntityError, ReadableEntity},
+        toggleables::{ToggleCheatError, Toggleable},
+        writers::WriteableEntity,
+    };
+}

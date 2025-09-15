@@ -3,7 +3,7 @@ use std::time::Duration;
 use num_enum::IntoPrimitive;
 
 use super::{ToggleCheatError, Toggleable};
-use crate::game::Popcapgame;
+use crate::Popcapgame;
 
 const INSTRUCTION_OFFSET1: [usize; 1] = [0x678E7]; // "popcapgame1.exe" + 0x678E7
 const INSTRUCTION_OFFSET2: [usize; 1] = [0x6789E]; // "popcapgame1.exe" + 0x6789E

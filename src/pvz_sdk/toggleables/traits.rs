@@ -1,7 +1,7 @@
 use proc_mem::ProcMemError;
 use thiserror::Error;
 
-use crate::game::Popcapgame;
+use crate::Popcapgame;
 
 pub trait Toggleable {
     fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError>;

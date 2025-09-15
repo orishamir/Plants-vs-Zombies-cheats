@@ -1,9 +1,9 @@
 use strum::IntoEnumIterator;
 
-use crate::{entities::Slot, offsets::SlotOffset, traits::WriteableEntity};
+use crate::{Popcapgame, entities::Slot, offsets::SlotOffset, writers::WriteableEntity};
 
 impl WriteableEntity for Slot {
-    fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {
+    fn write_entity(&self, addr: usize, game: &Popcapgame) {
         for off in SlotOffset::iter() {
             match off {
                 SlotOffset::DisplayPosX => game.write_at(addr, off, self.display_pos_x),

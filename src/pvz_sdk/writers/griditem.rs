@@ -1,8 +1,9 @@
+use crate::Popcapgame;
 use crate::entities::{Griditem, GriditemContent, GriditemContentType, VaseContent, VaseKind};
-use crate::{offsets::GriditemOffset, traits::WriteableEntity};
+use crate::{offsets::GriditemOffset, writers::WriteableEntity};
 
 impl WriteableEntity for Griditem {
-    fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {
+    fn write_entity(&self, addr: usize, game: &Popcapgame) {
         game.write_at(addr, GriditemOffset::IsDeleted, self.is_deleted);
 
         let griditem_type: GriditemContentType = match self.content {
@@ -60,7 +61,7 @@ impl Griditem {
     fn write_vase(
         &self,
         addr: usize,
-        game: &crate::game::Popcapgame,
+        game: &Popcapgame,
         column: u32,
         row: u32,
         is_highlighted: bool,

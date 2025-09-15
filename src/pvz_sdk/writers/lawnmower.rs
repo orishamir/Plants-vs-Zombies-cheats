@@ -1,9 +1,9 @@
 use strum::IntoEnumIterator;
 
-use crate::{entities::Lawnmower, offsets::LawnmowerOffset, traits::WriteableEntity};
+use crate::{Popcapgame, entities::Lawnmower, offsets::LawnmowerOffset, writers::WriteableEntity};
 
 impl WriteableEntity for Lawnmower {
-    fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {
+    fn write_entity(&self, addr: usize, game: &Popcapgame) {
         for off in LawnmowerOffset::iter() {
             match off {
                 LawnmowerOffset::DisplayPosX => game.write_at(addr, off, self.display_pos_x),

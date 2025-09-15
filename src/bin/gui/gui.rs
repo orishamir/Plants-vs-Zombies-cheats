@@ -1,10 +1,7 @@
 use egui::{self, Color32, Frame, RichText, Ui};
 use log::info;
-use pvz_sdk::game::Popcapgame;
-use pvz_sdk::toggleables::{
-    FastChomperCheat, FreePlantsCheat, InstantRechargeCheat, InvinciblePlantsCheat, NoPauseCheat,
-    PlantAnywhereCheat, SeethroughVasesCheat, Toggleable,
-};
+use pvz_sdk::Popcapgame;
+use pvz_sdk::toggleables::{self, Toggleable};
 
 pub struct MyApp {
     toggleables: Vec<Box<dyn Toggleable>>,
@@ -73,13 +70,13 @@ impl Default for MyApp {
         let popcapgame = Popcapgame::init().unwrap();
 
         let toggleables: Vec<Box<dyn Toggleable>> = vec![
-            Box::new(InvinciblePlantsCheat {}),
-            Box::new(PlantAnywhereCheat {}),
-            Box::new(FreePlantsCheat {}),
-            Box::new(InstantRechargeCheat {}),
-            Box::new(FastChomperCheat {}),
-            Box::new(NoPauseCheat {}),
-            Box::new(SeethroughVasesCheat {}),
+            Box::new(toggleables::InvinciblePlantsCheat {}),
+            Box::new(toggleables::PlantAnywhereCheat {}),
+            Box::new(toggleables::FreePlantsCheat {}),
+            Box::new(toggleables::InstantRechargeCheat {}),
+            Box::new(toggleables::FastChomperCheat {}),
+            Box::new(toggleables::NoPauseCheat {}),
+            Box::new(toggleables::SeethroughVasesCheat {}),
         ];
 
         let toggled: Vec<bool> = toggleables

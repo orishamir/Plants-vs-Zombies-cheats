@@ -32,10 +32,6 @@ impl<'a> OffsetReader<'a> {
             .ok_or(OffsetReaderError::ReadOutOfBounds)
     }
 
-    pub fn seek_by(&mut self, amount: usize) {
-        self.base_addr += amount;
-    }
-
     pub fn read_u32(&self, offset: impl Into<usize>) -> Result<u32, OffsetReaderError> {
         let bytes = self.read(offset, 4)?;
         Ok(u32::from_le_bytes(

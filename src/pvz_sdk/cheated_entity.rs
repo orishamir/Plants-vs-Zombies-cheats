@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::{game::Popcapgame, traits::WriteableEntity};
+use crate::{Popcapgame, writers::WriteableEntity};
 
 #[derive(Debug)]
 pub struct CheatedEntity<T: WriteableEntity> {

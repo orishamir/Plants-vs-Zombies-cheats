@@ -1,5 +1,5 @@
 use super::{ToggleCheatError, Toggleable};
-use crate::game::Popcapgame;
+use crate::Popcapgame;
 
 const RESET_OPACITY_AWAY_OFFSET: [usize; 1] = [0x531cc];
 const CHECK_OPACITY_OFFSET: [usize; 1] = [0x527c8];

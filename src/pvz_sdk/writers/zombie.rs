@@ -1,9 +1,9 @@
 use strum::IntoEnumIterator;
 
-use crate::{entities::Zombie, offsets::ZombieOffset, traits::WriteableEntity};
+use crate::{Popcapgame, entities::Zombie, offsets::ZombieOffset, writers::WriteableEntity};
 
 impl WriteableEntity for Zombie {
-    fn write_entity(&self, addr: usize, game: &crate::game::Popcapgame) {
+    fn write_entity(&self, addr: usize, game: &Popcapgame) {
         for off in ZombieOffset::iter() {
             match off {
                 ZombieOffset::DisplayPosX => game.write_at(addr, off, self.display_pos_x),

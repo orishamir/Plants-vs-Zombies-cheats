@@ -1,5 +1,5 @@
 use super::{ToggleCheatError, Toggleable};
-use crate::game::Popcapgame;
+use crate::Popcapgame;
 
 const INSTRUCTION_OFFSETS: [usize; 1] = [0x1447a0];
 
