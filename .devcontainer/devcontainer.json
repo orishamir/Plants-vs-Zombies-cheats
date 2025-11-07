@@ -1,0 +1,21 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/go
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "runArgs": [
+        "--network=host"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "usernamehw.errorlens",
+                "tamasfe.even-better-toml",
+                "tal7aouy.icons",
+                "marclipovsky.string-manipulation"
+            ]
+        }
+    }
+}
