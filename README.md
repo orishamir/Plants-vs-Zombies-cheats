@@ -2,6 +2,5 @@
 
 A work in progress.
 
-## TODO
-
-Implement all cheats available in [The C# version](https://github.com/orishamir/PlantsVsZombiesHacks)
+# NOTE
+This is the version for game of the year edition. Go to `main` branch for Replanted.
