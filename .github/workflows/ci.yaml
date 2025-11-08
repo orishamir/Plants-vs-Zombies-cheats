@@ -4,37 +4,35 @@ jobs:
   test:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5.0.0
 
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1.0.7
+        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
         with:
-          profile: minimal
           toolchain: stable
-          target: i686-pc-windows-msvc
-          override: true
-      
+          targets: x86_64-pc-windows-msvc
+          components: rustfmt, clippy
+
       - name: Test
         run: cargo test
 
   build:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5.0.0
 
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1.0.7
+        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
         with:
-          profile: minimal
           toolchain: stable
-          target: i686-pc-windows-msvc
-          override: true
-      
+          targets: x86_64-pc-windows-msvc
+          components: rustfmt
+
       - name: Build Release
-        run: cargo build --target i686-pc-windows-msvc --release --bin gui
+        run: cargo build --target x86_64-pc-windows-msvc --release --bin gui
 
       - name: Upload Built Artifacts (.exe)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5.0.0
         with:
-          name: plants_vs_zombies_cheats.exe
-          path: target/i686-pc-windows-msvc/release/plants_vs_zombies_cheats.exe
+          name: replanted_cheats.exe
+          path: target/x86_64-pc-windows-msvc/release/gui.exe

@@ -1,8 +1,12 @@
 use super::{ToggleCheatError, Toggleable};
 use crate::Popcapgame;
 
-const INSTRUCTION_OFFSETS: [usize; 1] = [0x958BC];
+const INSTRUCTION_OFFSETS: [usize; 1] = [0x6CB1FD];
 
+/// ```diff
+/// - GameAssembly.dll+6CB1FD - 7E 1A                 - jle GameAssembly.dll+6CB219
+/// + GameAssembly.dll+6CB1FD - 90 90                 - nop
+/// ```
 pub struct InstantRechargeCheat {}
 
 impl Toggleable for InstantRechargeCheat {
@@ -12,36 +16,22 @@ impl Toggleable for InstantRechargeCheat {
     }
 
     fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; _]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0x81, 0x47, 0x24, 0x0, 0x2, 0x0, 0x0,  // add [edi+24], 000200
-                0x90, // NOP
-                0x90, // NOP
-            ],
-        )?;
+        game.write::<[u8; _]>(&INSTRUCTION_OFFSETS, [0x90, 0x90])?;
 
         Ok(())
     }
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0xff, 0x47, 0x24, // inc [edi + 24]
-                0x8b, 0x47, 0x24, // mov eax, [edi+24]
-                0x3b, 0x47, 0x28, // cmp eax, [edi+28]
-            ],
-        )?;
+        process.write::<[u8; _]>(&INSTRUCTION_OFFSETS, [0x7e, 0x1a])?;
 
         Ok(())
     }
 
     fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
         let current_instructions = game
-            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSETS, true)?, 4)
+            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSETS, true)?, 2)
             .unwrap();
 
-        Ok(current_instructions[0..4] == [0x81, 0x47, 0x24, 0x0])
+        Ok(current_instructions[0..2] == [0x90, 0x90])
     }
 }

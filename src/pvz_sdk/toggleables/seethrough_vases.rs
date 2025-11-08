@@ -17,7 +17,7 @@ const DRAW_OPACITY_OFFSET: [usize; 1] = [0x7BFA43];
 /// When drawing opacity, use 50 instead of the actual opacity value:
 /// - GameAssembly.dll+7BFA43 - 8B B8 B0000000        - mov edi,[rax+000000B0]
 /// + GameAssembly.dll+7BFA43 - BF 32000000           - mov edi,00000032
-/// + GameAssembly.dll+7BFA48 - 90                    - nop 
+/// + GameAssembly.dll+7BFA48 - 90                    - nop
 /// ```
 pub struct SeethroughVasesCheat {}
 
@@ -36,9 +36,9 @@ impl Toggleable for SeethroughVasesCheat {
     }
 
     fn deactivate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; _]>(&DEC_OPACITY_OFFSET, [0xFF, 0x8B, 0xB0, 0x00, 0x00, 0x00])?;
+        game.write::<[u8; _]>(&DEC_OPACITY_OFFSET, [0xFF, 0x8B, 0xB0, 0x0, 0x0, 0x0])?;
         game.write::<[u8; _]>(&CHECK_OPACITY_OFFSET, [0x7f, 0x23])?;
-        game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x8b, 0xb0, 0xb0, 0x0, 0x0, 0x0])?;
+        game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x8b, 0xb8, 0xb0, 0x0, 0x0, 0x0])?;
 
         Ok(())
     }
