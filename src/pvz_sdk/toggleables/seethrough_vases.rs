@@ -1,22 +1,23 @@
 use super::{ToggleCheatError, Toggleable};
 use crate::Popcapgame;
 
-const RESET_OPACITY_AWAY_OFFSET: [usize; 1] = [0x531cc];
-const CHECK_OPACITY_OFFSET: [usize; 1] = [0x527c8];
-const DRAW_OPACITY_OFFSET: [usize; 1] = [0x52aa8];
+const DEC_OPACITY_OFFSET: [usize; 1] = [0x6B706F];
+const CHECK_OPACITY_OFFSET: [usize; 1] = [0x7BF7A5];
+const DRAW_OPACITY_OFFSET: [usize; 1] = [0x7BFA43];
 
 /// ```diff
-/// Skip loop that decreases opacity over time:
-/// - popcapgame1.exe+531CC - 7E 04                 - jle popcapgame1.exe+531D2
-/// + popcapgame1.exe+531CC - EB 04                 - jmp popcapgame1.exe+531D2
+/// Don't decrement opacity over time:
+/// - GameAssembly.dll+6B706F - FF 8B B0000000        - dec [rbx+000000B0]
+/// + GameAssembly.dll+6B706F - 90 90 90909090        - nop
 ///
 /// Skip check that opacity > 0:
-/// - popcapgame1.exe+527C8 - 0F8E 35030000         - jng popcapgame1.exe+52B03
-/// + popcapgame1.exe+527C8 - 9090 90909090         - NOPs
+/// - GameAssembly.dll+7BF7A5 - 7F 23                 - jg GameAssembly.dll+7BF7CA
+/// + GameAssembly.dll+7BF7A5 - EB 23                 - jmp GameAssembly.dll+7BF7CA
 ///
 /// When drawing opacity, use 50 instead of the actual opacity value:
-/// - popcapgame1.exe+52AA8 - 8B 45 4C              - mov eax, [ebp+4C]
-/// + popcapgame1.exe+52AA8 - 83 C0 32              - add eax, 32
+/// - GameAssembly.dll+7BFA43 - 8B B8 B0000000        - mov edi,[rax+000000B0]
+/// + GameAssembly.dll+7BFA43 - BF 32000000           - mov edi,00000032
+/// + GameAssembly.dll+7BFA48 - 90                    - nop 
 /// ```
 pub struct SeethroughVasesCheat {}
 
@@ -27,26 +28,26 @@ impl Toggleable for SeethroughVasesCheat {
     }
 
     fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; _]>(&RESET_OPACITY_AWAY_OFFSET, [0xeb, 0x04])?;
-        game.write::<[u8; 6]>(&CHECK_OPACITY_OFFSET, [0x90; _])?;
-        game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x83, 0xc0, 0x50])?;
+        game.write::<[u8; 6]>(&DEC_OPACITY_OFFSET, [0x90; _])?;
+        game.write::<[u8; _]>(&CHECK_OPACITY_OFFSET, [0xeb, 0x23])?;
+        game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0xbf, 0x32, 0x0, 0x0, 0x0, 0x90])?;
 
         Ok(())
     }
 
     fn deactivate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; _]>(&RESET_OPACITY_AWAY_OFFSET, [0x7e, 0x04])?;
-        game.write::<[u8; _]>(&CHECK_OPACITY_OFFSET, [0x0f, 0x8e, 0x35, 0x03, 0x00, 0x00])?;
-        game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x8b, 0x45, 0x4c])?;
+        game.write::<[u8; _]>(&DEC_OPACITY_OFFSET, [0xFF, 0x8B, 0xB0, 0x00, 0x00, 0x00])?;
+        game.write::<[u8; _]>(&CHECK_OPACITY_OFFSET, [0x7f, 0x23])?;
+        game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x8b, 0xb0, 0xb0, 0x0, 0x0, 0x0])?;
 
         Ok(())
     }
 
     fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
         let current_instructions = game
-            .read_bytes_at(game.read_ptr_chain(&RESET_OPACITY_AWAY_OFFSET, true)?, 2)
+            .read_bytes_at(game.read_ptr_chain(&DEC_OPACITY_OFFSET, true)?, 2)
             .unwrap();
 
-        Ok(current_instructions[0..2] == [0xeb, 0x04])
+        Ok(current_instructions[0..2] == [0x90, 0x90])
     }
 }

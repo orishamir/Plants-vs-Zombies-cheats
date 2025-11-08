@@ -1,7 +1,7 @@
-# Plants vs. Zombies Cheats
+# Plants vs. Zombies Replanted Cheats
 
 A work in progress.
 
 ## TODO
 
-Implement all cheats available in [The C# version](https://github.com/orishamir/PlantsVsZombiesHacks)
+Implement all cheats available in the GOTY Edition (see branch release/final-pvz-goty)

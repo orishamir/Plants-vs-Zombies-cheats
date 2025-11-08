@@ -72,8 +72,8 @@ impl Popcapgame {
     }
 
     pub fn init() -> Result<Self, ProcMemError> {
-        let proc = Process::with_name("popcapgame1.exe")?;
-        let base_module = proc.module("popcapgame1.exe")?;
+        let proc = Process::with_name("Replanted.exe")?;
+        let base_module = proc.module("GameAssembly.dll")?;
         Ok(Self { proc, base_module })
     }
 }

@@ -1,8 +1,11 @@
 use super::{ToggleCheatError, Toggleable};
 use crate::Popcapgame;
 
-const INSTRUCTION_OFFSETS: [usize; 1] = [0x1447a0];
-
+const INSTRUCTION_OFFSETS: [usize; 1] = [0x6E2A96];
+/// ```diff
+/// - GameAssembly.dll+6E2A96 - 83 AB 8C000000 04        - sub dword ptr [rbx+0000008C],04
+/// + GameAssembly.dll+6E2A96 - 90 90 90 90 90 90 90     - nop
+/// ```
 pub struct InvinciblePlantsCheat {}
 
 impl Toggleable for InvinciblePlantsCheat {
@@ -12,7 +15,7 @@ impl Toggleable for InvinciblePlantsCheat {
     }
 
     fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; 4]>(&INSTRUCTION_OFFSETS, [0x90; _])?;
+        game.write::<[u8; 7]>(&INSTRUCTION_OFFSETS, [0x90; _])?;
 
         Ok(())
     }
@@ -20,9 +23,7 @@ impl Toggleable for InvinciblePlantsCheat {
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
         process.write::<[u8; _]>(
             &INSTRUCTION_OFFSETS,
-            [
-                0x83, 0x46, 0x40, 0xFC, // add dword ptr [esi + 0x40], -04
-            ],
+            [0x83, 0xab, 0x8c, 0x0, 0x0, 0x0, 0x4], // sub dword ptr [rbx+0000008C],04
         )?;
 
         Ok(())
