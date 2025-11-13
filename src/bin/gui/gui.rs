@@ -73,6 +73,7 @@ impl Default for MyApp {
             Box::new(toggleables::InvinciblePlantsCheat {}),
             Box::new(toggleables::PlantAnywhereCheat {}),
             Box::new(toggleables::FreePlantsCheat {}),
+            Box::new(toggleables::AutoPickupSunCheat {}),
             Box::new(toggleables::InstantRechargeCheat {}),
             Box::new(toggleables::FastChomperCheat {}),
             Box::new(toggleables::NoPauseCheat {}),

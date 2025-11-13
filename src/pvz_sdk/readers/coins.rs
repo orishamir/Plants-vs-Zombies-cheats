@@ -57,6 +57,7 @@ impl Coins {
             CoinType::GiantBagOfCash => CoinContent::GiantBagOfCash,
             CoinType::GoldSunflowerTrophy => CoinContent::GoldsunflowerTrophy,
             CoinType::Chocolate => CoinContent::Chocolate,
+            CoinType::BigSun => CoinContent::BigSun,
         };
 
         Ok(Coin {

@@ -32,6 +32,7 @@ pub enum CoinContent {
     Diamond,
     Sun,
     MiniSun,
+    BigSun,
     DroppedCard { plant_type: PlantType },
     GiantBagOfCash,
     GoldsunflowerTrophy,
@@ -46,6 +47,7 @@ pub enum CoinType {
     Diamond = 3,
     Sun = 4,
     MiniSun = 5,
+    BigSun = 6, // gives 50 sun
     DroppedCard = 16,
     GiantBagOfCash = 18,
     /// Beating a mini-game, Puzzle Mode, or Survival Mode level for the first time.

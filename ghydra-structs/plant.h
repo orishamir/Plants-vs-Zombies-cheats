@@ -1,9 +1,7 @@
-use num_enum::{IntoPrimitive, TryFromPrimitive};
-use std::fmt::Debug;
+#include <stdint.h>
 
-#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
-#[repr(u32)]
-pub enum PlantType {
+typedef enum PlantType
+{
     Peashooter = 0,
     Sunflower = 1,
     CherryBomb = 2,
@@ -52,9 +50,18 @@ pub enum PlantType {
     GoldMagnet = 45,
     Spikerock = 46,
     CobCannon = 47,
-    Imitator = 48, //maybe false
+    Imitator = 48, // maybe false
     ExplodeONut = 49,
     GiantWallnut = 50,
     Sprout = 51,
     ReverseRepeater = 52,
-}
+} PlantType;
+
+// typedef struct MyStruct
+// {
+//     uint32_t id;
+//     uint16_t count;
+//     uint8_t flags;
+//     char name[16];
+//     MyEnum sType;
+// } MyStruct;
