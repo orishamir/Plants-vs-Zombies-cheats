@@ -22,12 +22,7 @@ impl Toggleable for FreePlantsCheat {
     }
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0x44, 0x29, 0x68, 0x10, // sub [rax+10], r13d
-            ],
-        )?;
+        process.write::<[u8; _]>(&INSTRUCTION_OFFSETS, [0x44, 0x29, 0x68, 0x10])?;
 
         Ok(())
     }

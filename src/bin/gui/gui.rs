@@ -70,14 +70,15 @@ impl Default for MyApp {
         let popcapgame = Popcapgame::init().unwrap();
 
         let toggleables: Vec<Box<dyn Toggleable>> = vec![
-            Box::new(toggleables::InvinciblePlantsCheat {}),
-            Box::new(toggleables::PlantAnywhereCheat {}),
-            Box::new(toggleables::FreePlantsCheat {}),
             Box::new(toggleables::AutoPickupSunCheat {}),
             Box::new(toggleables::InstantRechargeCheat {}),
-            Box::new(toggleables::FastChomperCheat {}),
-            Box::new(toggleables::NoPauseCheat {}),
+            Box::new(toggleables::FreePlantsCheat {}),
+            Box::new(toggleables::InvinciblePlantsCheat {}),
             Box::new(toggleables::SeethroughVasesCheat {}),
+            Box::new(toggleables::HeadshotMode {}),
+            // Box::new(toggleables::PlantAnywhereCheat {}),
+            // Box::new(toggleables::FastChomperCheat {}),
+            // Box::new(toggleables::NoPauseCheat {}),
         ];
 
         let toggled: Vec<bool> = toggleables

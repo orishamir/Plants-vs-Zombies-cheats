@@ -29,10 +29,10 @@ jobs:
           components: rustfmt
 
       - name: Build Release
-        run: cargo build --target x86_64-pc-windows-msvc --release --bin gui
+        run: cargo build --release --bin gui
 
       - name: Upload Built Artifacts (.exe)
         uses: actions/upload-artifact@v5.0.0
         with:
           name: replanted_cheats.exe
-          path: target/x86_64-pc-windows-msvc/release/gui.exe
+          path: target/release/gui.exe

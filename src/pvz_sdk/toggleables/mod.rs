@@ -1,6 +1,7 @@
 mod auto_pickup_sun;
 mod fast_chomper;
 mod free_plants;
+mod headshot_mode;
 mod instant_recharge;
 mod invincible_plants;
 mod no_pause;
@@ -11,6 +12,7 @@ mod traits;
 pub use auto_pickup_sun::AutoPickupSunCheat;
 pub use fast_chomper::FastChomperCheat;
 pub use free_plants::FreePlantsCheat;
+pub use headshot_mode::HeadshotMode;
 pub use instant_recharge::InstantRechargeCheat;
 pub use invincible_plants::InvinciblePlantsCheat;
 pub use no_pause::NoPauseCheat;
