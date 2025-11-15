@@ -2,6 +2,16 @@
 
 A work in progress.
 
-## TODO
+## Available Cheats
 
-Implement all cheats available in the GOTY Edition (see branch release/final-pvz-goty)
+- [x] Auto pickup sun
+- [x] Free plants
+- [x] One-Shot-Kill zombies
+- [x] Seethrough vases
+- [x] Invincible plants
+- [x] Instant recharge
+
+## TODO
+- [ ] Plant anywhere
+- [ ] Hungry chompers
+- [ ] More

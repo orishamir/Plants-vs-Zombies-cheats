@@ -2,7 +2,7 @@
 name = "pvz_cheats"
 version = "0.1.0"
 edition = "2024"
-default-run = "testing"
+default-run = "gui"
 
 [lints.rust]
 unfulfilled_lint_expectations = "deny"

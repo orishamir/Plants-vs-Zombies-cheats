@@ -1,7 +1,11 @@
 FROM rust:1.90.0-trixie
 
 RUN apt update && apt upgrade -y
-RUN apt install -y mingw-w64 neovim jq
+RUN apt install -y \
+    mingw-w64 \
+    neovim \
+    jq \
+    less
 
 ENV CARGO_BUILD_TARGET=x86_64-pc-windows-gnu
 
