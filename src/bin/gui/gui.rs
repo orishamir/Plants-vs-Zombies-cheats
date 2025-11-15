@@ -76,8 +76,8 @@ impl Default for MyApp {
             Box::new(toggleables::InvinciblePlantsCheat {}),
             Box::new(toggleables::SeethroughVasesCheat {}),
             Box::new(toggleables::HeadshotMode {}),
+            Box::new(toggleables::HungryCompersCheat {}),
             // Box::new(toggleables::PlantAnywhereCheat {}),
-            // Box::new(toggleables::FastChomperCheat {}),
             // Box::new(toggleables::NoPauseCheat {}),
         ];
 

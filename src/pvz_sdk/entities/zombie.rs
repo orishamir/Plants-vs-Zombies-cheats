@@ -1,4 +1,4 @@
-use super::{ArmorType, ZombieType};
+use super::{HeadwearType, ZombieType};
 
 use std::fmt::Debug;
 
@@ -21,7 +21,7 @@ pub struct Zombie {
     pub freeze_timer: u32,
     /// Is the zombie attacking other zombies
     pub is_hypnotized: bool,
-    pub armor_type: ArmorType,
+    pub armor_type: HeadwearType,
     pub health: i32,
     pub original_health: i32,
     pub armor_hp: u32,

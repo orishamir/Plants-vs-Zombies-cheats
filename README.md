@@ -10,8 +10,8 @@ A work in progress.
 - [x] Seethrough vases
 - [x] Invincible plants
 - [x] Instant recharge
+- [x] Hungry chompers
 
 ## TODO
 - [ ] Plant anywhere
-- [ ] Hungry chompers
 - [ ] More

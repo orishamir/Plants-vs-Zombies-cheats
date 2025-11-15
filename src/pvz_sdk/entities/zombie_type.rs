@@ -40,10 +40,19 @@ pub enum ZombieType {
 
 #[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[repr(u32)]
-pub enum ArmorType {
+pub enum HeadwearType {
     None = 0,
     Cone = 1,
     Bucket = 2,
     Football = 3,
-    Digger = 4,
+    HardHat = 4,
+}
+
+#[derive(Debug, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
+#[repr(u32)]
+pub enum ShieldType {
+    None = 0,
+    ScreenDoor = 1,
+    Newspaper = 2,
+    Ladder = 3,
 }
