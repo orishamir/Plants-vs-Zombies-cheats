@@ -10,7 +10,7 @@ RUN apt install -y \
 ENV CARGO_BUILD_TARGET=x86_64-pc-windows-gnu
 
 RUN rustup target add x86_64-pc-windows-gnu
-RUN rustup component add clippy
+RUN rustup component add clippy rustfmt
 
 COPY <<EOF /root/.bashrc
 
