@@ -17,7 +17,7 @@ name = "gui"
 name = "testing"
 
 [dependencies]
-windows = { version = "0.61.3", features = [
+windows = { version = "0.62.2", features = [
     "Win32_Foundation",
     "Win32_Graphics_Dwm",
     "Win32_System_Diagnostics_ToolHelp",
@@ -25,10 +25,10 @@ windows = { version = "0.61.3", features = [
 ] }
 env_logger = "0.11.8"
 proc_mem = "0.1.6"
-num_enum = "0.7.4"
-eframe = { version = "0.32.1" }
-egui = "0.32.1"
-thiserror = "2.0.16"
-log = "0.4.27"
-anyhow = "1.0.99"
+num_enum = "0.7.5"
+eframe = { version = "0.33.2" }
+egui = "0.33.2"
+thiserror = "2.0.17"
+log = "0.4.28"
+anyhow = "1.0.100"
 strum = { version = "0.27.2", features = ["derive"] }

@@ -1,0 +1,37 @@
+name: Release version
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: windows-2022
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5.0.0
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
+        with:
+          toolchain: stable
+          targets: x86_64-pc-windows-msvc
+          components: rustfmt
+
+      - name: Build Release
+        run: cargo build --release --bin gui
+
+      - name: Rename exe
+        shell: bash
+        run: mv target/release/gui.exe replanted_cheats-${{ github.ref_name }}.exe
+
+      - name: Upload Built Artifacts (.exe)
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          path: replanted_cheats-${{ github.ref_name }}.exe
+
+      - name: Release with Notes
+        uses: softprops/action-gh-release@v2.4.2
+        with:
+          name: ${{ github.ref_name }}
+          files: replanted_cheats-${{ github.ref_name }}.exe

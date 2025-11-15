@@ -1,0 +1,19 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "tamasfe.even-better-toml",
+                "github.vscode-github-actions",
+                "redhat.vscode-yaml",
+                "docker.docker",
+                "usernamehw.errorlens",
+                "marclipovsky.string-manipulation",
+                "tal7aouy.icons"
+            ]
+        }
+    }
+}
