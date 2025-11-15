@@ -24,4 +24,4 @@ pub use projectile_type::ProjectileType;
 pub use slot::{Slot, Slots};
 pub use slot_type::SlotType;
 pub use zombie::{Zombie, Zombies};
-pub use zombie_type::{ArmorType, ZombieType};
+pub use zombie_type::{HeadwearType, ShieldType, ZombieType};
