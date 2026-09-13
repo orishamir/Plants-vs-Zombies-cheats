@@ -42,15 +42,14 @@ impl eframe::App for MyApp {
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
         [0., 0., 0., 0.4]
     }
-
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         egui::Window::new(toggleables_header_font())
             .auto_sized()
-            .show(ctx, |ui| self.render_toggleables(ui));
+            .show(ui, |ui| self.render_toggleables(ui));
 
         egui::CentralPanel::default()
             .frame(Frame::NONE)
-            .show(ctx, |ui| {
+            .show(ui, |ui| {
                 if ui
                     .interact(
                         ui.max_rect(),
@@ -59,7 +58,7 @@ impl eframe::App for MyApp {
                     )
                     .dragged()
                 {
-                    ctx.send_viewport_cmd(egui::ViewportCommand::StartDrag);
+                    ui.send_viewport_cmd(egui::ViewportCommand::StartDrag);
                 }
             });
     }

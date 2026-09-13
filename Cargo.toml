@@ -23,12 +23,12 @@ windows = { version = "0.62.2", features = [
     "Win32_System_Diagnostics_ToolHelp",
     "Win32_UI_WindowsAndMessaging",
 ] }
-env_logger = "0.11.8"
+env_logger = "0.11.11"
 proc_mem = "0.1.6"
-num_enum = "0.7.5"
-eframe = { version = "0.33.2" }
-egui = "0.33.2"
-thiserror = "2.0.17"
-log = "0.4.28"
-anyhow = "1.0.100"
-strum = { version = "0.27.2", features = ["derive"] }
+num_enum = "0.7.6"
+eframe = { version = "0.36.2" }
+egui = "0.36.2"
+thiserror = "2.0.20"
+log = "0.4.34"
+anyhow = "1.0.104"
+strum = { version = "0.28.0", features = ["derive"] }

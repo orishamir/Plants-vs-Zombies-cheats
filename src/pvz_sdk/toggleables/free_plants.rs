@@ -1,11 +1,11 @@
 use super::{ToggleCheatError, Toggleable};
 use crate::Popcapgame;
 
-const INSTRUCTION_OFFSETS: [usize; 1] = [0x64D2C0];
+const INSTRUCTION_OFFSETS: [usize; 1] = [0x665DE0];
 
 /// ```diff
-/// - GameAssembly.dll+64D2C0 - 44 29 68 10           - sub [rax+10],r13d
-/// + GameAssembly.dll+64D2C0 - 90 90 90 90           - nop
+/// - GameAssembly.dll+665DE0 - 44 29 60 10           - sub [rax+10],r12d
+/// + GameAssembly.dll+665DE0 - 90 90 90 90           - nop
 /// ```
 pub struct FreePlantsCheat {}
 
@@ -22,7 +22,7 @@ impl Toggleable for FreePlantsCheat {
     }
 
     fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(&INSTRUCTION_OFFSETS, [0x44, 0x29, 0x68, 0x10])?;
+        process.write::<[u8; _]>(&INSTRUCTION_OFFSETS, [0x44, 0x29, 0x60, 0x10])?;
 
         Ok(())
     }
