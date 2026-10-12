@@ -8,3 +8,14 @@ Cargo.lock
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+
+# Il2CppDumper output, generated from the game install (see tools/re-tools/README.md)
+/il2cpp-dump/
+
+# Copies of the game's files for each version, and the Ghidra project made from them (see tools/re-tools/README.md)
+/game-versions/
+/ghidra-project/
+
+# PDBs downloaded by `re-tools snapshot`, laid out like a symbol server
+/symbols/
+.ruff_cache/

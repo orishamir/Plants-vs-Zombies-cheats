@@ -1,57 +1,49 @@
-use super::{ToggleCheatError, Toggleable};
-use crate::Popcapgame;
+use super::{Patch, PatchCheat};
+use crate::{Dll, Location};
 
-const INSTRUCTION_OFFSETS: [usize; 1] = [0x1924B];
-
-/// The cheat modifies the instructions like this:
-/// ```diff
-/// popcapgame1.exe+19244 - 80 BD 7C010000 00     - cmp byte ptr [ebp+0000017C],00
-/// - popcapgame1.exe+1924B - 74 37                 - je popcapgame1.exe+19284
-/// + popcapgame1.exe+1924B - EB 37                 - jmp popcapgame1.exe+19284
-/// ```
-/// Note: [esi+0000017C] points to the value of "is_paused"
-/// So, translated to C:
-/// ```c
-/// if (!is_paused) run_game()
-/// ```
-/// I change it to run regardless.
+/// The game keeps running when its window loses focus, for example when you click this
+/// cheat's window.
 ///
-/// TODO: Hide "pause" menu
-pub struct NoPauseCheat {}
-
-impl Toggleable for NoPauseCheat {
-    #[inline(always)]
-    fn name(&self) -> &'static str {
-        "No Pause"
-    }
-
-    fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; _]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0xEB, 0x37, // jmp popcapgame1.exe+19284
-            ],
-        )?;
-
-        Ok(())
-    }
-
-    fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0x74, 0x37, // je popcapgame1.exe+19284
-            ],
-        )?;
-
-        Ok(())
-    }
-
-    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
-        let current_instructions = game
-            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSETS, true)?, 2)
-            .unwrap();
-
-        Ok(current_instructions[0..2] == [0xeb, 0x37])
-    }
-}
+/// The Unity engine stops the whole game unless its `runInBackground` setting is on, and the
+/// game itself opens the pause menu and pauses time.
+pub const NO_PAUSE: PatchCheat = PatchCheat {
+    name: "No Pause",
+    patches: &[
+        // Turn on Unity's `Application.runInBackground`, which this game leaves off. When the
+        // window loses focus, the engine's window procedure (`PlayerMainWndProc`, the call at
+        // `UnityPlayer.dll+7C7741`) calls `SetPlayerPause` unless
+        // `GetPlayerShouldRunInBackground` (`UnityPlayer.dll+5775F0`) says to keep running,
+        // which mostly returns this setting. Other engine code reads the setting directly too.
+        //
+        // The setting is a `bool` at `+0x24F` in the engine's player settings object, where
+        // its serializer stores the field named "runInBackground". The engine keeps the
+        // object's address in a private global at `UnityPlayer.dll+1F15830`, which the PDB
+        // doesn't name.
+        Patch {
+            location: Location::ThroughPointer {
+                dll: Dll::UnityPlayer,
+                pointer: 0x1F15830,
+                offset: 0x24F,
+            },
+            original: &[0x00], // false
+            patched: &[0x01],  // true
+        },
+        // `Source.TreeStateActivities.TransitionWhenFocusLostActivity$$OnPlatformFocusChanged`
+        // opens the pause menu during gameplay when the game loses focus. After
+        // `test dil,dil` checks `hasFocus`, always return early as if the game had focus.
+        Patch {
+            location: Dll::GameAssembly.at(0x7A1DFF),
+            original: &[0x75, 0x7D], // jne +0x7D (to the return)
+            patched: &[0xEB, 0x7D],  // jmp +0x7D
+        },
+        // `Source.TreeStateActivities.PauseOnFocusChangeActivity$$OnPlatformFocusChanged`
+        // calls `TimeUtil$$PauseTime` or `TimeUtil$$UnpauseTime`, depending on
+        // `cmp [rbx+0x68],dil` (its `m_invertPause` against `hasFocus`). Always unpause, so
+        // that focusing the game also unpauses it if it was paused before turning this on.
+        Patch {
+            location: Dll::GameAssembly.at(0x7971C3),
+            original: &[0x74, 0x3C], // je +0x3C (to PauseTime)
+            patched: &[0x90; 2],     // nop
+        },
+    ],
+};

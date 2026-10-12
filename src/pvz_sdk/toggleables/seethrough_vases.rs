@@ -1,53 +1,43 @@
-use super::{ToggleCheatError, Toggleable};
-use crate::Popcapgame;
+use super::{Patch, PatchCheat};
+use crate::Dll;
 
-const DEC_OPACITY_OFFSET: [usize; 1] = [0x6B706F];
-const CHECK_OPACITY_OFFSET: [usize; 1] = [0x7BF7A5];
-const DRAW_OPACITY_OFFSET: [usize; 1] = [0x7BFA43];
-
-/// ```diff
-/// Don't decrement opacity over time:
-/// - GameAssembly.dll+6B706F - FF 8B B0000000        - dec [rbx+000000B0]
-/// + GameAssembly.dll+6B706F - 90 90 90909090        - nop
+/// Vases always show what's inside them.
 ///
-/// Skip check that opacity > 0:
-/// - GameAssembly.dll+7BF7A5 - 7F 23                 - jg GameAssembly.dll+7BF7CA
-/// + GameAssembly.dll+7BF7A5 - EB 23                 - jmp GameAssembly.dll+7BF7CA
-///
-/// When drawing opacity, use 50 instead of the actual opacity value:
-/// - GameAssembly.dll+7BFA43 - 8B B8 B0000000        - mov edi,[rax+000000B0]
-/// + GameAssembly.dll+7BFA43 - BF 32000000           - mov edi,00000032
-/// + GameAssembly.dll+7BFA48 - 90                    - nop
-/// ```
-pub struct SeethroughVasesCheat {}
-
-impl Toggleable for SeethroughVasesCheat {
-    #[inline(always)]
-    fn name(&self) -> &'static str {
-        "Seethrough Vases"
-    }
-
-    fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; 6]>(&DEC_OPACITY_OFFSET, [0x90; _])?;
-        game.write::<[u8; _]>(&CHECK_OPACITY_OFFSET, [0xeb, 0x23])?;
-        game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0xbf, 0x32, 0x0, 0x0, 0x0, 0x90])?;
-
-        Ok(())
-    }
-
-    fn deactivate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; _]>(&DEC_OPACITY_OFFSET, [0xFF, 0x8B, 0xB0, 0x0, 0x0, 0x0])?;
-        game.write::<[u8; _]>(&CHECK_OPACITY_OFFSET, [0x7f, 0x23])?;
-        game.write::<[u8; _]>(&DRAW_OPACITY_OFFSET, [0x8b, 0xb8, 0xb0, 0x0, 0x0, 0x0])?;
-
-        Ok(())
-    }
-
-    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
-        let current_instructions = game
-            .read_bytes_at(game.read_ptr_chain(&DEC_OPACITY_OFFSET, true)?, 2)
-            .unwrap();
-
-        Ok(current_instructions[0..2] == [0x90, 0x90])
-    }
-}
+/// A vase shows its contents while its opacity (`GridItem.mTransparentCounter`, `+0xB0`) is
+/// above 0. Normally only a nearby Plantern raises it.
+pub const SEETHROUGH_VASES: PatchCheat = PatchCheat {
+    name: "Seethrough Vases",
+    patches: &[
+        // Don't lower the opacity over time. This is `GridItem$$UpdateScaryPot`, which the
+        // compiler copied into `Reloaded.Gameplay.GridItem$$Update` (nothing calls the original).
+        Patch {
+            location: Dll::GameAssembly.at(0x6C311F),
+            original: &[0xFF, 0x8B, 0xB0, 0x00, 0x00, 0x00], // dec dword ptr [rbx+0xB0]
+            patched: &[0x90; 6],                             // nop
+        },
+        // The rest is in `Source.Controllers.ScaryPotController$$Update`, which draws the
+        // vase. Both checks follow a `cmp [rax+0xB0],r15d`, where `r15d` is 0.
+        //
+        // Show a sun vase's sun even at opacity 0.
+        Patch {
+            location: Dll::GameAssembly.at(0x7CBE44),
+            original: &[0x7F, 0x05], // jg +0x05
+            patched: &[0xEB, 0x05],  // jmp +0x05
+        },
+        // Show the plant or zombie inside even at opacity 0.
+        Patch {
+            location: Dll::GameAssembly.at(0x7CBEA5),
+            original: &[0x7F, 0x7D], // jg +0x7D
+            patched: &[0xEB, 0x7D],  // jmp +0x7D
+        },
+        // Draw the contents at opacity 50 instead of the actual value.
+        Patch {
+            location: Dll::GameAssembly.at(0x7CC206),
+            original: &[0x8B, 0xB8, 0xB0, 0x00, 0x00, 0x00], // mov edi,[rax+0xB0]
+            patched: &[
+                0xBF, 0x32, 0x00, 0x00, 0x00, // mov edi,50
+                0x90, // nop
+            ],
+        },
+    ],
+};

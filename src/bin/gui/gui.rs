@@ -1,12 +1,18 @@
-use egui::{self, Color32, Frame, RichText, Ui};
-use log::info;
+use egui::{self, Checkbox, Color32, Frame, RichText, Ui};
+use log::{info, warn};
 use pvz_sdk::Popcapgame;
-use pvz_sdk::toggleables::{self, Toggleable};
+use pvz_sdk::toggleables::{self, ToggleCheatError, Toggleable};
 
 pub struct MyApp {
-    toggleables: Vec<Box<dyn Toggleable>>,
-    toggled: Vec<bool>,
+    cheats: Vec<CheatRow>,
     popcapgame: Popcapgame,
+}
+
+/// A cheat and its state, as one row in the window.
+struct CheatRow {
+    cheat: &'static dyn Toggleable,
+    /// Whether the cheat is on, or why it can't be used.
+    state: Result<bool, ToggleCheatError>,
 }
 
 #[inline(always)]
@@ -21,17 +27,41 @@ fn togglecheat_font(name: &'static str) -> RichText {
     RichText::new(name).size(24.).strong()
 }
 
+impl CheatRow {
+    fn new(cheat: &'static dyn Toggleable, game: &Popcapgame) -> Self {
+        let state = cheat.is_activated(game);
+        if let Err(error) = &state {
+            warn!("{} can't be used: {error}", cheat.name());
+        }
+        Self { cheat, state }
+    }
+
+    fn show(&mut self, ui: &mut Ui, game: &Popcapgame) {
+        let label = togglecheat_font(self.cheat.name());
+        match &mut self.state {
+            Ok(toggled) => {
+                if ui.checkbox(toggled, label).changed() {
+                    info!("Detected change in {} to {toggled}", self.cheat.name());
+                    if let Err(error) = self.cheat.toggle(game, *toggled) {
+                        warn!("Couldn't toggle {}: {error}", self.cheat.name());
+                        self.state = Err(error);
+                    }
+                }
+            }
+            Err(error) => {
+                ui.add_enabled(false, Checkbox::new(&mut false, label));
+                ui.colored_label(Color32::LIGHT_RED, "⚠")
+                    .on_hover_text(error.to_string());
+            }
+        }
+    }
+}
+
 impl MyApp {
     fn render_toggleables(&mut self, ui: &mut Ui) {
         egui::Grid::new("id_salt").striped(true).show(ui, |ui| {
-            for (toggleable, toggled) in self.toggleables.iter().zip(&mut self.toggled) {
-                if ui
-                    .checkbox(toggled, togglecheat_font(toggleable.name()))
-                    .changed()
-                {
-                    toggleable.toggle(&self.popcapgame, *toggled).unwrap();
-                    info!("Detected change in {} to {toggled}", toggleable.name());
-                }
+            for cheat in &mut self.cheats {
+                cheat.show(ui, &self.popcapgame);
                 ui.end_row();
             }
         });
@@ -68,27 +98,11 @@ impl Default for MyApp {
     fn default() -> Self {
         let popcapgame = Popcapgame::init().unwrap();
 
-        let toggleables: Vec<Box<dyn Toggleable>> = vec![
-            Box::new(toggleables::AutoPickupSunCheat {}),
-            Box::new(toggleables::InstantRechargeCheat {}),
-            Box::new(toggleables::FreePlantsCheat {}),
-            Box::new(toggleables::InvinciblePlantsCheat {}),
-            Box::new(toggleables::SeethroughVasesCheat {}),
-            Box::new(toggleables::HeadshotMode {}),
-            Box::new(toggleables::HungryCompersCheat {}),
-            // Box::new(toggleables::PlantAnywhereCheat {}),
-            // Box::new(toggleables::NoPauseCheat {}),
-        ];
-
-        let toggled: Vec<bool> = toggleables
+        let cheats = toggleables::ALL
             .iter()
-            .map(|toggleable| toggleable.is_activated(&popcapgame).unwrap())
+            .map(|cheat| CheatRow::new(cheat, &popcapgame))
             .collect();
 
-        Self {
-            toggled,
-            toggleables,
-            popcapgame,
-        }
+        Self { cheats, popcapgame }
     }
 }

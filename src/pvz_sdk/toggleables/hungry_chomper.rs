@@ -1,55 +1,33 @@
-use super::{ToggleCheatError, Toggleable};
-use crate::Popcapgame;
+use super::{Patch, PatchCheat};
+use crate::Dll;
 
-const INSTRUCTION_OFFSET1: [usize; 1] = [0x6AB757];
-
-/// This cheat works like this:
-/// All plants have a "state" variable at offset `Plant.OffsetPlantState`, but only some plants use it.
-/// In the Chomper's case, its state can have several things as in ChomperState enum.
+/// Chompers don't digest: they can bite again right after eating a zombie.
 ///
-/// ```diff
-/// - GameAssembly.dll+6AB757 - C7 83 88000000 0B000000 - mov [rbx+00000088],0000000B
-/// + GameAssembly.dll+6AB757 - 90 90 90909090 90909090 - nop
-/// ```
-pub struct HungryCompersCheat {}
+/// When a chomper catches a zombie, the game sets its state (`Plant.mState`, `+0x88`) to
+/// `ChomperState::BitingGotOne`, which leads to the long `ChomperState::Digesting`. Skipping
+/// that write leaves the chomper able to bite again.
+///
+/// The code is `Plant$$UpdateChomper`, which the compiler copied into
+/// `Reloaded.Gameplay.Plant$$UpdateAbilities`. The standalone `Plant$$UpdateChomper` has the
+/// same instruction at `+0x2F0`, but nothing calls it.
+pub const HUNGRY_CHOMPERS: PatchCheat = PatchCheat {
+    name: "Hungry Chompers",
+    patches: &[Patch {
+        location: Dll::GameAssembly.at(0x6B77B1),
+        // mov dword ptr [rbx+0x88],11
+        original: &[0xC7, 0x83, 0x88, 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00],
+        patched: &[0x90; 10], // nop
+    }],
+};
 
-/// may be outdated!
+/// The chomper's values of `Plant.mState` (the game's `PlantState` enum).
 #[derive(Debug)]
 #[expect(dead_code)]
 enum ChomperState {
-    WaitingForPrey = 1, // Pretty much "idle"
-    Attacking = 10,
-    KilledZombie = 11,    // Not so sure about this
-    Digesting = 13,       // The one that takes most time
-    FinishedEating = 0xe, // I'm not sure the difference between this and WaitingForPrey.
-}
-
-impl Toggleable for HungryCompersCheat {
-    #[inline(always)]
-    fn name(&self) -> &'static str {
-        "Hungry Chompers"
-    }
-
-    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; 10]>(&INSTRUCTION_OFFSET1, [0x90; _])?;
-
-        Ok(())
-    }
-
-    fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(
-            &INSTRUCTION_OFFSET1,
-            [0xC7, 0x83, 0x88, 0, 0, 0, 0xb, 0, 0, 0],
-        )?;
-
-        Ok(())
-    }
-
-    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
-        let current_instructions = game
-            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSET1, true)?, 4)
-            .unwrap();
-
-        Ok(current_instructions[0..4] == [0x90, 0x90, 0x90, 0x90])
-    }
+    Ready = 1,
+    Biting = 10,
+    BitingGotOne = 11,
+    BitingMissed = 12,
+    Digesting = 13,
+    Swallowing = 14,
 }

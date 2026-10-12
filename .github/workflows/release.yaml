@@ -9,10 +9,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v7.0.1
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f
         with:
           toolchain: nightly
           targets: x86_64-pc-windows-msvc
@@ -26,12 +26,12 @@ jobs:
         run: mv target/release/gui.exe replanted_cheats-${{ github.ref_name }}.exe
 
       - name: Upload Built Artifacts (.exe)
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v7.0.2
         with:
           path: replanted_cheats-${{ github.ref_name }}.exe
 
       - name: Release with Notes
-        uses: softprops/action-gh-release@v2.4.2
+        uses: softprops/action-gh-release@v3.0.3
         with:
           name: ${{ github.ref_name }}
           files: replanted_cheats-${{ github.ref_name }}.exe

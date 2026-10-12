@@ -1,43 +1,26 @@
-use super::{ToggleCheatError, Toggleable};
-use crate::Popcapgame;
+use super::{Patch, PatchCheat};
+use crate::Dll;
 
-const INSTRUCTION_OFFSETS: [usize; 1] = [0x1334D];
-
-pub struct PlantAnywhereCheat {}
-
-impl Toggleable for PlantAnywhereCheat {
-    #[inline(always)]
-    fn name(&self) -> &'static str {
-        "Plant Anywhere"
-    }
-
-    fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; _]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0x31, 0xC0, // xor eax, eax
-            ],
-        )?;
-
-        Ok(())
-    }
-
-    fn deactivate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
-        game.write::<[u8; _]>(
-            &INSTRUCTION_OFFSETS,
-            [
-                0x85, 0xC0, // test eax, eax
-            ],
-        )?;
-
-        Ok(())
-    }
-
-    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
-        let current_instructions = game
-            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSETS, true)?, 2)
-            .unwrap();
-
-        Ok(current_instructions[0..2] == [0x31, 0xc0])
-    }
-}
+/// Plants can go on any tile, even where the game normally refuses.
+///
+/// `Reloaded.Gameplay.Board$$MouseDownWithPlant` calls `Board$$CanPlantAt` to check the
+/// clicked tile. It returns a `PlantingReason`, where 0 means the plant is allowed. Right after
+/// the call, pretend it returned 0.
+///
+/// Other checks still use `CanPlantAt` as usual. For example, the plant preview under the
+/// cursor may not show on tiles the game refuses, and in "Column Like You See 'Em" the rest of
+/// the column is checked by a second call at `MouseDownWithPlant+0xDC9`.
+pub const PLANT_ANYWHERE: PatchCheat = PatchCheat {
+    name: "Plant Anywhere",
+    patches: &[Patch {
+        location: Dll::GameAssembly.at(0x6657E7),
+        original: &[
+            0x8B, 0xD8, // mov ebx,eax
+            0x85, 0xC0, // test eax,eax
+        ],
+        patched: &[
+            0x31, 0xDB, // xor ebx,ebx
+            0x31, 0xC0, // xor eax,eax
+        ],
+    }],
+};

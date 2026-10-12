@@ -1,90 +1,44 @@
-use super::{ToggleCheatError, Toggleable};
-use crate::Popcapgame;
+use super::{Patch, PatchCheat};
+use crate::Dll;
 
-const NORMAL_OFFSET: [usize; 1] = [0x6EA165];
-const ARMOR_OFFSET: [usize; 1] = [0x6EAF2D];
-const SHIELD_OFFSET: [usize; 1] = [0x6eb55b];
-
-/// Normal zombie damage
-/// ```diff
-/// - GameAssembly.dll+6EA165 - 29 FD                 - sub ebp,edi
-/// + GameAssembly.dll+6EA165 - 29 ED                 - sub ebp,ebp
-/// ```
-///
-/// Also insta-kill armor
-/// ```diff
-/// - GameAssembly.dll+6EAF2D - 0F4C C8               - cmovl ecx,eax
-/// - GameAssembly.dll+6EAF30 - 29 8B 28010000        - sub [rbx+00000128],ecx
-/// + GameAssembly.dll+6EAF2D - 31 C9                 - xor ecx,ecx
-/// + GameAssembly.dll+6EAF2F - 90                    - nop
-/// + GameAssembly.dll+6EAF30 - 89 8B 28010000        - mov [rbx+00000128],ecx
-/// ```
-///
-/// And insta kill shield
-/// ```diff
-/// - GameAssembly.dll+6EB55B - 2B F2                 - sub esi,edx
-/// - GameAssembly.dll+6EB55D - 29 93 34010000        - sub [rbx+00000134],edx
-/// + GameAssembly.dll+6EB55B - 31 D2                 - xor edx,edx
-/// + GameAssembly.dll+6EB55D - 89 93 34010000        - mov [rbx+00000134],edx
-/// ```
-pub struct HeadshotMode {}
-
-impl Toggleable for HeadshotMode {
-    #[inline(always)]
-    fn name(&self) -> &'static str {
-        "Headshot Mode"
-    }
-
-    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(&NORMAL_OFFSET, [0x29, 0xed])?;
-
-        process.write::<[u8; _]>(
-            &ARMOR_OFFSET,
-            [
-                0x31, 0xc9, // first
+/// Any hit takes all of a zombie's health: its body, its armor (like a cone or bucket) and
+/// its shield (like a screen door).
+pub const HEADSHOT_MODE: PatchCheat = PatchCheat {
+    name: "Headshot Mode",
+    patches: &[
+        // `Reloaded.Gameplay.Zombie$$TakeBodyDamage` subtracts the damage (`edi`) from what
+        // becomes `Zombie.mBodyHealth` (`+0x120`). Subtract all of it instead.
+        Patch {
+            location: Dll::GameAssembly.at(0x6F85D5),
+            original: &[0x2B, 0xEF], // sub ebp,edi
+            patched: &[0x29, 0xED],  // sub ebp,ebp
+        },
+        // `Reloaded.Gameplay.Zombie$$TakeHelmDamage` subtracts the damage, capped at what's
+        // left, from `Zombie.mHelmHealth` (`+0x128`). Set it to 0 instead.
+        Patch {
+            location: Dll::GameAssembly.at(0x6F939D),
+            original: &[
+                0x0F, 0x4C, 0xC8, // cmovl ecx,eax
+                0x29, 0x8B, 0x28, 0x01, 0x00, 0x00, // sub [rbx+0x128],ecx
+            ],
+            patched: &[
+                0x31, 0xC9, // xor ecx,ecx
                 0x90, // nop
-                0x89, 0x8b, 0x28, 0x01, 0x0, 0x0,
+                0x89, 0x8B, 0x28, 0x01, 0x00, 0x00, // mov [rbx+0x128],ecx
             ],
-        )?;
-
-        process.write::<[u8; _]>(
-            &SHIELD_OFFSET,
-            [
-                0x31, 0xd2, // first
-                0x89, 0x93, 0x34, 0x01, 0x0, 0x0,
+        },
+        // `Reloaded.Gameplay.Zombie$$TakeShieldDamage` does the same for
+        // `Zombie.mShieldHealth` (`+0x134`).
+        Patch {
+            location: Dll::GameAssembly.at(0x6F99D2),
+            original: &[
+                0x2B, 0xF2, // sub esi,edx
+                0x29, 0x93, 0x34, 0x01, 0x00, 0x00, // sub [rbx+0x134],edx
             ],
-        )?;
-
-        Ok(())
-    }
-
-    fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(&NORMAL_OFFSET, [0x29, 0xfd])?;
-
-        process.write::<[u8; _]>(
-            &ARMOR_OFFSET,
-            [
-                0x0f, 0x4c, 0xc8, // first
-                0x29, 0x8B, 0x28, 0x01, 0x00, 0x00,
+            patched: &[
+                0x31, 0xD2, // xor edx,edx
+                0x89, 0x93, 0x34, 0x01, 0x00, 0x00, // mov [rbx+0x134],edx
             ],
-        )?;
-
-        process.write::<[u8; _]>(
-            &SHIELD_OFFSET,
-            [
-                0x2b, 0xf2, // first
-                0x29, 0x93, 0x34, 0x01, 0x00, 0x00,
-            ],
-        )?;
-
-        Ok(())
-    }
-
-    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
-        let current_instructions = game
-            .read_bytes_at(game.read_ptr_chain(&NORMAL_OFFSET, true)?, 2)
-            .unwrap();
-
-        Ok(current_instructions[0..2] == [0x29, 0xed])
-    }
-}
+        },
+    ],
+};

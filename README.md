@@ -11,7 +11,8 @@ A work in progress.
 - [x] Invincible plants
 - [x] Instant recharge
 - [x] Hungry chompers
+- [x] Plant anywhere
+- [x] No pause when the game loses focus
 
 ## TODO
-- [ ] Plant anywhere
 - [ ] More

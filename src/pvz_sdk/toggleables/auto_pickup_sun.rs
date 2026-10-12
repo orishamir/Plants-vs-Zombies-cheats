@@ -1,37 +1,17 @@
-use super::{ToggleCheatError, Toggleable};
-use crate::Popcapgame;
+use super::{Patch, PatchCheat};
+use crate::Dll;
 
-const INSTRUCTION_OFFSETS: [usize; 1] = [0x681154];
-
-/// ```diff
-/// - GameAssembly.dll+681154 - 74 0A                 - je GameAssembly.dll+681160
-/// + GameAssembly.dll+681154 - 75 0A                 - jne GameAssembly.dll+681160
-/// ```
-pub struct AutoPickupSunCheat {}
-
-impl Toggleable for AutoPickupSunCheat {
-    #[inline(always)]
-    fn name(&self) -> &'static str {
-        "Auto Pickup Sun"
-    }
-
-    fn activate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(&INSTRUCTION_OFFSETS, [0x75, 0x0a])?;
-
-        Ok(())
-    }
-
-    fn deactivate(&self, process: &Popcapgame) -> Result<(), ToggleCheatError> {
-        process.write::<[u8; _]>(&INSTRUCTION_OFFSETS, [0x74, 0x0a])?;
-
-        Ok(())
-    }
-
-    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
-        let current_instructions = game
-            .read_bytes_at(game.read_ptr_chain(&INSTRUCTION_OFFSETS, true)?, 2)
-            .unwrap();
-
-        Ok(current_instructions[0..2] == [0x75, 0x0a])
-    }
-}
+/// Every coin, sun included, flies to the counter as soon as it appears.
+///
+/// `Reloaded.Gameplay.Coin$$Update` either moves a coin normally (`Coin$$UpdateFall`) or flies
+/// it to the counter (`Coin$$UpdateCollected`), depending on whether it's being collected:
+/// `cmp [rbx+0xA8],dil` compares `Coin.mIsBeingCollected` with 0. Inverting the jump after
+/// that comparison collects every coin.
+pub const AUTO_PICKUP_SUN: PatchCheat = PatchCheat {
+    name: "Auto Pickup Sun",
+    patches: &[Patch {
+        location: Dll::GameAssembly.at(0x69A6B5),
+        original: &[0x74, 0x0A], // je +0x0A (to UpdateFall)
+        patched: &[0x75, 0x0A],  // jne +0x0A
+    }],
+};

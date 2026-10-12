@@ -4,10 +4,10 @@ jobs:
   test:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v7.0.1
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f
         with:
           toolchain: nightly
           targets: x86_64-pc-windows-msvc
@@ -19,10 +19,10 @@ jobs:
   build:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v7.0.1
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@6d653acede28d24f02e3cd41383119e8b1b35921
+        uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f
         with:
           toolchain: nightly
           targets: x86_64-pc-windows-msvc
@@ -32,7 +32,7 @@ jobs:
         run: cargo build --release --bin gui
 
       - name: Upload Built Artifacts (.exe)
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: replanted_cheats.exe
           path: target/release/gui.exe
