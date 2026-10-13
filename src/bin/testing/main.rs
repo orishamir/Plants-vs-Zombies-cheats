@@ -14,9 +14,27 @@ fn main() -> anyhow::Result<()> {
     };
 
     println!("{board:#?}");
+    print_all("Level", board.level_info(&game).map(Vec::from_iter));
+    match board.challenge(&game) {
+        Ok(Some(challenge)) => {
+            print_all("Challenge", Ok(vec![&challenge]));
+            print_all("Beghouled craters", challenge.beghouled_craters(&game));
+            print_all("Beghouled upgrades", challenge.beghouled_upgrades(&game));
+        }
+        other => print_all("Challenge", other.map(Vec::from_iter)),
+    }
     print_all("Sun", board.sun(&game).map(|sun| vec![sun]));
     print_all("Seed packets", board.seed_packets(&game));
     print_all("Plants", board.plants(&game));
+    print_all(
+        "Potted plants",
+        board.plants(&game).and_then(|plants| {
+            plants
+                .iter()
+                .filter_map(|plant| plant.potted_plant(&game).transpose())
+                .collect()
+        }),
+    );
     print_all("Zombies", board.zombies(&game));
     print_all("Projectiles", board.projectiles(&game));
     print_all("Coins", board.coins(&game));
