@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{MemoryError, Popcapgame};
+use crate::{Game, MemoryError};
 
 /// The game's DLLs that cheats change.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -45,7 +45,7 @@ pub enum Location {
 
 impl Location {
     /// The address this location is at in the running game.
-    pub fn resolve(self, game: &Popcapgame) -> Result<usize, MemoryError> {
+    pub fn resolve(self, game: &Game) -> Result<usize, MemoryError> {
         match self {
             Location::InDll { dll, offset } => Ok(game.dll_base(dll) + offset),
             Location::ThroughPointer {

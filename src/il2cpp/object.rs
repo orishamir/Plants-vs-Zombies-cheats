@@ -3,7 +3,7 @@ use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
 
 use super::{Class, FieldValue, Layout, ObjectError, runtime};
-use crate::Popcapgame;
+use crate::Game;
 
 /// One of the game's C# objects, like a plant or the board.
 ///
@@ -21,14 +21,14 @@ impl Object {
         self.0
     }
 
-    pub fn class(self, game: &Popcapgame) -> Result<Class, ObjectError> {
+    pub fn class(self, game: &Game) -> Result<Class, ObjectError> {
         Ok(Class::at(
             game.read_pointer(self.0 + runtime::object::CLASS)?,
         ))
     }
 
     /// Copies the whole object, to read its fields from.
-    pub fn read(self, game: &Popcapgame) -> Result<Instance, ObjectError> {
+    pub fn read(self, game: &Game) -> Result<Instance, ObjectError> {
         let class = self.class(game)?;
         let size = class.info(game)?.instance_size;
         Ok(Instance {
@@ -39,11 +39,7 @@ impl Object {
     }
 
     /// Reads one field.
-    pub fn get<T: FieldValue>(
-        self,
-        game: &Popcapgame,
-        name: &'static str,
-    ) -> Result<T, ObjectError> {
+    pub fn get<T: FieldValue>(self, game: &Game, name: &'static str) -> Result<T, ObjectError> {
         let class = self.class(game)?;
         let field = class.instance_field::<T>(game, name)?;
         let bytes = game.read_memory(self.0 + field.offset, T::SIZE)?;
@@ -53,7 +49,7 @@ impl Object {
     /// Writes one field.
     pub fn set<T: FieldValue>(
         self,
-        game: &Popcapgame,
+        game: &Game,
         name: &'static str,
         value: &T,
     ) -> Result<(), ObjectError> {
@@ -88,11 +84,7 @@ impl Instance {
     }
 
     /// Reads one field from the copy.
-    pub fn get<T: FieldValue>(
-        &self,
-        game: &Popcapgame,
-        name: &'static str,
-    ) -> Result<T, ObjectError> {
+    pub fn get<T: FieldValue>(&self, game: &Game, name: &'static str) -> Result<T, ObjectError> {
         let field = self.class.instance_field::<T>(game, name)?;
         let bytes = field
             .offset
@@ -122,7 +114,7 @@ impl<T> Ref<T> {
 
 impl<T: Layout> Ref<T> {
     /// Reads the object's fields. Fails if the object isn't a `T::CLASS`.
-    pub fn read(self, game: &Popcapgame) -> Result<T, ObjectError> {
+    pub fn read(self, game: &Game) -> Result<T, ObjectError> {
         let instance = self.object.read(game)?;
         if !instance.class().is_a(game, T::CLASS)? {
             return Err(ObjectError::WrongClass {

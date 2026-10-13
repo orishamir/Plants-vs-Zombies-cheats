@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex, PoisonError};
 use super::value::DecodeError;
 use super::{FieldValue, ObjectError, TypeKind, runtime};
 use crate::game::Primitive;
-use crate::{Location, Popcapgame};
+use crate::{Game, Location};
 
 /// One of the game's C# classes or structs, like `Reloaded.Gameplay.Plant`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -22,7 +22,7 @@ pub struct TypeInfo {
 
 impl TypeInfo {
     /// The class this global points to.
-    pub fn class(self, game: &Popcapgame) -> Result<Class, ObjectError> {
+    pub fn class(self, game: &Game) -> Result<Class, ObjectError> {
         match game.read_pointer(self.location.resolve(game)?)? {
             0 => Err(ObjectError::ClassNotLoaded {
                 type_info: self.name,
@@ -85,14 +85,14 @@ impl Class {
     }
 
     /// Like `Reloaded.Gameplay.Plant`.
-    pub fn full_name(self, game: &Popcapgame) -> Result<String, ObjectError> {
+    pub fn full_name(self, game: &Game) -> Result<String, ObjectError> {
         Ok(self.info(game)?.full_name.clone())
     }
 
     /// Reads one of the class's static fields.
     pub fn get_static<T: FieldValue>(
         self,
-        game: &Popcapgame,
+        game: &Game,
         name: &'static str,
     ) -> Result<T, ObjectError> {
         let field = self.field::<T>(game, name, true)?;
@@ -105,7 +105,7 @@ impl Class {
     /// it can be read as `T`.
     pub(super) fn instance_field<T: FieldValue>(
         self,
-        game: &Popcapgame,
+        game: &Game,
         name: &'static str,
     ) -> Result<Field, ObjectError> {
         self.field::<T>(game, name, false)
@@ -113,7 +113,7 @@ impl Class {
 
     fn field<T: FieldValue>(
         self,
-        game: &Popcapgame,
+        game: &Game,
         name: &'static str,
         is_static: bool,
     ) -> Result<Field, ObjectError> {
@@ -145,7 +145,7 @@ impl Class {
 
     /// Whether this class is the one named `full_name`, or inherits from it. A generic class
     /// matches without its type parameters: ``List`1`` is `System.Collections.Generic.List`.
-    pub(super) fn is_a(self, game: &Popcapgame, full_name: &str) -> Result<bool, ObjectError> {
+    pub(super) fn is_a(self, game: &Game, full_name: &str) -> Result<bool, ObjectError> {
         for class in self.ancestors(game) {
             if class?.full_name.split('`').next() == Some(full_name) {
                 return Ok(true);
@@ -155,10 +155,7 @@ impl Class {
     }
 
     /// This class, then the class it inherits from, and so on up to `System.Object`.
-    fn ancestors(
-        self,
-        game: &Popcapgame,
-    ) -> impl Iterator<Item = Result<Arc<ClassInfo>, ObjectError>> {
+    fn ancestors(self, game: &Game) -> impl Iterator<Item = Result<Arc<ClassInfo>, ObjectError>> {
         let mut next = Some(self);
         std::iter::from_fn(move || {
             let info = next?.info(game);
@@ -168,12 +165,7 @@ impl Class {
     }
 
     /// The error for a field whose value isn't one the field's Rust type can hold.
-    pub(super) fn invalid_value(
-        self,
-        game: &Popcapgame,
-        field: &str,
-        error: DecodeError,
-    ) -> ObjectError {
+    pub(super) fn invalid_value(self, game: &Game, field: &str, error: DecodeError) -> ObjectError {
         ObjectError::InvalidValue {
             place: format!("{}.{field}", self.describe(game)),
             error,
@@ -181,12 +173,12 @@ impl Class {
     }
 
     /// The class's name for error messages, even if it can't be read.
-    pub(super) fn describe(self, game: &Popcapgame) -> String {
+    pub(super) fn describe(self, game: &Game) -> String {
         self.full_name(game)
             .unwrap_or_else(|_| format!("the class at {:#X}", self.0))
     }
 
-    pub(super) fn info(self, game: &Popcapgame) -> Result<Arc<ClassInfo>, ObjectError> {
+    pub(super) fn info(self, game: &Game) -> Result<Arc<ClassInfo>, ObjectError> {
         let cache = &game.classes().0;
         let cached = cache
             .lock()
@@ -207,7 +199,7 @@ impl Class {
 }
 
 impl ClassInfo {
-    fn read(game: &Popcapgame, class: Class) -> Result<Self, ObjectError> {
+    fn read(game: &Game, class: Class) -> Result<Self, ObjectError> {
         use runtime::class::*;
 
         let header = game.read_memory(class.0, SIZE)?;
@@ -254,7 +246,7 @@ impl ClassInfo {
 
 /// Reads `count` `FieldInfo`s at `address`, by their names.
 fn read_fields(
-    game: &Popcapgame,
+    game: &Game,
     address: usize,
     count: usize,
 ) -> Result<HashMap<String, Field>, ObjectError> {
@@ -290,7 +282,7 @@ fn read_fields(
 }
 
 /// Reads a NUL-terminated UTF-8 string, like a class or field name.
-fn read_c_string(game: &Popcapgame, address: usize) -> Result<String, ObjectError> {
+fn read_c_string(game: &Game, address: usize) -> Result<String, ObjectError> {
     const CHUNK: usize = 64;
     const PAGE: usize = 0x1000;
     const LONGEST: usize = 1024;

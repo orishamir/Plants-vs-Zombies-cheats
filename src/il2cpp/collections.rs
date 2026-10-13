@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use super::{Class, FieldValue, Instance, Layout, ObjectError, Ref, class_layout, runtime};
-use crate::Popcapgame;
+use crate::Game;
 use crate::game::Primitive;
 
 /// A C# array, `E[]`. Read one through a `Ref<Array<E>>`.
@@ -12,11 +12,11 @@ pub struct Array<E> {
 /// Something an array can hold: a value like an `i32`, a reference, or a struct.
 pub trait Element: Sized {
     /// Reads one element from its bytes in the array.
-    fn read_element(game: &Popcapgame, class: Class, bytes: &[u8]) -> Result<Self, ObjectError>;
+    fn read_element(game: &Game, class: Class, bytes: &[u8]) -> Result<Self, ObjectError>;
 }
 
 impl<T: FieldValue> Element for T {
-    fn read_element(game: &Popcapgame, class: Class, bytes: &[u8]) -> Result<Self, ObjectError> {
+    fn read_element(game: &Game, class: Class, bytes: &[u8]) -> Result<Self, ObjectError> {
         let kind = class.info(game)?.kind;
         if !T::fits(kind) {
             return Err(ObjectError::WrongElementType {
@@ -33,28 +33,24 @@ impl<T: FieldValue> Element for T {
 }
 
 /// Reads a struct stored in an array, for implementing [`Element`] for a struct's [`Layout`].
-pub fn read_struct<T: Layout>(
-    game: &Popcapgame,
-    class: Class,
-    bytes: &[u8],
-) -> Result<T, ObjectError> {
+pub fn read_struct<T: Layout>(game: &Game, class: Class, bytes: &[u8]) -> Result<T, ObjectError> {
     T::read(game, &Instance::of_struct(class, bytes))
 }
 
 impl<E> Ref<Array<E>> {
     /// How many elements the array has.
-    pub fn len(self, game: &Popcapgame) -> Result<usize, ObjectError> {
+    pub fn len(self, game: &Game) -> Result<usize, ObjectError> {
         Ok(game.read(self.object().address() + runtime::array::LENGTH)?)
     }
 }
 
 impl<E: Element> Ref<Array<E>> {
-    pub fn read_all(self, game: &Popcapgame) -> Result<Vec<E>, ObjectError> {
+    pub fn read_all(self, game: &Game) -> Result<Vec<E>, ObjectError> {
         self.read_first(game, usize::MAX)
     }
 
     /// Reads the first `count` elements, or all of them if there are fewer.
-    pub fn read_first(self, game: &Popcapgame, count: usize) -> Result<Vec<E>, ObjectError> {
+    pub fn read_first(self, game: &Game, count: usize) -> Result<Vec<E>, ObjectError> {
         let class = self.object().class(game)?;
         let (element_class, element_size) =
             class
@@ -86,7 +82,7 @@ pub struct Array2D<E> {
 
 impl<E: Element> Ref<Array2D<E>> {
     /// Reads every element, as rows: `rows[i][j]` is the C# array's `[i, j]`.
-    pub fn read_all(self, game: &Popcapgame) -> Result<Vec<Vec<E>>, ObjectError> {
+    pub fn read_all(self, game: &Game) -> Result<Vec<Vec<E>>, ObjectError> {
         let address = self.object().address();
         let class = self.object().class(game)?;
         let info = class.info(game)?;
@@ -142,7 +138,7 @@ class_layout! {
 }
 
 impl<E: Element> List<E> {
-    pub fn elements(&self, game: &Popcapgame) -> Result<Vec<E>, ObjectError> {
+    pub fn elements(&self, game: &Game) -> Result<Vec<E>, ObjectError> {
         let size = usize::try_from(self.size).unwrap_or_default();
         self.items.read_first(game, size)
     }
@@ -154,7 +150,7 @@ pub struct CsString {
 }
 
 impl Ref<CsString> {
-    pub fn read_string(self, game: &Popcapgame) -> Result<String, ObjectError> {
+    pub fn read_string(self, game: &Game) -> Result<String, ObjectError> {
         let address = self.object().address();
         let len: i32 = game.read(address + runtime::string::LENGTH)?;
         let len = usize::try_from(len).unwrap_or_default();

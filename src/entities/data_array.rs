@@ -1,5 +1,5 @@
 use super::{Entity, GameObject, Id};
-use crate::Popcapgame;
+use crate::Game;
 use crate::il2cpp::{Array, Class, Element, ObjectError, Ref, class_layout, read_struct};
 
 class_layout! {
@@ -21,7 +21,7 @@ class_layout! {
 }
 
 impl<T> Element for DataArrayItem<T> {
-    fn read_element(game: &Popcapgame, class: Class, bytes: &[u8]) -> Result<Self, ObjectError> {
+    fn read_element(game: &Game, class: Class, bytes: &[u8]) -> Result<Self, ObjectError> {
         read_struct(game, class, bytes)
     }
 }
@@ -47,7 +47,7 @@ impl<T: BoardObject> Entity<T> {
 
 /// Reads the objects in `array` that are alive, and set up.
 pub(super) fn read_living<T: BoardObject>(
-    game: &Popcapgame,
+    game: &Game,
     array: Ref<DataArray<T::Fields>>,
 ) -> Result<Vec<Entity<T>>, ObjectError> {
     let array = array.read(game)?;

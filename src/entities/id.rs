@@ -14,9 +14,9 @@ use crate::il2cpp::{DecodeError, FieldValue, TypeKind};
 /// look for it among the objects of its kind:
 ///
 /// ```no_run
-/// # use pvz_sdk::{Popcapgame, entities::Board};
+/// # use pvz_sdk::{Game, entities::Board};
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// # let game = Popcapgame::init()?;
+/// # let game = Game::attach()?;
 /// # let board = Board::current(&game)?.expect("in a level");
 /// let plants = board.plants(&game)?;
 /// for zombie in board.zombies(&game)? {

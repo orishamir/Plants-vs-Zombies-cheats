@@ -3,7 +3,7 @@ use std::time::{Duration, SystemTime};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use super::{Cell, Entity, GameObject, Plant, PlantType};
-use crate::Popcapgame;
+use crate::Game;
 use crate::il2cpp::{Enum, EnumWithNone, ObjectError, Ref, class_layout};
 
 /// What the Zen Garden keeps about one of its plants between visits, like how often it was
@@ -71,10 +71,7 @@ impl EnumWithNone for PottedPlantNeed {
 
 impl Entity<Plant> {
     /// For a Zen Garden plant, what the Zen Garden keeps about it.
-    pub fn potted_plant(
-        &self,
-        game: &Popcapgame,
-    ) -> Result<Option<Entity<PottedPlant>>, ObjectError> {
+    pub fn potted_plant(&self, game: &Game) -> Result<Option<Entity<PottedPlant>>, ObjectError> {
         let Some(controller) = self.fields.potted_plant_controller else {
             return Ok(None);
         };

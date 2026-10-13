@@ -18,7 +18,7 @@ use crate::il2cpp::{
     Array, Class, CsString, DecodeError, Element, Enum, List, Object, ObjectError, Ref, TypeInfo,
     class_layout, read_struct,
 };
-use crate::{Dll, Popcapgame};
+use crate::{Dll, Game};
 
 /// The lawn during a level.
 ///
@@ -80,7 +80,7 @@ const GAMEPLAY_MODEL_KEY: &str = "gameplay";
 
 impl Board {
     /// The board of the level being played, or `None` when there isn't one.
-    pub fn current(game: &Popcapgame) -> Result<Option<Entity<Board>>, ObjectError> {
+    pub fn current(game: &Game) -> Result<Option<Entity<Board>>, ObjectError> {
         let root: Ref<RootModel> = ROOT_MODEL
             .class(game)?
             .get_static(game, "<Instance>k__BackingField")?;
@@ -101,32 +101,32 @@ impl Board {
 }
 
 impl Entity<Board> {
-    pub fn zombies(&self, game: &Popcapgame) -> Result<Vec<Entity<Zombie>>, ObjectError> {
+    pub fn zombies(&self, game: &Game) -> Result<Vec<Entity<Zombie>>, ObjectError> {
         read_living(game, self.fields.zombies)
     }
 
-    pub fn plants(&self, game: &Popcapgame) -> Result<Vec<Entity<Plant>>, ObjectError> {
+    pub fn plants(&self, game: &Game) -> Result<Vec<Entity<Plant>>, ObjectError> {
         read_living(game, self.fields.plants)
     }
 
-    pub fn projectiles(&self, game: &Popcapgame) -> Result<Vec<Entity<Projectile>>, ObjectError> {
+    pub fn projectiles(&self, game: &Game) -> Result<Vec<Entity<Projectile>>, ObjectError> {
         read_living(game, self.fields.projectiles)
     }
 
-    pub fn coins(&self, game: &Popcapgame) -> Result<Vec<Entity<Coin>>, ObjectError> {
+    pub fn coins(&self, game: &Game) -> Result<Vec<Entity<Coin>>, ObjectError> {
         read_living(game, self.fields.coins)
     }
 
-    pub fn lawn_mowers(&self, game: &Popcapgame) -> Result<Vec<Entity<LawnMower>>, ObjectError> {
+    pub fn lawn_mowers(&self, game: &Game) -> Result<Vec<Entity<LawnMower>>, ObjectError> {
         read_living(game, self.fields.lawn_mowers)
     }
 
-    pub fn grid_items(&self, game: &Popcapgame) -> Result<Vec<Entity<GridItem>>, ObjectError> {
+    pub fn grid_items(&self, game: &Game) -> Result<Vec<Entity<GridItem>>, ObjectError> {
         read_living(game, self.fields.grid_items)
     }
 
     /// The seed packets in the seed bank, from left to right.
-    pub fn seed_packets(&self, game: &Popcapgame) -> Result<Vec<Entity<SeedPacket>>, ObjectError> {
+    pub fn seed_packets(&self, game: &Game) -> Result<Vec<Entity<SeedPacket>>, ObjectError> {
         let Some(seed_bank) = self.fields.seed_bank else {
             return Ok(Vec::new());
         };
@@ -142,7 +142,7 @@ impl Entity<Board> {
     }
 
     /// What the level is and how it's set up, like its mode.
-    pub fn level_info(&self, game: &Popcapgame) -> Result<Option<LevelInfo>, ObjectError> {
+    pub fn level_info(&self, game: &Game) -> Result<Option<LevelInfo>, ObjectError> {
         self.fields
             .level_entry_data
             .map(|data| LevelInfo::read(game, data))
@@ -150,7 +150,7 @@ impl Entity<Board> {
     }
 
     /// What the level's mode keeps track of, like Beghouled's craters.
-    pub fn challenge(&self, game: &Popcapgame) -> Result<Option<Entity<Challenge>>, ObjectError> {
+    pub fn challenge(&self, game: &Game) -> Result<Option<Entity<Challenge>>, ObjectError> {
         self.fields
             .challenge
             .map(|challenge| Entity::read(game, challenge))
@@ -158,7 +158,7 @@ impl Entity<Board> {
     }
 
     /// The first player's sun.
-    pub fn sun(&self, game: &Popcapgame) -> Result<Entity<Sun>, ObjectError> {
+    pub fn sun(&self, game: &Game) -> Result<Entity<Sun>, ObjectError> {
         let players = self.fields.sun_money.read(game)?.values;
         let first = players
             .read_first(game, 1)?
@@ -190,7 +190,7 @@ class_layout! {
 }
 
 impl Element for ModelReference {
-    fn read_element(game: &Popcapgame, class: Class, bytes: &[u8]) -> Result<Self, ObjectError> {
+    fn read_element(game: &Game, class: Class, bytes: &[u8]) -> Result<Self, ObjectError> {
         read_struct(game, class, bytes)
     }
 }

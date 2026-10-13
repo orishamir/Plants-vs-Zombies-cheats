@@ -1,7 +1,7 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use super::{Cell, Entity, GameObject};
-use crate::Popcapgame;
+use crate::Game;
 use crate::il2cpp::{Array, Array2D, Enum, ObjectError, Ref, class_layout};
 
 /// What the level's mini-game, puzzle or other mode keeps track of, like Beghouled's craters.
@@ -60,7 +60,7 @@ pub enum BeghouledUpgrade {
 impl Entity<Challenge> {
     /// Beghouled's craters: the cells where a zombie ate a plant, which nothing can be moved
     /// into until the crater is filled.
-    pub fn beghouled_craters(&self, game: &Popcapgame) -> Result<Vec<Cell>, ObjectError> {
+    pub fn beghouled_craters(&self, game: &Game) -> Result<Vec<Cell>, ObjectError> {
         let Some(eaten) = self.fields.beghouled_eaten else {
             return Ok(Vec::new());
         };
@@ -80,10 +80,7 @@ impl Entity<Challenge> {
     }
 
     /// The Beghouled upgrades that have been bought.
-    pub fn beghouled_upgrades(
-        &self,
-        game: &Popcapgame,
-    ) -> Result<Vec<BeghouledUpgrade>, ObjectError> {
+    pub fn beghouled_upgrades(&self, game: &Game) -> Result<Vec<BeghouledUpgrade>, ObjectError> {
         let Some(purchased) = self.fields.beghouled_purchased_upgrade else {
             return Ok(Vec::new());
         };

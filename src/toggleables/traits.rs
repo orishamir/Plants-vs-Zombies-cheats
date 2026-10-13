@@ -1,14 +1,14 @@
 use thiserror::Error;
 
-use crate::{Location, MemoryError, Popcapgame};
+use crate::{Game, Location, MemoryError};
 
 /// A cheat that can be turned on and off.
 pub trait Toggleable {
-    fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError>;
-    fn deactivate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError>;
-    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError>;
+    fn activate(&self, game: &Game) -> Result<(), ToggleCheatError>;
+    fn deactivate(&self, game: &Game) -> Result<(), ToggleCheatError>;
+    fn is_activated(&self, game: &Game) -> Result<bool, ToggleCheatError>;
     fn name(&self) -> &'static str;
-    fn toggle(&self, game: &Popcapgame, toggled: bool) -> Result<(), ToggleCheatError> {
+    fn toggle(&self, game: &Game, toggled: bool) -> Result<(), ToggleCheatError> {
         if toggled {
             self.activate(game)
         } else {

@@ -1,5 +1,5 @@
 use super::{Instance, Object, ObjectError};
-use crate::Popcapgame;
+use crate::Game;
 
 /// The fields this crate reads from one of the game's C# classes or structs, each with the
 /// Rust type it's read as. Declare one with `class_layout!`.
@@ -9,15 +9,10 @@ pub trait Layout: Sized {
     const CLASS: &'static str;
 
     /// Reads the fields from a copy of the object or struct.
-    fn read(game: &Popcapgame, instance: &Instance) -> Result<Self, ObjectError>;
+    fn read(game: &Game, instance: &Instance) -> Result<Self, ObjectError>;
 
     /// Writes the fields whose values differ from `old`'s into `object`.
-    fn write_changes(
-        &self,
-        old: &Self,
-        game: &Popcapgame,
-        object: Object,
-    ) -> Result<(), ObjectError>;
+    fn write_changes(&self, old: &Self, game: &Game, object: Object) -> Result<(), ObjectError>;
 }
 
 /// Declares a [`Layout`]: a struct of the fields to read from one of the game's classes.
@@ -60,7 +55,7 @@ macro_rules! class_layout {
             const CLASS: &'static str = $class;
 
             fn read(
-                game: &$crate::Popcapgame,
+                game: &$crate::Game,
                 instance: &$crate::il2cpp::Instance,
             ) -> Result<Self, $crate::il2cpp::ObjectError> {
                 Ok(Self {
@@ -71,7 +66,7 @@ macro_rules! class_layout {
             fn write_changes(
                 &self,
                 old: &Self,
-                game: &$crate::Popcapgame,
+                game: &$crate::Game,
                 object: $crate::il2cpp::Object,
             ) -> Result<(), $crate::il2cpp::ObjectError> {
                 $(

@@ -1,5 +1,5 @@
 use super::{ToggleCheatError, Toggleable};
-use crate::{Location, Popcapgame};
+use crate::{Game, Location};
 
 /// A change to the game's memory, usually its code: some bytes, and what to replace them with.
 ///
@@ -23,7 +23,7 @@ enum PatchState {
 }
 
 impl Patch {
-    fn state(&self, game: &Popcapgame) -> Result<PatchState, ToggleCheatError> {
+    fn state(&self, game: &Game) -> Result<PatchState, ToggleCheatError> {
         let address = self.location.resolve(game)?;
         let found = game.read_memory(address, self.original.len())?;
         if found == self.original {
@@ -39,7 +39,7 @@ impl Patch {
         }
     }
 
-    fn write(&self, game: &Popcapgame, state: PatchState) -> Result<(), ToggleCheatError> {
+    fn write(&self, game: &Game, state: PatchState) -> Result<(), ToggleCheatError> {
         let bytes = match state {
             PatchState::Original => self.original,
             PatchState::Patched => self.patched,
@@ -60,7 +60,7 @@ pub struct PatchCheat {
 impl PatchCheat {
     /// Writes every patch's bytes for `state`. All the patches are checked first, so if any
     /// of them is out of date, nothing is written.
-    fn set(&self, game: &Popcapgame, state: PatchState) -> Result<(), ToggleCheatError> {
+    fn set(&self, game: &Game, state: PatchState) -> Result<(), ToggleCheatError> {
         for patch in self.patches {
             patch.state(game)?;
         }
@@ -71,16 +71,16 @@ impl PatchCheat {
 }
 
 impl Toggleable for PatchCheat {
-    fn activate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
+    fn activate(&self, game: &Game) -> Result<(), ToggleCheatError> {
         self.set(game, PatchState::Patched)
     }
 
-    fn deactivate(&self, game: &Popcapgame) -> Result<(), ToggleCheatError> {
+    fn deactivate(&self, game: &Game) -> Result<(), ToggleCheatError> {
         self.set(game, PatchState::Original)
     }
 
     /// The cheat is on only when every one of its patches is in place.
-    fn is_activated(&self, game: &Popcapgame) -> Result<bool, ToggleCheatError> {
+    fn is_activated(&self, game: &Game) -> Result<bool, ToggleCheatError> {
         let states = self
             .patches
             .iter()

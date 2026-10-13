@@ -45,7 +45,7 @@ Padding, pointer width and raw integer values belong only in the lower layers.
 ## Layout
 
 - `src/` is the library crate `pvz_sdk` (`lib.rs`), next to the binaries in `src/bin/`:
-  - `game.rs`: `Popcapgame` attaches to `Replanted.exe` and reads and writes its memory (layer 1).
+  - `game.rs`: `Game` attaches to `Replanted.exe` and reads and writes its memory (layer 1).
   - `process.rs`: opening a process and reading and writing its memory, through Windows' API.
   - `il2cpp/`: reads the game's C# objects, finding classes and fields by name (layer 2). `class_layout!` declares which fields to read from a class, and `runtime.rs` has the only hard-coded offsets, those of IL2CPP's own structs.
   - `location.rs`: `Dll` and `Location`, which say where something is in the game's memory independently of where Windows loaded the DLLs.

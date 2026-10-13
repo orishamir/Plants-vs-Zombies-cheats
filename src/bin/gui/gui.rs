@@ -2,7 +2,7 @@ use std::time::{Duration, Instant};
 
 use egui::{self, Checkbox, Color32, Frame, RichText, Ui};
 use log::{info, warn};
-use pvz_sdk::Popcapgame;
+use pvz_sdk::Game;
 use pvz_sdk::toggleables::{self, ToggleCheatError, Toggleable};
 
 /// How often to look for the game while it isn't running.
@@ -22,7 +22,7 @@ enum Connection {
         error: Option<String>,
     },
     Attached {
-        game: Popcapgame,
+        game: Game,
         cheats: Vec<CheatRow>,
     },
 }
@@ -51,7 +51,7 @@ impl Connection {
         }
         *last_attempt = Some(Instant::now());
 
-        match Popcapgame::init() {
+        match Game::attach() {
             Ok(game) => {
                 info!("Attached to the game");
                 let cheats = toggleables::ALL
@@ -85,7 +85,7 @@ fn togglecheat_font(name: &'static str) -> RichText {
 }
 
 impl CheatRow {
-    fn new(cheat: &'static dyn Toggleable, game: &Popcapgame) -> Self {
+    fn new(cheat: &'static dyn Toggleable, game: &Game) -> Self {
         let state = cheat.is_activated(game);
         if let Err(error) = &state {
             warn!("{} can't be used: {error}", cheat.name());
@@ -93,7 +93,7 @@ impl CheatRow {
         Self { cheat, state }
     }
 
-    fn show(&mut self, ui: &mut Ui, game: &Popcapgame) {
+    fn show(&mut self, ui: &mut Ui, game: &Game) {
         let label = togglecheat_font(self.cheat.name());
         match &mut self.state {
             Ok(toggled) => {
@@ -114,7 +114,7 @@ impl CheatRow {
     }
 }
 
-fn render_toggleables(ui: &mut Ui, game: &Popcapgame, cheats: &mut [CheatRow]) {
+fn render_toggleables(ui: &mut Ui, game: &Game, cheats: &mut [CheatRow]) {
     egui::Grid::new("id_salt").striped(true).show(ui, |ui| {
         for cheat in cheats {
             cheat.show(ui, game);

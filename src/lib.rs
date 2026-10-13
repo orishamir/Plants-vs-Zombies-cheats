@@ -5,7 +5,7 @@ mod location;
 mod process;
 pub mod toggleables;
 
-pub use game::{MemoryError, Popcapgame};
+pub use game::{Game, MemoryError};
 pub use location::{Dll, Location};
 pub use process::AttachError;
 

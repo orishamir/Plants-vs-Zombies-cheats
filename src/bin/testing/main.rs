@@ -2,12 +2,12 @@
 
 use std::fmt::Debug;
 
-use pvz_sdk::Popcapgame;
+use pvz_sdk::Game;
 use pvz_sdk::entities::Board;
 use pvz_sdk::il2cpp::ObjectError;
 
 fn main() -> anyhow::Result<()> {
-    let game = Popcapgame::init()?;
+    let game = Game::attach()?;
     let Some(board) = Board::current(&game)? else {
         println!("Not in a level.");
         return Ok(());

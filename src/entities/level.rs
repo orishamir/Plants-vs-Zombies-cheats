@@ -1,7 +1,7 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use super::ZombieType;
-use crate::Popcapgame;
+use crate::Game;
 use crate::il2cpp::{Array, CsString, Enum, EnumWithNone, ObjectError, Ref, class_layout};
 
 /// What the level is and how it's set up. The game's `LevelEntryData`, which describes a level
@@ -187,10 +187,7 @@ class_layout! {
 
 impl LevelInfo {
     /// Reads the level's data, with its name and zombies, which are separate objects.
-    pub(super) fn read(
-        game: &Popcapgame,
-        data: Ref<LevelEntryDataFields>,
-    ) -> Result<Self, ObjectError> {
+    pub(super) fn read(game: &Game, data: Ref<LevelEntryDataFields>) -> Result<Self, ObjectError> {
         let fields = data.read(game)?;
         Ok(Self {
             name: match fields.level_name {

@@ -56,7 +56,7 @@ impl_primitive!(u8, u16, u32, u64, usize, i8, i16, i32, i64, f32, f64);
 
 /// The running game, and what's been learned about its classes so far.
 #[derive(Debug)]
-pub struct Popcapgame {
+pub struct Game {
     process: Process,
     /// Where `GameAssembly.dll` is loaded in the game.
     game_assembly: usize,
@@ -65,9 +65,9 @@ pub struct Popcapgame {
     classes: ClassCache,
 }
 
-impl Popcapgame {
-    /// Opens the running game.
-    pub fn init() -> Result<Self, AttachError> {
+impl Game {
+    /// Attaches to the running game.
+    pub fn attach() -> Result<Self, AttachError> {
         let process = Process::open("Replanted.exe")?;
         Ok(Self {
             game_assembly: process.module_base(Dll::GameAssembly.file_name())?,

@@ -1,7 +1,7 @@
 use std::fmt;
 use std::ops::{Deref, DerefMut};
 
-use crate::Popcapgame;
+use crate::Game;
 use crate::il2cpp::{Layout, ObjectError, Ref};
 
 /// A type that one of the game's classes is read as, like [`Plant`](super::Plant) for
@@ -30,9 +30,9 @@ pub trait GameObject: Sized {
 /// and [`save`](Self::save) it:
 ///
 /// ```no_run
-/// # use pvz_sdk::{Popcapgame, entities::Board};
+/// # use pvz_sdk::{Game, entities::Board};
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// let game = Popcapgame::init()?;
+/// let game = Game::attach()?;
 /// if let Some(board) = Board::current(&game)? {
 ///     for mut zombie in board.zombies(&game)? {
 ///         zombie.is_hypnotized = true;
@@ -60,7 +60,7 @@ impl<T: GameObject> Entity<T> {
         })
     }
 
-    pub(super) fn read(game: &Popcapgame, object: Ref<T::Fields>) -> Result<Self, ObjectError> {
+    pub(super) fn read(game: &Game, object: Ref<T::Fields>) -> Result<Self, ObjectError> {
         Self::new(object, object.read(game)?).ok_or(ObjectError::Unfinished {
             class: <T::Fields as Layout>::CLASS,
         })
@@ -69,7 +69,7 @@ impl<T: GameObject> Entity<T> {
     /// Writes the changes made to the value into the game. Only the fields that changed are
     /// written, so this doesn't undo what the game changed since the object was read, unless
     /// it's in a field that was changed here too.
-    pub fn save(&mut self, game: &Popcapgame) -> Result<(), ObjectError> {
+    pub fn save(&mut self, game: &Game) -> Result<(), ObjectError> {
         let mut fields = self.fields.clone();
         self.value.update_fields(&mut fields);
         fields.write_changes(&self.fields, game, self.object.object())?;
@@ -78,7 +78,7 @@ impl<T: GameObject> Entity<T> {
     }
 
     /// Reads the object again, dropping any changes that weren't saved.
-    pub fn refresh(&mut self, game: &Popcapgame) -> Result<(), ObjectError> {
+    pub fn refresh(&mut self, game: &Game) -> Result<(), ObjectError> {
         *self = Self::read(game, self.object)?;
         Ok(())
     }
