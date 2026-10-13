@@ -13,7 +13,8 @@ use crate::il2cpp::{Array, Array2D, Enum, ObjectError, Ref, class_layout};
 pub struct Challenge {
     pub state: ChallengeState,
     /// A counter that each mode uses its own way. In Portal Combat, it counts down to when a
-    /// portal moves (`Challenge.UpdatePortalCombat`).
+    /// portal moves, from 9000 at the start and from 6000 after each move
+    /// (`Challenge.UpdatePortalCombat`).
     pub state_counter: i32,
     /// The score, in the modes that keep one, like Beghouled and I, Zombie.
     pub score: i32,
