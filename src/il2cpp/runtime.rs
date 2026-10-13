@@ -40,8 +40,10 @@ pub mod class {
     /// `u16`, how many fields the class declares, without inherited ones.
     /// (`il2cpp_class_num_fields`)
     pub const FIELD_COUNT: usize = 0x124;
+    /// `u8`, for an array class, how many dimensions its arrays have. (`il2cpp_class_get_rank`)
+    pub const RANK: usize = 0x132;
     /// How many bytes to read to get everything above.
-    pub const SIZE: usize = 0x128;
+    pub const SIZE: usize = 0x133;
 }
 
 /// `FieldInfo`.
@@ -70,10 +72,23 @@ pub mod type_ {
 
 /// `Il2CppArray`.
 pub mod array {
-    /// `usize`, how many elements the array has. (`il2cpp_array_length`)
+    /// `Il2CppArrayBounds*`, for an array with more than one dimension, how long each
+    /// dimension is. (`il2cpp_array_get_byte_length`)
+    pub const BOUNDS: usize = 0x10;
+    /// `usize`, how many elements the array has, in all its dimensions.
+    /// (`il2cpp_array_length`)
     pub const LENGTH: usize = 0x18;
-    /// Where the elements start. (`il2cpp_array_object_header_size`)
+    /// Where the elements start, one row after another. (`il2cpp_array_object_header_size`)
     pub const ELEMENTS: usize = 0x20;
+}
+
+/// `Il2CppArrayBounds`, one for each dimension of an array.
+pub mod array_bounds {
+    /// `usize`, how many elements long the dimension is. (`il2cpp_array_get_byte_length`)
+    pub const LENGTH: usize = 0x0;
+    /// The size of an `Il2CppArrayBounds`, as `il2cpp_array_get_byte_length` steps through
+    /// them.
+    pub const SIZE: usize = 0x10;
 }
 
 /// `Il2CppString`, C#'s `string`.

@@ -29,7 +29,7 @@ use crate::MemoryError;
 
 pub(crate) use class::ClassCache;
 pub use class::{Class, TypeInfo};
-pub use collections::{Array, CsString, Element, List, read_struct};
+pub use collections::{Array, Array2D, CsString, Element, List, read_struct};
 pub use layout::Layout;
 pub(crate) use layout::class_layout;
 pub use object::{Instance, Object, Ref};
@@ -92,6 +92,13 @@ pub enum ObjectError {
 
     #[error("{class} isn't an array")]
     NotAnArray { class: String },
+
+    #[error("{class} has {found} dimensions, not {expected}")]
+    WrongDimensions {
+        class: String,
+        expected: u8,
+        found: u8,
+    },
 
     #[error("the name at {address:#X} isn't valid UTF-8")]
     InvalidName { address: usize },

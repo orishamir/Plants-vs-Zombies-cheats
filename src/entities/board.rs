@@ -1,5 +1,6 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
+use super::challenge::ChallengeFields;
 use super::coin::CoinFields;
 use super::data_array::{DataArray, read_living};
 use super::grid_item::GridItemFields;
@@ -9,7 +10,8 @@ use super::projectile::ProjectileFields;
 use super::seed_packet::SeedBankFields;
 use super::zombie::ZombieFields;
 use super::{
-    Coin, Entity, GameObject, GridItem, LawnMower, Plant, Projectile, SeedPacket, Ticks, Zombie,
+    Challenge, Coin, Entity, GameObject, GridItem, LawnMower, Plant, Projectile, SeedPacket, Ticks,
+    Zombie,
 };
 use crate::il2cpp::{
     Array, Class, CsString, DecodeError, Element, Enum, List, Object, ObjectError, Ref, TypeInfo,
@@ -138,6 +140,14 @@ impl Entity<Board> {
             .collect()
     }
 
+    /// What the level's mode keeps track of, like Beghouled's craters.
+    pub fn challenge(&self, game: &Popcapgame) -> Result<Option<Entity<Challenge>>, ObjectError> {
+        self.fields
+            .challenge
+            .map(|challenge| Entity::read(game, challenge))
+            .transpose()
+    }
+
     /// The first player's sun.
     pub fn sun(&self, game: &Popcapgame) -> Result<Entity<Sun>, ObjectError> {
         let players = self.fields.sun_money.read(game)?.values;
@@ -193,6 +203,7 @@ class_layout! {
         lawn_mowers: Ref<DataArray<LawnMowerFields>> = "m_lawnMowers",
         grid_items: Ref<DataArray<GridItemFields>> = "m_gridItems",
         seed_bank: Option<Ref<SeedBankFields>> = "mSeedBank",
+        challenge: Option<Ref<ChallengeFields>> = "mChallenge",
         paused: bool = "mPaused",
         sun_count_down: i32 = "mSunCountDown",
         background: Background = "mBackground",
@@ -280,6 +291,7 @@ mod tests {
             lawn_mowers: any(0x500),
             grid_items: any(0x600),
             seed_bank: None,
+            challenge: None,
             paused: false,
             sun_count_down: 100,
             background: Background::Day,

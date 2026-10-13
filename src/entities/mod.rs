@@ -19,6 +19,7 @@
 //! enum, a comment after it has the game's name, to find it in `dump.cs`.
 
 mod board;
+mod challenge;
 mod coin;
 mod common;
 mod data_array;
@@ -34,6 +35,7 @@ mod zombie;
 use crate::il2cpp::TypeInfo;
 
 pub use board::{Background, Board, ROOT_MODEL, Sun};
+pub use challenge::{BeghouledUpgrade, Challenge, ChallengeState};
 pub use coin::{Coin, CoinKind, CoinMotion};
 pub use common::{Cell, Health, Position, Ticks};
 pub use data_array::BoardObject;

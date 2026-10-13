@@ -2,6 +2,7 @@ use std::marker::PhantomData;
 
 use super::{Class, FieldValue, Instance, Layout, ObjectError, Ref, class_layout, runtime};
 use crate::Popcapgame;
+use crate::game::Primitive;
 
 /// A C# array, `E[]`. Read one through a `Ref<Array<E>>`.
 pub struct Array<E> {
@@ -75,6 +76,59 @@ impl<E: Element> Ref<Array<E>> {
             .chunks_exact(element_size)
             .map(|bytes| E::read_element(game, element_class, bytes))
             .collect()
+    }
+}
+
+/// A C# two-dimensional array, `E[,]`. Read one through a `Ref<Array2D<E>>`.
+pub struct Array2D<E> {
+    element: PhantomData<fn() -> E>,
+}
+
+impl<E: Element> Ref<Array2D<E>> {
+    /// Reads every element, as rows: `rows[i][j]` is the C# array's `[i, j]`.
+    pub fn read_all(self, game: &Popcapgame) -> Result<Vec<Vec<E>>, ObjectError> {
+        let address = self.object().address();
+        let class = self.object().class(game)?;
+        let info = class.info(game)?;
+        let (element_class, element_size) =
+            info.element.ok_or_else(|| ObjectError::NotAnArray {
+                class: class.describe(game),
+            })?;
+        if info.rank != 2 {
+            return Err(ObjectError::WrongDimensions {
+                class: class.describe(game),
+                expected: 2,
+                found: info.rank,
+            });
+        }
+
+        let bounds = game.read_memory(
+            game.read_pointer(address + runtime::array::BOUNDS)?,
+            2 * runtime::array_bounds::SIZE,
+        )?;
+        let length_of = |dimension: usize| {
+            usize::from_le_slice_at(
+                &bounds,
+                dimension * runtime::array_bounds::SIZE + runtime::array_bounds::LENGTH,
+            )
+        };
+        let (rows, columns) = (length_of(0), length_of(1));
+        if rows * columns == 0 {
+            return Ok((0..rows).map(|_| Vec::new()).collect());
+        }
+
+        let bytes = game.read_memory(
+            address + runtime::array::ELEMENTS,
+            rows * columns * element_size,
+        )?;
+        let mut elements = bytes
+            .chunks_exact(element_size)
+            .map(|bytes| E::read_element(game, element_class, bytes))
+            .collect::<Result<Vec<E>, _>>()?
+            .into_iter();
+        Ok((0..rows)
+            .map(|_| elements.by_ref().take(columns).collect())
+            .collect())
     }
 }
 

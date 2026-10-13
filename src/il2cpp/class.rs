@@ -56,6 +56,8 @@ pub(super) struct ClassInfo {
     pub instance_size: usize,
     /// For an array class, the class of its elements and how many bytes each one takes.
     pub element: Option<(Class, usize)>,
+    /// For an array class, how many dimensions its arrays have.
+    pub rank: u8,
 }
 
 /// What's been read about the game's classes. IL2CPP never moves or frees a class while the
@@ -245,6 +247,7 @@ impl ClassInfo {
             kind,
             instance_size: u32_at(INSTANCE_SIZE) as usize,
             element,
+            rank: header[RANK],
         })
     }
 }
