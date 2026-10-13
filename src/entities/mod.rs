@@ -38,7 +38,10 @@ pub use coin::{Coin, CoinKind, CoinMotion};
 pub use common::{Cell, Health, Position, Ticks};
 pub use data_array::BoardObject;
 pub use entity::{Entity, GameObject};
-pub use grid_item::{GridItem, GridItemKind, GridItemState, Vase, VaseContent};
+pub use grid_item::{
+    GridItem, GridItemKind, PortalShape, RakeState, SquirrelState, StinkyState, Vase, VaseContent,
+    VaseKind, ZenTool,
+};
 pub use id::Id;
 pub use lawn_mower::{LawnMower, LawnMowerState, LawnMowerType};
 pub use plant::{BungeeGrab, Plant, PlantState, PlantType};
