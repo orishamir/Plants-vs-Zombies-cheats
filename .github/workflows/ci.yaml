@@ -1,5 +1,9 @@
 name: CI Pipeline
-on: [workflow_dispatch]
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
 jobs:
   test:
     runs-on: windows-2022
@@ -13,8 +17,14 @@ jobs:
           targets: x86_64-pc-windows-msvc
           components: rustfmt, clippy
 
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
       - name: Test
-        run: cargo test
+        run: cargo test --workspace
 
   build:
     runs-on: windows-2022
