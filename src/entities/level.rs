@@ -8,7 +8,7 @@ use crate::il2cpp::{Array, CsString, Enum, EnumWithNone, ObjectError, Ref, class
 /// before it starts; read it with [`level_info`](super::Entity::level_info).
 #[derive(Debug, Clone, PartialEq)]
 pub struct LevelInfo {
-    /// The level's name, as the game's data calls it.
+    /// The level's name in the game's data, like `$SURVIVAL_NIGHT_HARD`.
     pub name: String,
     pub mode: GameMode,
     /// For the modes Replanted added, which one.
@@ -22,7 +22,8 @@ pub struct LevelInfo {
     pub waves: i32,
     /// How much sun the level starts with.
     pub initial_sun: i32,
-    /// The kinds of zombies that come in the level.
+    /// The kinds of zombies the level's data lists. They aren't always all the zombies that
+    /// come: Survival: Night (Hard) only lists the basic Zombie.
     pub zombie_types: Vec<ZombieType>,
 }
 
