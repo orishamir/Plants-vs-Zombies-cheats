@@ -8,12 +8,15 @@ use crate::il2cpp::{Enum, EnumWithNone, class_layout};
 /// calls them all coins.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Coin {
+    /// Changing it changes what collecting the coin gives, but not how it looks, which the
+    /// game picks when it creates the coin.
     pub kind: CoinKind,
     pub position: Position,
     /// How it moves, like falling from the sky or popping out of a plant.
     pub motion: CoinMotion,
     /// How long ago it appeared.
     pub age: Ticks,
+    /// Setting it collects the coin: it flies to its counter, as if it was clicked.
     pub is_being_collected: bool,
 }
 
