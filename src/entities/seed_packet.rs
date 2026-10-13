@@ -55,26 +55,26 @@ const OTHER_SEEDS: [(i32, Seed); 27] = [
     (57, Seed::SlotMachineDiamond),
     (58, Seed::ZombiquariumSnorkel),
     (59, Seed::ZombiquariumTrophy),
-    (60, Seed::Zombie(ZombieType::Zombie)), // ZombieNormal
-    (61, Seed::Zombie(ZombieType::ConeheadZombie)), // ZombieTrafficCone
-    (62, Seed::Zombie(ZombieType::PoleVaultingZombie)), // ZombiePolevaulter
-    (63, Seed::Zombie(ZombieType::BucketheadZombie)), // ZombiePail
-    (64, Seed::Zombie(ZombieType::LadderZombie)), // ZombieLadder
-    (65, Seed::Zombie(ZombieType::DiggerZombie)), // ZombieDigger
-    (66, Seed::Zombie(ZombieType::BungeeZombie)), // ZombieBungee
-    (67, Seed::Zombie(ZombieType::FootballZombie)), // ZombieFootball
-    (68, Seed::Zombie(ZombieType::BalloonZombie)), // ZombieBalloon
-    (69, Seed::Zombie(ZombieType::ScreenDoorZombie)), // ZombieScreenDoor
-    (70, Seed::Zombie(ZombieType::Zomboni)), // Zomboni
-    (71, Seed::Zombie(ZombieType::PogoZombie)), // ZombiePogo
-    (72, Seed::Zombie(ZombieType::DancingZombie)), // ZombieDancer
+    (60, Seed::Zombie(ZombieType::Normal)),   // ZombieNormal
+    (61, Seed::Zombie(ZombieType::Conehead)), // ZombieTrafficCone
+    (62, Seed::Zombie(ZombieType::PoleVaulting)), // ZombiePolevaulter
+    (63, Seed::Zombie(ZombieType::Buckethead)), // ZombiePail
+    (64, Seed::Zombie(ZombieType::Ladder)),   // ZombieLadder
+    (65, Seed::Zombie(ZombieType::Digger)),   // ZombieDigger
+    (66, Seed::Zombie(ZombieType::Bungee)),   // ZombieBungee
+    (67, Seed::Zombie(ZombieType::Football)), // ZombieFootball
+    (68, Seed::Zombie(ZombieType::Balloon)),  // ZombieBalloon
+    (69, Seed::Zombie(ZombieType::ScreenDoor)), // ZombieScreenDoor
+    (70, Seed::Zombie(ZombieType::Zomboni)),  // Zomboni
+    (71, Seed::Zombie(ZombieType::Pogo)),     // ZombiePogo
+    (72, Seed::Zombie(ZombieType::Dancing)),  // ZombieDancer
     (73, Seed::Zombie(ZombieType::Gargantuar)), // ZombieGargantuar
-    (74, Seed::Zombie(ZombieType::Imp)),    // ZombieImp
-    (75, Seed::Zombie(ZombieType::FlagZombie)), // ZombieFlag
-    (76, Seed::Zombie(ZombieType::TrashCanZombie)), // ZombieTrashCan
-    (77, Seed::Zombie(ZombieType::NewspaperZombie)), // ZombieNewspaper
-    (78, Seed::Zombie(ZombieType::JackInTheBoxZombie)), // ZombieJackInTheBox
-    (79, Seed::Zombie(ZombieType::CatapultZombie)), // ZombieCatapult
+    (74, Seed::Zombie(ZombieType::Imp)),      // ZombieImp
+    (75, Seed::Zombie(ZombieType::Flag)),     // ZombieFlag
+    (76, Seed::Zombie(ZombieType::TrashCan)), // ZombieTrashCan
+    (77, Seed::Zombie(ZombieType::Newspaper)), // ZombieNewspaper
+    (78, Seed::Zombie(ZombieType::JackInTheBox)), // ZombieJackInTheBox
+    (79, Seed::Zombie(ZombieType::Catapult)), // ZombieCatapult
     (80, Seed::Zombie(ZombieType::Gravestone)), // ZombieGravestone
 ];
 
@@ -195,7 +195,7 @@ mod tests {
         assert_eq!(read(-1), None);
         assert_eq!(read(2), Some(Seed::Plant(PlantType::CherryBomb)));
         assert_eq!(read(56), Some(Seed::SlotMachineSun));
-        assert_eq!(read(77), Some(Seed::Zombie(ZombieType::NewspaperZombie)));
+        assert_eq!(read(77), Some(Seed::Zombie(ZombieType::Newspaper)));
         assert!(Option::<Seed>::decode(&53_i32.to_le_bytes()).is_err());
     }
 

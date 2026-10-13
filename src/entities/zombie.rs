@@ -56,47 +56,55 @@ pub struct Armor<Kind> {
     pub health: Health,
 }
 
-/// The game's `ZombieType`, with the names players know the zombies by.
+/// The game's `ZombieType`, with the names players know the zombies by, without "Zombie" at
+/// the end: the Conehead Zombie is `ZombieType::Conehead`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, IntoPrimitive)]
 #[repr(i32)]
 pub enum ZombieType {
-    Zombie = 0,             // Normal
-    FlagZombie = 1,         // Flag
-    ConeheadZombie = 2,     // TrafficCone
-    PoleVaultingZombie = 3, // Polevaulter
-    BucketheadZombie = 4,   // Pail
-    NewspaperZombie = 5,    // Newspaper
-    ScreenDoorZombie = 6,   // Door
-    FootballZombie = 7,     // Football
-    DancingZombie = 8,      // Dancer
+    /// The basic zombie.
+    Normal = 0,
+    Flag = 1,
+    Conehead = 2,     // TrafficCone
+    PoleVaulting = 3, // Polevaulter
+    Buckethead = 4,   // Pail
+    Newspaper = 5,
+    ScreenDoor = 6, // Door
+    Football = 7,
+    Dancing = 8, // Dancer
     BackupDancer = 9,
-    DuckyTubeZombie = 10,    // DuckyTube
-    SnorkelZombie = 11,      // Snorkel
-    Zomboni = 12,            // Zamboni
-    ZombieBobsledTeam = 13,  // Bobsled
-    DolphinRiderZombie = 14, // DolphinRider
-    JackInTheBoxZombie = 15, // JackInTheBox
-    BalloonZombie = 16,      // Balloon
-    DiggerZombie = 17,       // Digger
-    PogoZombie = 18,         // Pogo
-    ZombieYeti = 19,         // Yeti
-    BungeeZombie = 20,       // Bungee
-    LadderZombie = 21,       // Ladder
-    CatapultZombie = 22,     // Catapult
+    DuckyTube = 10,
+    Snorkel = 11,
+    Zomboni = 12,     // Zamboni
+    BobsledTeam = 13, // Bobsled
+    DolphinRider = 14,
+    JackInTheBox = 15,
+    Balloon = 16,
+    Digger = 17,
+    Pogo = 18,
+    Yeti = 19,
+    Bungee = 20,
+    Ladder = 21,
+    Catapult = 22,
     Gargantuar = 23,
     Imp = 24,
-    DrZomboss = 25,        // Boss
-    PeashooterZombie = 26, // PeaHead
-    WallNutZombie = 27,    // WallnutHead
-    JalapenoZombie = 28,   // JalapenoHead
-    GatlingPeaZombie = 29, // GatlingHead
-    SquashZombie = 30,     // SquashHead
-    TallNutZombie = 31,    // TallnutHead
-    GigaGargantuar = 32,   // RedeyeGargantuar
+    DrZomboss = 25, // Boss
+    /// A zombie with a Peashooter for a head, from Zombotany.
+    Peashooter = 26, // PeaHead
+    /// A zombie with a Wall-nut for a head, from Zombotany.
+    WallNut = 27, // WallnutHead
+    /// A zombie with a Jalapeno for a head, from Zombotany.
+    Jalapeno = 28, // JalapenoHead
+    /// A zombie with a Gatling Pea for a head, from Zombotany.
+    GatlingPea = 29, // GatlingHead
+    /// A zombie with a Squash for a head, from Zombotany.
+    Squash = 30, // SquashHead
+    /// A zombie with a Tall-nut for a head, from Zombotany.
+    TallNut = 31, // TallnutHead
+    GigaGargantuar = 32, // RedeyeGargantuar
     /// A zombie made in the Zombatar editor.
     Zombatar = 33,
-    TargetZombie = 34,   // Target
-    TrashCanZombie = 35, // TrashCan
+    Target = 34,
+    TrashCan = 35,
     /// A gravestone that zombies come out of, in Versus mode.
     Gravestone = 36,
 }
@@ -404,7 +412,7 @@ mod tests {
         let zombie = ZombieFields {
             id: test_id(1),
             row: 0,
-            zombie_type: ZombieType::Zombie,
+            zombie_type: ZombieType::Normal,
             phase: ZombiePhase::Normal,
             x: 800.0,
             y: 60.0,
@@ -436,7 +444,7 @@ mod tests {
         let balloon_zombie = ZombieFields {
             id: test_id(2),
             row: 2,
-            zombie_type: ZombieType::BalloonZombie,
+            zombie_type: ZombieType::Balloon,
             phase: ZombiePhase::BalloonFlying,
             x: 500.0,
             y: 260.0,
