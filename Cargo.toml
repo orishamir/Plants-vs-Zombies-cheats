@@ -31,7 +31,6 @@ egui = "0.36.2"
 thiserror = "2.0.21"
 log = "0.4.34"
 anyhow = "1.0.104"
-strum = { version = "0.28.0", features = ["derive"] }
 
 [workspace]
 members = ["tools/re-tools"]

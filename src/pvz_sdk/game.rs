@@ -2,6 +2,7 @@ use proc_mem::{Module, ProcMemError, Process};
 use thiserror::Error;
 
 use crate::Dll;
+use crate::il2cpp::ClassCache;
 use windows::Win32::{
     Foundation::{HWND, RECT},
     UI::WindowsAndMessaging,
@@ -17,14 +18,68 @@ pub enum MemoryError {
     Write { address: usize, len: usize },
 }
 
+/// A number the game stores in its memory as little-endian bytes, like an `i32` or a pointer.
+pub trait Primitive: Copy {
+    /// Decodes it from exactly `size_of::<Self>()` bytes.
+    ///
+    /// # Panics
+    ///
+    /// If `bytes` is a different length.
+    fn from_le_slice(bytes: &[u8]) -> Self;
+
+    fn to_le_vec(self) -> Vec<u8>;
+
+    /// Decodes it from the bytes at `offset` in `bytes`, like a field from a copy of a struct.
+    ///
+    /// # Panics
+    ///
+    /// If `bytes` ends before the number does.
+    fn from_le_slice_at(bytes: &[u8], offset: usize) -> Self {
+        Self::from_le_slice(&bytes[offset..][..size_of::<Self>()])
+    }
+}
+
+macro_rules! impl_primitive {
+    ($($type:ty),*) => {$(
+        impl Primitive for $type {
+            fn from_le_slice(bytes: &[u8]) -> Self {
+                let bytes = bytes.try_into().unwrap_or_else(|_| {
+                    panic!("{} takes {} bytes, not {}", stringify!($type), size_of::<$type>(), bytes.len())
+                });
+                <$type>::from_le_bytes(bytes)
+            }
+
+            fn to_le_vec(self) -> Vec<u8> {
+                <$type>::to_le_bytes(self).to_vec()
+            }
+        }
+    )*};
+}
+
+impl_primitive!(u8, u16, u32, u64, usize, i8, i16, i32, i64, f32, f64);
+
+/// The running game, and what's been learned about its classes so far.
 #[derive(Debug)]
 pub struct Popcapgame {
     proc: Process,
     game_assembly: Module,
     unity_player: Module,
+    classes: ClassCache,
 }
 
 impl Popcapgame {
+    pub fn init() -> Result<Self, ProcMemError> {
+        let proc = Process::with_name("Replanted.exe")?;
+        let game_assembly = proc.module(Dll::GameAssembly.file_name())?;
+        let unity_player = proc.module(Dll::UnityPlayer.file_name())?;
+        Ok(Self {
+            proc,
+            game_assembly,
+            unity_player,
+            classes: ClassCache::default(),
+        })
+    }
+
     pub fn get_rect_size(&self) -> Option<RECT> {
         let mut rect = RECT::default();
 
@@ -38,30 +93,6 @@ impl Popcapgame {
         Some(rect)
     }
 
-    // Raw bytes
-    pub fn read_bytes(
-        &self,
-        offsets: &[usize],
-        count: usize,
-        with_base_addr: bool,
-    ) -> Result<Option<Vec<u8>>, ProcMemError> {
-        let addr: usize = self.read_ptr_chain(offsets, with_base_addr)?;
-        Ok(self.read_bytes_at(addr, count))
-    }
-
-    pub fn read_bytes_at(&self, addr: usize, count: usize) -> Option<Vec<u8>> {
-        let mut buf = vec![0; count];
-        if self.proc.read_bytes(addr, buf.as_mut_ptr(), count) {
-            Some(buf)
-        } else {
-            None
-        }
-    }
-
-    pub fn write_at<T: Default>(&self, addr: usize, offset: impl Into<usize>, value: T) -> bool {
-        self.proc.write_mem::<T>(addr + offset.into(), value)
-    }
-
     /// The address `dll` is loaded at in the game.
     pub fn dll_base(&self, dll: Dll) -> usize {
         match dll {
@@ -72,18 +103,23 @@ impl Popcapgame {
 
     /// Reads `len` bytes at `address`.
     pub fn read_memory(&self, address: usize, len: usize) -> Result<Vec<u8>, MemoryError> {
-        self.read_bytes_at(address, len)
+        let mut buf = vec![0; len];
+        self.proc
+            .read_bytes(address, buf.as_mut_ptr(), len)
+            .then_some(buf)
             .ok_or(MemoryError::Read { address, len })
+    }
+
+    /// Reads the number at `address`.
+    pub fn read<T: Primitive>(&self, address: usize) -> Result<T, MemoryError> {
+        Ok(T::from_le_slice(
+            &self.read_memory(address, size_of::<T>())?,
+        ))
     }
 
     /// Reads the pointer stored at `address`.
     pub fn read_pointer(&self, address: usize) -> Result<usize, MemoryError> {
-        self.proc
-            .read_mem::<usize>(address)
-            .map_err(|_| MemoryError::Read {
-                address,
-                len: size_of::<usize>(),
-            })
+        self.read(address)
     }
 
     /// Writes `bytes` at `address`.
@@ -99,28 +135,9 @@ impl Popcapgame {
             })
     }
 
-    pub fn read_ptr_chain(
-        &self,
-        offsets: &[usize],
-        with_base_addr: bool,
-    ) -> Result<usize, ProcMemError> {
-        let mut out = offsets.to_vec();
-        if with_base_addr {
-            out.insert(0, self.game_assembly.base_address());
-        }
-
-        self.proc.read_ptr_chain(out)
-    }
-
-    pub fn init() -> Result<Self, ProcMemError> {
-        let proc = Process::with_name("Replanted.exe")?;
-        let game_assembly = proc.module(Dll::GameAssembly.file_name())?;
-        let unity_player = proc.module(Dll::UnityPlayer.file_name())?;
-        Ok(Self {
-            proc,
-            game_assembly,
-            unity_player,
-        })
+    /// What's been read about the game's classes, so that each is only read once.
+    pub(crate) fn classes(&self) -> &ClassCache {
+        &self.classes
     }
 }
 
