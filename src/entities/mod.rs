@@ -27,6 +27,7 @@ mod entity;
 mod grid_item;
 mod id;
 mod lawn_mower;
+mod level;
 mod plant;
 mod projectile;
 mod seed_packet;
@@ -46,6 +47,7 @@ pub use grid_item::{
 };
 pub use id::Id;
 pub use lawn_mower::{LawnMower, LawnMowerState, LawnMowerType};
+pub use level::{GameArea, GameMode, LevelCategory, LevelInfo, ReloadedGameMode};
 pub use plant::{BungeeGrab, Plant, PlantState, PlantType};
 pub use projectile::{Projectile, ProjectileMotion, ProjectileType};
 pub use seed_packet::{PacketState, Seed, SeedPacket};

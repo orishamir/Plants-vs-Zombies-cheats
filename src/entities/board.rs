@@ -5,6 +5,7 @@ use super::coin::CoinFields;
 use super::data_array::{DataArray, read_living};
 use super::grid_item::GridItemFields;
 use super::lawn_mower::LawnMowerFields;
+use super::level::{LevelEntryDataFields, LevelInfo};
 use super::plant::PlantFields;
 use super::projectile::ProjectileFields;
 use super::seed_packet::SeedBankFields;
@@ -140,6 +141,14 @@ impl Entity<Board> {
             .collect()
     }
 
+    /// What the level is and how it's set up, like its mode.
+    pub fn level_info(&self, game: &Popcapgame) -> Result<Option<LevelInfo>, ObjectError> {
+        self.fields
+            .level_entry_data
+            .map(|data| LevelInfo::read(game, data))
+            .transpose()
+    }
+
     /// What the level's mode keeps track of, like Beghouled's craters.
     pub fn challenge(&self, game: &Popcapgame) -> Result<Option<Entity<Challenge>>, ObjectError> {
         self.fields
@@ -208,6 +217,7 @@ class_layout! {
         sun_count_down: i32 = "mSunCountDown",
         background: Background = "mBackground",
         level: i32 = "mLevel",
+        level_entry_data: Option<Ref<LevelEntryDataFields>> = "mLevelEntryData",
         sun_money: Ref<MultiplayerType<Option<Ref<SunFields>>>> = "mSunMoney",
         num_waves: i32 = "mNumWaves",
         main_counter: i32 = "mMainCounter",
@@ -296,6 +306,7 @@ mod tests {
             sun_count_down: 100,
             background: Background::Day,
             level,
+            level_entry_data: None,
             sun_money: any(0x700),
             num_waves: 2,
             main_counter: 1000,
