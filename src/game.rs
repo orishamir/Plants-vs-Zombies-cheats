@@ -10,10 +10,18 @@ use crate::process::{AttachError, Process};
 #[derive(Debug, Error)]
 pub enum MemoryError {
     #[error("couldn't read {len} bytes of the game's memory at {address:#X}")]
-    Read { address: usize, len: usize },
+    Read {
+        address: usize,
+        len: usize,
+        source: windows::core::Error,
+    },
 
     #[error("couldn't write {len} bytes of the game's memory at {address:#X}")]
-    Write { address: usize, len: usize },
+    Write {
+        address: usize,
+        len: usize,
+        source: windows::core::Error,
+    },
 }
 
 /// A number the game stores in its memory as little-endian bytes, like an `i32` or a pointer.
@@ -96,7 +104,11 @@ impl Game {
         self.process
             .read(address, &mut buffer)
             .map(|()| buffer)
-            .map_err(|_| MemoryError::Read { address, len })
+            .map_err(|source| MemoryError::Read {
+                address,
+                len,
+                source,
+            })
     }
 
     /// Reads the number at `address`.
@@ -115,9 +127,10 @@ impl Game {
     pub(crate) fn write_memory(&self, address: usize, bytes: &[u8]) -> Result<(), MemoryError> {
         self.process
             .write(address, bytes)
-            .map_err(|_| MemoryError::Write {
+            .map_err(|source| MemoryError::Write {
                 address,
                 len: bytes.len(),
+                source,
             })
     }
 

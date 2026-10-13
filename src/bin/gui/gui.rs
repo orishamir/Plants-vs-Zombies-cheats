@@ -1,3 +1,5 @@
+use std::error::Error;
+use std::iter;
 use std::time::{Duration, Instant};
 
 use egui::{self, Checkbox, Color32, Frame, RichText, Ui};
@@ -60,7 +62,7 @@ impl Connection {
                     .collect();
                 *self = Self::Attached { game, cheats };
             }
-            Err(attach_error) => *error = Some(attach_error.to_string()),
+            Err(attach_error) => *error = Some(with_causes(&attach_error)),
         }
     }
 }
@@ -86,7 +88,7 @@ impl CheatRow {
     fn new(cheat: &'static dyn Toggleable, game: &Game) -> Self {
         let state = cheat.is_active(game);
         if let Err(error) = &state {
-            warn!("{} can't be used: {error}", cheat.name());
+            warn!("{} can't be used: {}", cheat.name(), with_causes(error));
         }
         Self { cheat, state }
     }
@@ -98,7 +100,11 @@ impl CheatRow {
                 if ui.checkbox(active, label).changed() {
                     info!("Detected change in {} to {active}", self.cheat.name());
                     if let Err(error) = self.cheat.set_active(game, *active) {
-                        warn!("Couldn't toggle {}: {error}", self.cheat.name());
+                        warn!(
+                            "Couldn't toggle {}: {}",
+                            self.cheat.name(),
+                            with_causes(&error)
+                        );
                         self.state = Err(error);
                     }
                 }
@@ -106,10 +112,19 @@ impl CheatRow {
             Err(error) => {
                 ui.add_enabled(false, Checkbox::new(&mut false, label));
                 ui.colored_label(Color32::LIGHT_RED, "⚠")
-                    .on_hover_text(error.to_string());
+                    .on_hover_text(with_causes(error));
             }
         }
     }
+}
+
+/// An error's message followed by the messages of the errors that caused it, like
+/// "couldn't read 8 bytes of the game's memory at 0x1F2E3D4C: Access is denied."
+fn with_causes(error: &(dyn Error + 'static)) -> String {
+    iter::successors(Some(error), |&error| error.source())
+        .map(ToString::to_string)
+        .collect::<Vec<_>>()
+        .join(": ")
 }
 
 fn render_toggleables(ui: &mut Ui, game: &Game, cheats: &mut [CheatRow]) {

@@ -48,6 +48,7 @@ fn print_all<T: Debug>(title: &str, entities: Result<Vec<T>, ObjectError>) {
     println!("----- {title}");
     match entities {
         Ok(entities) => entities.iter().for_each(|entity| println!("{entity:#?}")),
-        Err(error) => println!("Couldn't read them: {error}"),
+        // `{:#}` follows the error with what caused it, like Windows' reason for a failed read.
+        Err(error) => println!("Couldn't read them: {:#}", anyhow::Error::from(error)),
     }
 }

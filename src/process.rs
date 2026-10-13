@@ -27,7 +27,7 @@ pub enum AttachError {
         module: &'static str,
     },
 
-    #[error("Windows couldn't {action}: {source}")]
+    #[error("Windows couldn't {action}")]
     Windows {
         action: &'static str,
         source: windows::core::Error,
