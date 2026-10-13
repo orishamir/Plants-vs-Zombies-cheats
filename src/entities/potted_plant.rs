@@ -6,8 +6,8 @@ use super::{Cell, Entity, GameObject, Plant, PlantType};
 use crate::Popcapgame;
 use crate::il2cpp::{Enum, EnumWithNone, ObjectError, Ref, class_layout};
 
-/// What the Zen Garden keeps about one of its plants between visits, like what it needs to
-/// grow. The game's `PottedPlant`; read it with [`potted_plant`](Entity::potted_plant).
+/// What the Zen Garden keeps about one of its plants between visits, like how often it was
+/// watered. The game's `PottedPlant`; read it with [`potted_plant`](Entity::potted_plant).
 #[derive(Debug, Clone, PartialEq)]
 pub struct PottedPlant {
     pub plant_type: PlantType,
@@ -16,11 +16,14 @@ pub struct PottedPlant {
     /// Its spot in its garden.
     pub spot: Cell,
     pub age: PottedPlantAge,
-    /// What it needs next, if anything.
-    pub need: Option<PottedPlantNeed>,
-    pub times_fed: i32,
-    /// How many times it has to be fed to grow.
-    pub feedings_per_grow: i32,
+    /// What it asks for once it's full-grown and has been watered enough, like the
+    /// phonograph. Until then it asks for water, and a growing plant for fertilizer: the game
+    /// works out which each time (`ZenGarden.GetPlantsNeed`).
+    pub full_grown_need: Option<PottedPlantNeed>,
+    /// How many times it was watered since it last grew (`ZenGarden.PlantWatered`).
+    pub times_watered: i32,
+    /// How many times it has to be watered before fertilizer makes it grow.
+    pub waterings_per_grow: i32,
     pub last_watered: Option<SystemTime>,
     pub last_fertilized: Option<SystemTime>,
     /// The last time it got what it needed.
@@ -134,9 +137,9 @@ impl GameObject for PottedPlant {
                 column: fields.x,
             },
             age: fields.plant_age,
-            need: fields.plant_need,
-            times_fed: fields.times_fed,
-            feedings_per_grow: fields.feedings_per_grow,
+            full_grown_need: fields.plant_need,
+            times_watered: fields.times_fed,
+            waterings_per_grow: fields.feedings_per_grow,
             last_watered: time(fields.last_watered_time),
             last_fertilized: time(fields.last_fertilized_time),
             last_need_fulfilled: time(fields.last_need_fulfilled_time),
@@ -150,9 +153,9 @@ impl GameObject for PottedPlant {
         fields.y = self.spot.row;
         fields.x = self.spot.column;
         fields.plant_age = self.age;
-        fields.plant_need = self.need;
-        fields.times_fed = self.times_fed;
-        fields.feedings_per_grow = self.feedings_per_grow;
+        fields.plant_need = self.full_grown_need;
+        fields.times_fed = self.times_watered;
+        fields.feedings_per_grow = self.waterings_per_grow;
         fields.last_watered_time = seconds(self.last_watered);
         fields.last_fertilized_time = seconds(self.last_fertilized);
         fields.last_need_fulfilled_time = seconds(self.last_need_fulfilled);

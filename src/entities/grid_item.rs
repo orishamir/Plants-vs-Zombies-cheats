@@ -45,8 +45,11 @@ pub enum GridItemKind {
     Squirrel(SquirrelState),
     /// A Zen Garden tool being used, like the watering can.
     ZenTool(ZenTool),
-    /// Stinky the Snail, in the Zen Garden.
+    /// Stinky the Snail, in the Zen Garden. He's awake for about 3 minutes after he's woken
+    /// up, or while he's had chocolate (`ZenGarden.ShouldStinkyBeAwake`).
     Stinky {
+        /// Changing it doesn't change how he moves or looks: the game plays his animations
+        /// when it changes his state itself, like in `ZenGarden.StinkyWakeUp`.
         state: StinkyState,
         /// Where he's crawling to.
         goal: Position,
