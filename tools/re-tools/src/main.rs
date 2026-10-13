@@ -15,9 +15,9 @@ use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result, ensure};
+use anyhow::{Context, Result, bail, ensure};
 use clap::{Parser, Subcommand};
-use pvz_sdk::{Dll, Location, toggleables};
+use pvz_sdk::{Dll, Location, entities, toggleables};
 
 use hex::HexBytes;
 use image::DllImage;
@@ -50,7 +50,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Check that every cheat's patches still match the game's code.
+    /// Check that every cheat's patches still match the game's code, and that the globals the
+    /// entities are read from are still where the IL2CPP dump says.
     Check,
     /// Copy the game's files into `<to>/<Steam build ID>/`, to compare with after an update,
     /// and download the engine's PDB.
@@ -141,7 +142,7 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Command::Check => check_cheats(&cli)?,
+        Command::Check => check(&cli)?,
         Command::Snapshot { to } => {
             let game_dir = cli.dll.parent().context("--dll has no folder")?;
             let snapshot = snapshot::snapshot(game_dir, to)?;
@@ -227,12 +228,22 @@ fn download_engine_symbols(unity_player: &Path, store: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Prints whether each cheat's patches find the game's original bytes where they expect them,
-/// and fails if any don't. Each patch's DLL is read from the folder `--dll` is in.
-fn check_cheats(cli: &Cli) -> Result<()> {
-    let mut dlls = HashMap::new();
-    let mut broken = 0;
+/// Checks every address in the game's DLLs that the cheats and the entities use, printing
+/// whether each still matches the game, and fails if any don't.
+fn check(cli: &Cli) -> Result<()> {
+    let mut dlls = GameDlls::new(cli);
+    let broken = check_patches(&mut dlls)? + check_type_infos(&mut dlls)?;
+    ensure!(
+        broken == 0,
+        "{broken} addresses don't match the game; README.md explains how to find them again"
+    );
+    Ok(())
+}
 
+/// Prints whether each cheat's patches find the game's original bytes where they expect them,
+/// and returns how many don't.
+fn check_patches(dlls: &mut GameDlls) -> Result<usize> {
+    let mut broken = 0;
     for cheat in toggleables::ALL {
         for patch in cheat.patches {
             let location = patch.location.to_string();
@@ -243,15 +254,7 @@ fn check_cheats(cli: &Cli) -> Result<()> {
                 );
                 continue;
             };
-            let (image, symbols) = match dlls.entry(dll) {
-                Entry::Occupied(entry) => entry.into_mut(),
-                Entry::Vacant(entry) => {
-                    let path = cli.dll.with_file_name(dll.file_name());
-                    let image = DllImage::load(&path)?;
-                    let symbols = cli.symbols_for(&path, &image)?;
-                    entry.insert((image, symbols))
-                }
-            };
+            let (image, symbols) = dlls.get(dll)?;
 
             let rva = Rva(u32::try_from(offset)?);
             let found = image
@@ -271,11 +274,70 @@ fn check_cheats(cli: &Cli) -> Result<()> {
             }
         }
     }
-    ensure!(
-        broken == 0,
-        "{broken} patches don't match the game's code; README.md explains how to find them again"
-    );
-    Ok(())
+    Ok(broken)
+}
+
+/// Prints whether each `TypeInfo` global that reading the entities starts from is where
+/// Il2CppDumper's `script.json` says it is, and returns how many aren't.
+fn check_type_infos(dlls: &mut GameDlls) -> Result<usize> {
+    let mut broken = 0;
+    for type_info in entities::TYPE_INFOS {
+        let location = type_info.location.to_string();
+        let Location::InDll { dll, offset } = type_info.location else {
+            bail!("{} isn't in a DLL", type_info.name);
+        };
+        let Some(symbols) = &dlls.get(dll)?.1 else {
+            println!(
+                "skip    {:<24} {location:<28}  needs the IL2CPP dump",
+                "entities"
+            );
+            continue;
+        };
+
+        let found = symbols.address_of(type_info.name);
+        let matches = found.is_some_and(|rva| usize::try_from(rva.0) == Ok(offset));
+        let status = if matches { "ok" } else { "BROKEN" };
+        println!(
+            "{status:<6}  {:<24} {location:<28}  {}",
+            "entities", type_info.name
+        );
+        if !matches {
+            broken += 1;
+            match found {
+                Some(rva) => println!("        script.json has it at {rva}"),
+                None => println!("        script.json doesn't have it"),
+            }
+        }
+    }
+    Ok(broken)
+}
+
+/// The game's DLLs, each read from the folder `--dll` is in the first time it's needed,
+/// with names for their addresses if there are any.
+struct GameDlls<'a> {
+    cli: &'a Cli,
+    loaded: HashMap<Dll, (DllImage, Option<Symbols>)>,
+}
+
+impl<'a> GameDlls<'a> {
+    fn new(cli: &'a Cli) -> Self {
+        Self {
+            cli,
+            loaded: HashMap::new(),
+        }
+    }
+
+    fn get(&mut self, dll: Dll) -> Result<&(DllImage, Option<Symbols>)> {
+        Ok(match self.loaded.entry(dll) {
+            Entry::Occupied(entry) => entry.into_mut(),
+            Entry::Vacant(entry) => {
+                let path = self.cli.dll.with_file_name(dll.file_name());
+                let image = DllImage::load(&path)?;
+                let symbols = self.cli.symbols_for(&path, &image)?;
+                entry.insert((image, symbols))
+            }
+        })
+    }
 }
 
 /// Where `rva` is, as `name+offset`, or nothing without names.
