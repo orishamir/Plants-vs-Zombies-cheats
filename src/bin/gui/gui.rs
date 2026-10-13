@@ -9,7 +9,7 @@ use pvz_sdk::toggleables::{self, ToggleCheatError, Toggleable};
 const RETRY_INTERVAL: Duration = Duration::from_secs(1);
 
 #[derive(Default)]
-pub struct MyApp {
+pub struct CheatsApp {
     connection: Connection,
 }
 
@@ -72,14 +72,12 @@ struct CheatRow {
     state: Result<bool, ToggleCheatError>,
 }
 
-#[inline(always)]
 fn toggleables_header_font() -> RichText {
     RichText::new("Toggleables")
         .size(30.)
         .color(Color32::MAGENTA)
 }
 
-#[inline(always)]
 fn togglecheat_font(name: &'static str) -> RichText {
     RichText::new(name).size(24.).strong()
 }
@@ -115,7 +113,7 @@ impl CheatRow {
 }
 
 fn render_toggleables(ui: &mut Ui, game: &Game, cheats: &mut [CheatRow]) {
-    egui::Grid::new("id_salt").striped(true).show(ui, |ui| {
+    egui::Grid::new("cheats").striped(true).show(ui, |ui| {
         for cheat in cheats {
             cheat.show(ui, game);
             ui.end_row();
@@ -123,7 +121,7 @@ fn render_toggleables(ui: &mut Ui, game: &Game, cheats: &mut [CheatRow]) {
     });
 }
 
-impl eframe::App for MyApp {
+impl eframe::App for CheatsApp {
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
         [0., 0., 0., 0.4]
     }
