@@ -15,17 +15,22 @@ pub struct Zombie {
     /// How fast it moves.
     pub speed: f32,
     pub health: Health,
+    /// Taking it away here only changes the zombie's data: the zombie still looks like it wears
+    /// it, since the game hides headwear when it's knocked off (`Zombie.DropHelm`).
     pub headwear: Option<Armor<HeadwearType>>,
     pub shield: Option<Armor<ShieldType>>,
     /// A Balloon Zombie's balloon, which pops at 0 health.
     pub balloon: Option<Health>,
     /// How long until it's no longer slowed down by a Snow Pea or a Winter Melon, or 0.
     pub chilled: Ticks,
-    /// How long until it thaws from an Ice-shroom, or 0.
+    /// How long until it thaws from an Ice-shroom, or 0. Setting it stops the zombie, but it
+    /// keeps its walking animation and isn't drawn in ice: freezing it (`Zombie.HitIceTrap`)
+    /// also changes those.
     pub frozen: Ticks,
     /// How long until it shakes off a Kernel-pult's butter, or 0.
     pub buttered: Ticks,
-    /// Whether a Hypno-shroom made it fight for the plants.
+    /// Whether a Hypno-shroom made it fight for the plants. Setting it is enough: the zombie
+    /// turns around and is drawn purple.
     pub is_hypnotized: bool,
     pub is_eating: bool,
     /// Zombies drop an arm when they're badly hurt, and their head when they die.

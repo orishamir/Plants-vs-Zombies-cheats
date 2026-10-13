@@ -30,7 +30,7 @@ pub enum LawnMowerState {
     /// Rolling onto the lawn when the level starts.
     RollingIn = 0,
     Ready = 1,
-    /// Mowing down its row.
+    /// Mowing down its row. Setting a mower's state to this sets it off.
     Triggered = 2,
     Squished = 3,
 }
