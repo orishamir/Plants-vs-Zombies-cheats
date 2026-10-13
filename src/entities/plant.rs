@@ -1,8 +1,9 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use super::data_array::BoardObject;
+use super::potted_plant::PottedPlantControllerFields;
 use super::{Cell, GameObject, Health, Id, Position, Ticks, Zombie};
-use crate::il2cpp::{Enum, EnumWithNone, class_layout};
+use crate::il2cpp::{Enum, EnumWithNone, Ref, class_layout};
 
 /// A plant on the lawn.
 #[derive(Debug, Clone, PartialEq)]
@@ -205,6 +206,8 @@ class_layout! {
         is_imitation: bool = "mIsImitation",
         /// Only the Squash and the Tangle Kelp set it (`Plant.UpdateSquash`, `UpdateTanglekelp`).
         target_zombie_id: Option<Id<Zombie>> = "mTargetZombieID",
+        /// Only Zen Garden plants have one.
+        potted_plant_controller: Option<Ref<PottedPlantControllerFields>> = "PottedPlantController",
     }
 }
 
@@ -298,6 +301,7 @@ mod tests {
             is_asleep: false,
             is_imitation: false,
             target_zombie_id: None,
+            potted_plant_controller: None,
         };
         let chomper = PlantFields {
             id: test_id(2),
@@ -319,6 +323,7 @@ mod tests {
             is_asleep: true,
             is_imitation: true,
             target_zombie_id: Some(test_id(5)),
+            potted_plant_controller: None,
         };
         assert_round_trips::<Plant>(peashooter, chomper);
     }
