@@ -242,6 +242,16 @@ impl EnumWithNone for ScaryPotType {
     const NONE: i32 = 0;
 }
 
+impl From<VaseContent> for ScaryPotType {
+    fn from(content: VaseContent) -> Self {
+        match content {
+            VaseContent::Plant(_) => Self::Seed,
+            VaseContent::Zombie(_) => Self::Zombie,
+            VaseContent::Sun(_) => Self::Sun,
+        }
+    }
+}
+
 class_layout! {
     /// `Reloaded.Gameplay.GridItem`.
     pub struct GridItemFields = "Reloaded.Gameplay.GridItem" {
@@ -354,20 +364,13 @@ impl GameObject for GridItem {
             ),
             GridItemKind::Brain => (GridItemType::Brain, GridItemState::Normal),
             GridItemKind::Vase(vase) => {
-                fields.scary_pot_type = vase.content.map(|content| match content {
-                    VaseContent::Plant(plant) => {
-                        fields.seed_type = Some(plant);
-                        ScaryPotType::Seed
-                    }
-                    VaseContent::Zombie(zombie) => {
-                        fields.zombie_type = Some(zombie);
-                        ScaryPotType::Zombie
-                    }
-                    VaseContent::Sun(sun) => {
-                        fields.sun_count = sun;
-                        ScaryPotType::Sun
-                    }
-                });
+                match vase.content {
+                    Some(VaseContent::Plant(plant)) => fields.seed_type = Some(plant),
+                    Some(VaseContent::Zombie(zombie)) => fields.zombie_type = Some(zombie),
+                    Some(VaseContent::Sun(sun)) => fields.sun_count = sun,
+                    None => {}
+                }
+                fields.scary_pot_type = vase.content.map(ScaryPotType::from);
                 fields.highlighted = vase.is_highlighted;
                 fields.transparent_counter = vase.see_through;
                 (GridItemType::ScaryPot, GridItemState::from_kind(vase.kind))

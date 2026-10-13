@@ -70,12 +70,23 @@ pub(crate) struct ClassCache(Mutex<HashMap<Class, Arc<ClassInfo>>>);
 struct TypeBits(u32);
 
 impl TypeBits {
+    /// A field's `FIELD_ATTRIBUTE_*` flags.
     fn attributes(self) -> u16 {
         self.0 as u16
     }
 
     fn kind(self) -> TypeKind {
         TypeKind::from((self.0 >> 16) as u8)
+    }
+
+    /// Whether the field is `static`.
+    fn is_static(self) -> bool {
+        self.attributes() & runtime::type_::STATIC != 0
+    }
+
+    /// Whether the field is a `const`, which has no storage.
+    fn is_literal(self) -> bool {
+        self.attributes() & runtime::type_::LITERAL != 0
     }
 }
 
@@ -264,7 +275,7 @@ fn read_fields(
         let Ok(offset) = usize::try_from(offset) else {
             continue;
         };
-        if type_bits.attributes() & type_::LITERAL != 0 {
+        if type_bits.is_literal() {
             continue;
         }
 
@@ -274,7 +285,7 @@ fn read_fields(
             Field {
                 offset,
                 kind: type_bits.kind(),
-                is_static: type_bits.attributes() & type_::STATIC != 0,
+                is_static: type_bits.is_static(),
             },
         );
     }

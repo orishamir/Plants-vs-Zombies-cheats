@@ -64,15 +64,13 @@ impl Entity<Challenge> {
         let Some(eaten) = self.fields.beghouled_eaten else {
             return Ok(Vec::new());
         };
-        // `new bool[9, 6]` in `Challenge..ctor`: the columns, then the rows.
+        // `new bool[9, 6]` in `Challenge..ctor`: the columns, then the rows. Counting with
+        // `(0..).zip` instead of `enumerate` gives the `i32`s that `Cell` holds.
         let mut craters = Vec::new();
-        for (column, rows) in eaten.read_all(game)?.into_iter().enumerate() {
-            for (row, is_crater) in rows.into_iter().enumerate() {
+        for (column, rows) in (0..).zip(eaten.read_all(game)?) {
+            for (row, is_crater) in (0..).zip(rows) {
                 if is_crater {
-                    craters.push(Cell {
-                        row: row as i32,
-                        column: column as i32,
-                    });
+                    craters.push(Cell { row, column });
                 }
             }
         }
@@ -85,12 +83,10 @@ impl Entity<Challenge> {
             return Ok(Vec::new());
         };
         // One for each upgrade, in `BeghouledUpgrade`'s order.
-        Ok(purchased
-            .read_all(game)?
-            .into_iter()
-            .enumerate()
+        Ok((0..)
+            .zip(purchased.read_all(game)?)
             .filter(|&(_, is_purchased)| is_purchased)
-            .filter_map(|(upgrade, _)| BeghouledUpgrade::try_from(upgrade as i32).ok())
+            .filter_map(|(upgrade, _)| BeghouledUpgrade::try_from(upgrade).ok())
             .collect())
     }
 }
