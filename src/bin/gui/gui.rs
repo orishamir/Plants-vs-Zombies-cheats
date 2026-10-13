@@ -1,11 +1,68 @@
+use std::time::{Duration, Instant};
+
 use egui::{self, Checkbox, Color32, Frame, RichText, Ui};
 use log::{info, warn};
 use pvz_sdk::Popcapgame;
 use pvz_sdk::toggleables::{self, ToggleCheatError, Toggleable};
 
+/// How often to look for the game while it isn't running.
+const RETRY_INTERVAL: Duration = Duration::from_secs(1);
+
+#[derive(Default)]
 pub struct MyApp {
-    cheats: Vec<CheatRow>,
-    popcapgame: Popcapgame,
+    connection: Connection,
+}
+
+/// Whether the window is attached to the game yet.
+enum Connection {
+    /// The game isn't running, or couldn't be opened. Tried again every [`RETRY_INTERVAL`].
+    Waiting {
+        last_attempt: Option<Instant>,
+        /// Why the last attempt failed.
+        error: Option<String>,
+    },
+    Attached {
+        game: Popcapgame,
+        cheats: Vec<CheatRow>,
+    },
+}
+
+impl Default for Connection {
+    fn default() -> Self {
+        Self::Waiting {
+            last_attempt: None,
+            error: None,
+        }
+    }
+}
+
+impl Connection {
+    /// Attaches to the game if it's time to try again.
+    fn retry(&mut self) {
+        let Self::Waiting {
+            last_attempt,
+            error,
+        } = self
+        else {
+            return;
+        };
+        if last_attempt.is_some_and(|at| at.elapsed() < RETRY_INTERVAL) {
+            return;
+        }
+        *last_attempt = Some(Instant::now());
+
+        match Popcapgame::init() {
+            Ok(game) => {
+                info!("Attached to the game");
+                let cheats = toggleables::ALL
+                    .iter()
+                    .map(|cheat| CheatRow::new(cheat, &game))
+                    .collect();
+                *self = Self::Attached { game, cheats };
+            }
+            Err(attach_error) => *error = Some(attach_error.to_string()),
+        }
+    }
 }
 
 /// A cheat and its state, as one row in the window.
@@ -57,15 +114,13 @@ impl CheatRow {
     }
 }
 
-impl MyApp {
-    fn render_toggleables(&mut self, ui: &mut Ui) {
-        egui::Grid::new("id_salt").striped(true).show(ui, |ui| {
-            for cheat in &mut self.cheats {
-                cheat.show(ui, &self.popcapgame);
-                ui.end_row();
-            }
-        });
-    }
+fn render_toggleables(ui: &mut Ui, game: &Popcapgame, cheats: &mut [CheatRow]) {
+    egui::Grid::new("id_salt").striped(true).show(ui, |ui| {
+        for cheat in cheats {
+            cheat.show(ui, game);
+            ui.end_row();
+        }
+    });
 }
 
 impl eframe::App for MyApp {
@@ -73,9 +128,19 @@ impl eframe::App for MyApp {
         [0., 0., 0., 0.4]
     }
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        self.connection.retry();
         egui::Window::new(toggleables_header_font())
             .auto_sized()
-            .show(ui, |ui| self.render_toggleables(ui));
+            .show(ui, |ui| match &mut self.connection {
+                Connection::Attached { game, cheats } => render_toggleables(ui, game, cheats),
+                Connection::Waiting { error, .. } => {
+                    ui.label("Waiting for Plants vs. Zombies Replanted to start…");
+                    if let Some(error) = error {
+                        ui.weak(error.as_str());
+                    }
+                    ui.ctx().request_repaint_after(RETRY_INTERVAL);
+                }
+            });
 
         egui::CentralPanel::default()
             .frame(Frame::NONE)
@@ -91,18 +156,5 @@ impl eframe::App for MyApp {
                     ui.send_viewport_cmd(egui::ViewportCommand::StartDrag);
                 }
             });
-    }
-}
-
-impl Default for MyApp {
-    fn default() -> Self {
-        let popcapgame = Popcapgame::init().unwrap();
-
-        let cheats = toggleables::ALL
-            .iter()
-            .map(|cheat| CheatRow::new(cheat, &popcapgame))
-            .collect();
-
-        Self { cheats, popcapgame }
     }
 }
