@@ -45,7 +45,7 @@ pub enum Location {
 
 impl Location {
     /// The address this location is at in the running game.
-    pub fn resolve(self, game: &Game) -> Result<usize, MemoryError> {
+    pub(crate) fn resolve(self, game: &Game) -> Result<usize, MemoryError> {
         match self {
             Location::InDll { dll, offset } => Ok(game.dll_base(dll) + offset),
             Location::ThroughPointer {

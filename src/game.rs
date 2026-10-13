@@ -1,3 +1,5 @@
+//! The running game: attaching to it, and reading and writing its memory.
+
 use thiserror::Error;
 
 use crate::Dll;
@@ -55,6 +57,9 @@ macro_rules! impl_primitive {
 impl_primitive!(u8, u16, u32, u64, usize, i8, i16, i32, i64, f32, f64);
 
 /// The running game, and what's been learned about its classes so far.
+///
+/// Outside this crate, it's what [`Board::current`](crate::entities::Board::current) and the
+/// cheats read from and write to. Reading and writing at addresses stays inside the crate.
 #[derive(Debug)]
 pub struct Game {
     process: Process,
@@ -78,7 +83,7 @@ impl Game {
     }
 
     /// The address `dll` is loaded at in the game.
-    pub fn dll_base(&self, dll: Dll) -> usize {
+    pub(crate) fn dll_base(&self, dll: Dll) -> usize {
         match dll {
             Dll::GameAssembly => self.game_assembly,
             Dll::UnityPlayer => self.unity_player,
@@ -86,7 +91,7 @@ impl Game {
     }
 
     /// Reads `len` bytes at `address`.
-    pub fn read_memory(&self, address: usize, len: usize) -> Result<Vec<u8>, MemoryError> {
+    pub(crate) fn read_memory(&self, address: usize, len: usize) -> Result<Vec<u8>, MemoryError> {
         let mut buffer = vec![0; len];
         self.process
             .read(address, &mut buffer)
@@ -95,19 +100,19 @@ impl Game {
     }
 
     /// Reads the number at `address`.
-    pub fn read<T: Primitive>(&self, address: usize) -> Result<T, MemoryError> {
+    pub(crate) fn read<T: Primitive>(&self, address: usize) -> Result<T, MemoryError> {
         Ok(T::from_le_slice(
             &self.read_memory(address, size_of::<T>())?,
         ))
     }
 
     /// Reads the pointer stored at `address`.
-    pub fn read_pointer(&self, address: usize) -> Result<usize, MemoryError> {
+    pub(crate) fn read_pointer(&self, address: usize) -> Result<usize, MemoryError> {
         self.read(address)
     }
 
     /// Writes `bytes` at `address`.
-    pub fn write_memory(&self, address: usize, bytes: &[u8]) -> Result<(), MemoryError> {
+    pub(crate) fn write_memory(&self, address: usize, bytes: &[u8]) -> Result<(), MemoryError> {
         self.process
             .write(address, bytes)
             .map_err(|_| MemoryError::Write {
