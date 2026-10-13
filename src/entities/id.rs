@@ -15,8 +15,8 @@ use crate::il2cpp::{DecodeError, FieldValue, TypeKind};
 ///
 /// ```no_run
 /// # use pvz_sdk::{Popcapgame, entities::Board};
-/// # fn main() -> Result<(), pvz_sdk::il2cpp::ObjectError> {
-/// # let game = Popcapgame::init().expect("the game is running");
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// # let game = Popcapgame::init()?;
 /// # let board = Board::current(&game)?.expect("in a level");
 /// let plants = board.plants(&game)?;
 /// for zombie in board.zombies(&game)? {

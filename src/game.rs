@@ -1,8 +1,8 @@
-use proc_mem::{Module, ProcMemError, Process};
 use thiserror::Error;
 
 use crate::Dll;
 use crate::il2cpp::ClassCache;
+use crate::process::{AttachError, Process};
 use windows::Win32::{
     Foundation::{HWND, RECT},
     UI::WindowsAndMessaging,
@@ -61,21 +61,22 @@ impl_primitive!(u8, u16, u32, u64, usize, i8, i16, i32, i64, f32, f64);
 /// The running game, and what's been learned about its classes so far.
 #[derive(Debug)]
 pub struct Popcapgame {
-    proc: Process,
-    game_assembly: Module,
-    unity_player: Module,
+    process: Process,
+    /// Where `GameAssembly.dll` is loaded in the game.
+    game_assembly: usize,
+    /// Where `UnityPlayer.dll` is loaded in the game.
+    unity_player: usize,
     classes: ClassCache,
 }
 
 impl Popcapgame {
-    pub fn init() -> Result<Self, ProcMemError> {
-        let proc = Process::with_name("Replanted.exe")?;
-        let game_assembly = proc.module(Dll::GameAssembly.file_name())?;
-        let unity_player = proc.module(Dll::UnityPlayer.file_name())?;
+    /// Opens the running game.
+    pub fn init() -> Result<Self, AttachError> {
+        let process = Process::open("Replanted.exe")?;
         Ok(Self {
-            proc,
-            game_assembly,
-            unity_player,
+            game_assembly: process.module_base(Dll::GameAssembly.file_name())?,
+            unity_player: process.module_base(Dll::UnityPlayer.file_name())?,
+            process,
             classes: ClassCache::default(),
         })
     }
@@ -85,7 +86,7 @@ impl Popcapgame {
 
         unsafe {
             let _ = WindowsAndMessaging::GetWindowRect(
-                main_window_by_pid(self.proc.process_id)?,
+                main_window_by_pid(self.process.id())?,
                 &mut rect,
             );
         }
@@ -96,18 +97,18 @@ impl Popcapgame {
     /// The address `dll` is loaded at in the game.
     pub fn dll_base(&self, dll: Dll) -> usize {
         match dll {
-            Dll::GameAssembly => self.game_assembly.base_address(),
-            Dll::UnityPlayer => self.unity_player.base_address(),
+            Dll::GameAssembly => self.game_assembly,
+            Dll::UnityPlayer => self.unity_player,
         }
     }
 
     /// Reads `len` bytes at `address`.
     pub fn read_memory(&self, address: usize, len: usize) -> Result<Vec<u8>, MemoryError> {
-        let mut buf = vec![0; len];
-        self.proc
-            .read_bytes(address, buf.as_mut_ptr(), len)
-            .then_some(buf)
-            .ok_or(MemoryError::Read { address, len })
+        let mut buffer = vec![0; len];
+        self.process
+            .read(address, &mut buffer)
+            .map(|()| buffer)
+            .map_err(|_| MemoryError::Read { address, len })
     }
 
     /// Reads the number at `address`.
@@ -124,12 +125,9 @@ impl Popcapgame {
 
     /// Writes `bytes` at `address`.
     pub fn write_memory(&self, address: usize, bytes: &[u8]) -> Result<(), MemoryError> {
-        // `proc_mem` asks for a mutable pointer, although it only reads from it.
-        let mut buf = bytes.to_vec();
-        self.proc
-            .write_bytes(address, buf.as_mut_ptr(), buf.len())
-            .then_some(())
-            .ok_or(MemoryError::Write {
+        self.process
+            .write(address, bytes)
+            .map_err(|_| MemoryError::Write {
                 address,
                 len: bytes.len(),
             })

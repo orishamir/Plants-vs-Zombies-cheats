@@ -31,8 +31,8 @@ pub trait GameObject: Sized {
 ///
 /// ```no_run
 /// # use pvz_sdk::{Popcapgame, entities::Board};
-/// # fn main() -> Result<(), pvz_sdk::il2cpp::ObjectError> {
-/// let game = Popcapgame::init().expect("the game is running");
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// let game = Popcapgame::init()?;
 /// if let Some(board) = Board::current(&game)? {
 ///     for mut zombie in board.zombies(&game)? {
 ///         zombie.is_hypnotized = true;
