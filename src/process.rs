@@ -71,10 +71,6 @@ impl Process {
         Ok(Self { name, id, handle })
     }
 
-    pub fn id(&self) -> u32 {
-        self.id
-    }
-
     /// Where the module named `module`, like `GameAssembly.dll`, is loaded in the process.
     pub fn module_base(&self, module: &'static str) -> Result<usize, AttachError> {
         let snapshot = snapshot(
