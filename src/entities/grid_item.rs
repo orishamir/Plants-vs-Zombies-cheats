@@ -93,7 +93,8 @@ pub enum VaseKind {
 pub enum VaseContent {
     Plant(PlantType),
     Zombie(ZombieType),
-    /// How much sun.
+    /// How many suns come out, each worth 25 (`Challenge.ScaryPotterOpenPot` adds a sun for
+    /// each).
     Sun(i32),
 }
 
