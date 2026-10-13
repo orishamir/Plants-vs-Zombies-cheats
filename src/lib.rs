@@ -1,5 +1,12 @@
-pub mod pvz_sdk;
+pub mod entities;
+pub(crate) mod game;
+pub mod il2cpp;
+mod location;
+pub mod toggleables;
 
-// Re-export the whole modules at the root:
-#[doc(inline)]
-pub use pvz_sdk::*;
+pub use game::{MemoryError, Popcapgame};
+pub use location::{Dll, Location};
+
+pub mod traits {
+    pub use super::toggleables::{ToggleCheatError, Toggleable};
+}

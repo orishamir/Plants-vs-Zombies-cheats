@@ -20,7 +20,7 @@ Implementing a new cheat must be easy. A cheat should describe *what* it changes
 
 Everything needed to understand or redo a piece of reverse engineering lives in this repository, not in someone's head or a temp folder.
 
-- Each cheat documents what it patches: the game method, what the code there does, and the instruction behind each patch's bytes, as in `src/pvz_sdk/toggleables/`. After a game update, someone should be able to find the patch again from the cheat's file alone.
+- Each cheat documents what it patches: the game method, what the code there does, and the instruction behind each patch's bytes, as in `src/toggleables/`. After a game update, someone should be able to find the patch again from the cheat's file alone.
 - Reverse-engineering tooling and artifacts (scanners, scripts, Ghidra headers, ReClass.NET files) live in their own clearly separated place. They don't leak into the SDK or the cheats.
 - Don't commit the game's own files (DLLs, `global-metadata.dat`, full dumps). The work should be reproducible from a game install.
 
@@ -44,7 +44,7 @@ Padding, pointer width and raw integer values belong only in the lower layers.
 
 ## Layout
 
-- `src/pvz_sdk/` is the library crate `pvz_sdk`:
+- `src/` is the library crate `pvz_sdk` (`lib.rs`), next to the binaries in `src/bin/`:
   - `game.rs`: `Popcapgame` attaches to `Replanted.exe` and reads and writes its memory (layer 1).
   - `il2cpp/`: reads the game's C# objects, finding classes and fields by name (layer 2). `class_layout!` declares which fields to read from a class, and `runtime.rs` has the only hard-coded offsets, those of IL2CPP's own structs.
   - `location.rs`: `Dll` and `Location`, which say where something is in the game's memory independently of where Windows loaded the DLLs.

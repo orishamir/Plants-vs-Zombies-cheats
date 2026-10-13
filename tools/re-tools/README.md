@@ -46,7 +46,7 @@ Run from the repository root with `cargo run -p re-tools --release -- <command>`
 
 ## Finding a cheat's patch after a game update
 
-Each cheat's file in `src/pvz_sdk/toggleables/` names the method it patches and lists every patch's location, original bytes and patched bytes, with the instructions they encode.
+Each cheat's file in `src/toggleables/` names the method it patches and lists every patch's location, original bytes and patched bytes, with the instructions they encode.
 
 1. **See what broke:** `check`. Every patch marked `BROKEN` needs a new offset. Patches marked `skip` are values in the running game's memory, which `check` can't read; they only change when the engine (`UnityPlayer.dll`) is updated.
 2. **Search for the original bytes:** `find "<original bytes>"`. A single match inside the method the cheat names is the new offset.
@@ -58,7 +58,7 @@ Each cheat's file in `src/pvz_sdk/toggleables/` names the method it patches and 
 
 ## Keeping the entities working after a game update
 
-The entities (`src/pvz_sdk/entities/`) find each field by its C# name in the running game, so they don't break when an update moves fields. Two things can still go stale:
+The entities (`src/entities/`) find each field by its C# name in the running game, so they don't break when an update moves fields. Two things can still go stale:
 
 - **The global they start from.** `entities::ROOT_MODEL` (in `entities/board.rs`) is the address of `Tekly.DataModels.Models.RootModel_TypeInfo`, which changes with every build. After regenerating the IL2CPP dump, `check` prints its new address.
 - **Renamed fields.** Reading an entity then fails with the class and field it can't find, like `Reloaded.Gameplay.Plant has no field named mPlantHealth`. Look for the field's new name in that class in `il2cpp-dump/dump.cs`, and change it in the entity's `class_layout!`.
