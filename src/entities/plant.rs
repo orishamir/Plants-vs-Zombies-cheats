@@ -1,7 +1,7 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use super::data_array::BoardObject;
-use super::{Cell, GameObject, Health, Id, Position, Ticks};
+use super::{Cell, GameObject, Health, Id, Position, Ticks, Zombie};
 use crate::il2cpp::{Enum, EnumWithNone, class_layout};
 
 /// A plant on the lawn.
@@ -33,6 +33,8 @@ pub struct Plant {
     pub imitater_type: Option<PlantType>,
     /// Whether an Imitater turned into this plant, which makes it gray.
     pub is_imitation: bool,
+    /// The zombie a Squash is about to squash, or that a Tangle Kelp grabbed.
+    pub target_zombie: Option<Id<Zombie>>,
 }
 
 /// The game's `SeedType`, without the seed packets that aren't plants (see
@@ -201,6 +203,8 @@ class_layout! {
         dead: bool = "mDead",
         is_asleep: bool = "mIsAsleep",
         is_imitation: bool = "mIsImitation",
+        /// Only the Squash and the Tangle Kelp set it (`Plant.UpdateSquash`, `UpdateTanglekelp`).
+        target_zombie_id: Option<Id<Zombie>> = "mTargetZombieID",
     }
 }
 
@@ -231,6 +235,7 @@ impl GameObject for Plant {
             grabbed_by_bungee: fields.on_bungee_state,
             imitater_type: fields.imitater_type,
             is_imitation: fields.is_imitation,
+            target_zombie: fields.target_zombie_id,
         })
     }
 
@@ -251,6 +256,7 @@ impl GameObject for Plant {
         fields.on_bungee_state = self.grabbed_by_bungee;
         fields.imitater_type = self.imitater_type;
         fields.is_imitation = self.is_imitation;
+        fields.target_zombie_id = self.target_zombie;
     }
 }
 
@@ -291,6 +297,7 @@ mod tests {
             dead: false,
             is_asleep: false,
             is_imitation: false,
+            target_zombie_id: None,
         };
         let chomper = PlantFields {
             id: test_id(2),
@@ -311,6 +318,7 @@ mod tests {
             dead: true,
             is_asleep: true,
             is_imitation: true,
+            target_zombie_id: Some(test_id(5)),
         };
         assert_round_trips::<Plant>(peashooter, chomper);
     }

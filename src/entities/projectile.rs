@@ -1,7 +1,7 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use super::data_array::BoardObject;
-use super::{GameObject, Id, Position, Ticks};
+use super::{GameObject, Id, Position, Ticks, Zombie};
 use crate::il2cpp::{Enum, class_layout};
 
 /// Something a plant shot or threw, like a pea or a cabbage.
@@ -14,6 +14,8 @@ pub struct Projectile {
     pub position: Position,
     /// How long ago it was shot.
     pub age: Ticks,
+    /// The zombie a Cattail's spike is homing in on.
+    pub target_zombie: Option<Id<Zombie>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, IntoPrimitive)]
@@ -79,6 +81,8 @@ class_layout! {
         motion: ProjectileMotion = "mMotionType",
         projectile_type: ProjectileType = "mProjectileType",
         age: i32 = "mProjectileAge",
+        /// Only a Cattail's spikes have one (`Plant.Fire`).
+        target_zombie_id: Option<Id<Zombie>> = "mTargetZombieID",
     }
 }
 
@@ -95,6 +99,7 @@ impl GameObject for Projectile {
                 y: fields.y,
             },
             age: Ticks(fields.age),
+            target_zombie: fields.target_zombie_id,
         })
     }
 
@@ -105,6 +110,7 @@ impl GameObject for Projectile {
         fields.x = self.position.x;
         fields.y = self.position.y;
         fields.age = self.age.0;
+        fields.target_zombie_id = self.target_zombie;
     }
 }
 
@@ -135,6 +141,7 @@ mod tests {
             motion: ProjectileMotion::Straight,
             projectile_type: ProjectileType::Pea,
             age: 5,
+            target_zombie_id: None,
         };
         let cabbage = ProjectileFields {
             id: test_id(2),
@@ -145,6 +152,7 @@ mod tests {
             motion: ProjectileMotion::Lobbed,
             projectile_type: ProjectileType::Cabbage,
             age: 50,
+            target_zombie_id: Some(test_id(9)),
         };
         assert_round_trips::<Projectile>(pea, cabbage);
     }
