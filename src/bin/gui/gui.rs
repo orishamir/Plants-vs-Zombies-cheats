@@ -86,7 +86,7 @@ fn togglecheat_font(name: &'static str) -> RichText {
 
 impl CheatRow {
     fn new(cheat: &'static dyn Toggleable, game: &Game) -> Self {
-        let state = cheat.is_activated(game);
+        let state = cheat.is_active(game);
         if let Err(error) = &state {
             warn!("{} can't be used: {error}", cheat.name());
         }
@@ -96,10 +96,10 @@ impl CheatRow {
     fn show(&mut self, ui: &mut Ui, game: &Game) {
         let label = togglecheat_font(self.cheat.name());
         match &mut self.state {
-            Ok(toggled) => {
-                if ui.checkbox(toggled, label).changed() {
-                    info!("Detected change in {} to {toggled}", self.cheat.name());
-                    if let Err(error) = self.cheat.toggle(game, *toggled) {
+            Ok(active) => {
+                if ui.checkbox(active, label).changed() {
+                    info!("Detected change in {} to {active}", self.cheat.name());
+                    if let Err(error) = self.cheat.set_active(game, *active) {
                         warn!("Couldn't toggle {}: {error}", self.cheat.name());
                         self.state = Err(error);
                     }

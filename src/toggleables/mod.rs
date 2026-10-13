@@ -13,7 +13,7 @@ mod no_pause;
 mod patch;
 mod plant_anywhere;
 mod seethrough_vases;
-mod traits;
+mod toggleable;
 
 pub use auto_pickup_sun::AUTO_PICKUP_SUN;
 pub use free_plants::FREE_PLANTS;
@@ -25,7 +25,7 @@ pub use no_pause::NO_PAUSE;
 pub use patch::{Patch, PatchCheat};
 pub use plant_anywhere::PLANT_ANYWHERE;
 pub use seethrough_vases::SEETHROUGH_VASES;
-pub use traits::{ToggleCheatError, Toggleable};
+pub use toggleable::{ToggleCheatError, Toggleable};
 
 /// Every cheat, in the order the GUI shows them.
 pub const ALL: &[PatchCheat] = &[

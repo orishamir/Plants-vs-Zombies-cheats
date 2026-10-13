@@ -8,7 +8,3 @@ pub mod toggleables;
 pub use game::{Game, MemoryError};
 pub use location::{Dll, Location};
 pub use process::AttachError;
-
-pub mod traits {
-    pub use super::toggleables::{ToggleCheatError, Toggleable};
-}

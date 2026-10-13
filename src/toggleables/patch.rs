@@ -80,7 +80,7 @@ impl Toggleable for PatchCheat {
     }
 
     /// The cheat is on only when every one of its patches is in place.
-    fn is_activated(&self, game: &Game) -> Result<bool, ToggleCheatError> {
+    fn is_active(&self, game: &Game) -> Result<bool, ToggleCheatError> {
         let states = self
             .patches
             .iter()

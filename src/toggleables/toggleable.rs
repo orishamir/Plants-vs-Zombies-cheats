@@ -6,10 +6,12 @@ use crate::{Game, Location, MemoryError};
 pub trait Toggleable {
     fn activate(&self, game: &Game) -> Result<(), ToggleCheatError>;
     fn deactivate(&self, game: &Game) -> Result<(), ToggleCheatError>;
-    fn is_activated(&self, game: &Game) -> Result<bool, ToggleCheatError>;
+    fn is_active(&self, game: &Game) -> Result<bool, ToggleCheatError>;
     fn name(&self) -> &'static str;
-    fn toggle(&self, game: &Game, toggled: bool) -> Result<(), ToggleCheatError> {
-        if toggled {
+
+    /// Turns the cheat on or off.
+    fn set_active(&self, game: &Game, active: bool) -> Result<(), ToggleCheatError> {
+        if active {
             self.activate(game)
         } else {
             self.deactivate(game)
