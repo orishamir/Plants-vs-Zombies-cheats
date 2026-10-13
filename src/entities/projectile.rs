@@ -31,7 +31,7 @@ pub enum ProjectileType {
     /// A pea that went through a Torchwood.
     FlamingPea = 6, // Fireball
     Star = 7,
-    /// A Cactus's spike.
+    /// A Cactus's or a Cattail's spike.
     Spike = 8,
     /// What a Catapult Zombie throws.
     Basketball = 9,
