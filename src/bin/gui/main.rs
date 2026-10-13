@@ -3,7 +3,7 @@ mod gui;
 
 use eframe::NativeOptions;
 use egui::{self, ViewportBuilder};
-use gui::MyApp;
+use gui::CheatsApp;
 
 fn main() -> eframe::Result {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -17,8 +17,8 @@ fn main() -> eframe::Result {
         ..Default::default()
     };
     eframe::run_native(
-        "My egui App",
+        "pvz-cheats",
         options,
-        Box::new(|_| Ok(Box::<MyApp>::default())),
+        Box::new(|_| Ok(Box::<CheatsApp>::default())),
     )
 }

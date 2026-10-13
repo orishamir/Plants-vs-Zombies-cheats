@@ -26,7 +26,7 @@ Run from the repository root with `cargo run -p re-tools --release -- <command>`
 
 | Command | What it does |
 |---|---|
-| `check` | Checks every cheat's patches against the game's DLLs and lists the ones that no longer match. |
+| `check` | Checks every cheat's patches against the game's DLLs and lists the ones that no longer match. Also checks that the global the entities are read from, `RootModel_TypeInfo`, is where `script.json` says. |
 | `snapshot` | Copies the game's DLLs and metadata into `game-versions/<Steam build ID>/`, and downloads the engine's PDB into `symbols/` (both gitignored). Steam overwrites the game's files when it updates, so run it whenever you start working on a new build. |
 | `find "83 AB 8C000000 04"` | Finds a byte pattern in the code. `??` matches any byte. Accepts `--from` and `--to` to limit the range. |
 | `text "runInBackground"` | Finds a text string anywhere in the DLL. |
@@ -34,7 +34,7 @@ Run from the repository root with `cargo run -p re-tools --release -- <command>`
 | `where 6F10D6` | Names the function that contains each address. |
 | `callers 695DC0` | Lists the `call`s and `jmp`s that go to an address, such as a function's start. |
 | `refs 1C61298` | Lists the code and pointers that refer to an address, such as a string or a global variable. |
-| `names 'Coin$$'` | Lists the names that contain some text, with their addresses. |
+| `names 'Coin$$'` | Lists the names that contain some text, with their addresses. These include IL2CPP's globals, like `Reloaded.Gameplay.Board_TypeInfo`. |
 | `bytes 6F10D6 7` | Prints the bytes at an address. |
 
 - `--dll` picks the DLL to inspect. It defaults to `GameAssembly.dll` in the standard Steam install, and `--dll ".../UnityPlayer.dll"` inspects the engine instead. `check` reads every DLL it needs from the same folder.
@@ -46,7 +46,7 @@ Run from the repository root with `cargo run -p re-tools --release -- <command>`
 
 ## Finding a cheat's patch after a game update
 
-Each cheat's file in `src/pvz_sdk/toggleables/` names the method it patches and lists every patch's location, original bytes and patched bytes, with the instructions they encode.
+Each cheat's file in `src/toggleables/` names the method it patches and lists every patch's location, original bytes and patched bytes, with the instructions they encode.
 
 1. **See what broke:** `check`. Every patch marked `BROKEN` needs a new offset. Patches marked `skip` are values in the running game's memory, which `check` can't read; they only change when the engine (`UnityPlayer.dll`) is updated.
 2. **Search for the original bytes:** `find "<original bytes>"`. A single match inside the method the cheat names is the new offset.
@@ -55,6 +55,15 @@ Each cheat's file in `src/pvz_sdk/toggleables/` names the method it patches and 
    - Short jumps can get a different distance, which changes their second byte.
    - The compiler can copy a small method into its callers. If `callers` finds nothing for a method, look for its code inside the methods that used to call it.
 4. **Update the cheat:** the patch's location, its `original` bytes if the encoding changed, and the comments. Then run `check` again.
+
+## Keeping the entities working after a game update
+
+The entities (`src/entities/`) find each field by its C# name in the running game, so they don't break when an update moves fields. Two things can still go stale:
+
+- **The global they start from.** `entities::ROOT_MODEL` (in `entities/board.rs`) is the address of `Tekly.DataModels.Models.RootModel_TypeInfo`, which changes with every build. After regenerating the IL2CPP dump, `check` prints its new address.
+- **Renamed fields.** Reading an entity then fails with the class and field it can't find, like `Reloaded.Gameplay.Plant has no field named mPlantHealth`. Look for the field's new name in that class in `il2cpp-dump/dump.cs`, and change it in the entity's `class_layout!`.
+
+`cargo run --bin testing` prints everything in the level being played, which shows whether the entities read correctly.
 
 ## Finding things in the engine (`UnityPlayer.dll`)
 

@@ -20,7 +20,7 @@ Implementing a new cheat must be easy. A cheat should describe *what* it changes
 
 Everything needed to understand or redo a piece of reverse engineering lives in this repository, not in someone's head or a temp folder.
 
-- Each cheat documents what it patches: the game method, what the code there does, and the instruction behind each patch's bytes, as in `src/pvz_sdk/toggleables/`. After a game update, someone should be able to find the patch again from the cheat's file alone.
+- Each cheat documents what it patches: the game method, what the code there does, and the instruction behind each patch's bytes, as in `src/toggleables/`. After a game update, someone should be able to find the patch again from the cheat's file alone.
 - Reverse-engineering tooling and artifacts (scanners, scripts, Ghidra headers, ReClass.NET files) live in their own clearly separated place. They don't leak into the SDK or the cheats.
 - Don't commit the game's own files (DLLs, `global-metadata.dat`, full dumps). The work should be reproducible from a game install.
 
@@ -40,15 +40,17 @@ Padding, pointer width and raw integer values belong only in the lower layers.
 
 - The game is 64-bit Unity with IL2CPP. Its logic lives in `GameAssembly.dll` and the engine in `UnityPlayer.dll`. A `Patch` has a `Location`: either an offset into one of those DLLs (`Dll::GameAssembly.at(0x665DE0)`), or a field of an object reached through a pointer stored in one.
 - Game updates move code, so offsets go stale. A patch refuses to write when the game's bytes aren't the ones it expects, and `re-tools check` lists the patches that no longer match. `tools/re-tools/README.md` describes how to find a patch again.
-- Some code predates the move from the original 32-bit PvZ (`popcapgame1.exe`) and still uses its memory layout: the entity readers and writers, and the `testing` binary. They don't work against Replanted yet.
+- Entities don't use offsets: `il2cpp/` reads IL2CPP's own class metadata in the running game, so fields are found by their C# names (`Plant.mPlantHealth`), as Il2CppDumper's `dump.cs` shows them. They keep working across game updates unless the game renames a field, and then reading fails with the field's name. The one address they need is `entities::ROOT_MODEL`, which `re-tools check` checks against the dump.
 
 ## Layout
 
-- `src/pvz_sdk/` is the library crate `pvz_sdk`:
-  - `game.rs`: `Popcapgame` attaches to `Replanted.exe` and reads and writes its memory.
+- `src/` is the library crate `pvz_sdk` (`lib.rs`), next to the binaries in `src/bin/`:
+  - `game.rs`: `Game` attaches to `Replanted.exe` and reads and writes its memory (layer 1).
+  - `process.rs`: opening a process and reading and writing its memory, through Windows' API.
+  - `il2cpp/`: reads the game's C# objects, finding classes and fields by name (layer 2). `class_layout!` declares which fields to read from a class, and `runtime.rs` has the only hard-coded offsets, those of IL2CPP's own structs.
   - `location.rs`: `Dll` and `Location`, which say where something is in the game's memory independently of where Windows loaded the DLLs.
   - `toggleables/`: the cheats, one per file. Each is a `PatchCheat` constant (a name and its `Patch`es) listed in `toggleables::ALL`, which the GUI and `re-tools check` read. `patch.rs` holds the shared logic: checking, applying and reverting patches.
-  - `entities/`, `readers/`, `writers/`, `offsets.rs`: game entities and how they're read from and written to memory.
+  - `entities/`: the game's objects as Rust types (layer 3), one file each: the domain type at the top, and the class's fields (its `class_layout!`) and the conversion between them at the bottom. `Board::current` is where reading starts, and an `Entity<T>` writes back only the fields that changed.
 - `src/bin/gui/`: the egui window that lists the cheats (the default binary).
 - `src/bin/testing/`: prints the entities read from the running game.
 - `tools/re-tools/`: a command-line tool (a separate crate in the workspace) for finding and inspecting patches in the game's DLLs. Its README covers the reverse-engineering workflow.
@@ -58,7 +60,6 @@ Padding, pointer width and raw integer values belong only in the lower layers.
   - `game-versions/<Steam build ID>/`: copies of the game's DLLs and metadata, made by `re-tools snapshot`.
   - `symbols/`: the engine's PDB from Unity's symbol server, downloaded by `re-tools snapshot` and laid out like a symbol server (`<name>/<GUID+age>/<name>`).
   - `ghidra-project/`: the Ghidra project made by `pvz_ghidra.py import`.
-- `ghidra-structs/`, `entities-replanted.rcnet`: reverse-engineering artifacts (Ghidra headers and a ReClass.NET project).
 
 ## Commands
 

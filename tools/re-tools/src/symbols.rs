@@ -1,5 +1,5 @@
-//! Names for addresses in a DLL: the game's C# methods from Il2CppDumper, or the engine's C++
-//! functions and globals from its PDB.
+//! Names for addresses in a DLL: the game's C# methods and IL2CPP's globals from Il2CppDumper,
+//! or the engine's C++ functions and globals from its PDB.
 
 use std::fs::File;
 use std::path::Path;
@@ -16,7 +16,8 @@ pub struct Symbols(Vec<Symbol>);
 
 pub struct Symbol {
     pub start: Rva,
-    /// For the game's code, Il2CppDumper's `Class$$Method`, like `Plant$$UpdateChomper`. For
+    /// For the game's code, Il2CppDumper's `Class$$Method`, like `Plant$$UpdateChomper`, or the
+    /// name of one of IL2CPP's globals, like `Reloaded.Gameplay.Board_TypeInfo`. For
     /// the engine, the C++ name, like `GetPlayerShouldRunInBackground`.
     pub name: String,
 }
@@ -25,11 +26,15 @@ pub struct Symbol {
 #[derive(Deserialize)]
 struct Script {
     #[serde(rename = "ScriptMethod")]
-    methods: Vec<ScriptMethod>,
+    methods: Vec<ScriptEntry>,
+    /// IL2CPP's globals, like the `<class>_TypeInfo`s that point to classes.
+    #[serde(rename = "ScriptMetadata")]
+    metadata: Vec<ScriptEntry>,
 }
 
+/// A named address.
 #[derive(Deserialize)]
-struct ScriptMethod {
+struct ScriptEntry {
     #[serde(rename = "Address")]
     address: u32,
     #[serde(rename = "Name")]
@@ -37,7 +42,8 @@ struct ScriptMethod {
 }
 
 impl Symbols {
-    /// The game's methods, from `script.json` in an Il2CppDumper output directory.
+    /// The game's methods and IL2CPP's globals, from `script.json` in an Il2CppDumper output
+    /// directory.
     pub fn from_il2cpp_dump(dump_dir: &Path) -> Result<Self> {
         let path = dump_dir.join("script.json");
         let json = std::fs::read_to_string(&path).with_context(|| {
@@ -52,10 +58,11 @@ impl Symbols {
         let symbols = script
             .methods
             .into_iter()
-            .filter(|method| method.address != 0)
-            .map(|method| Symbol {
-                start: Rva(method.address),
-                name: method.name,
+            .chain(script.metadata)
+            .filter(|entry| entry.address != 0)
+            .map(|entry| Symbol {
+                start: Rva(entry.address),
+                name: entry.name,
             })
             .collect();
         Ok(Self::sorted(symbols))
@@ -127,6 +134,14 @@ impl Symbols {
     /// The symbol that starts exactly at `rva`, e.g. the target of a `call`.
     pub fn starting_at(&self, rva: Rva) -> Option<&Symbol> {
         self.containing(rva).filter(|symbol| symbol.start == rva)
+    }
+
+    /// Where the symbol named exactly `name` is.
+    pub fn address_of(&self, name: &str) -> Option<Rva> {
+        self.0
+            .iter()
+            .find(|symbol| symbol.name == name)
+            .map(|symbol| symbol.start)
     }
 
     /// Symbols whose name contains `query`.
